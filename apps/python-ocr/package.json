@@ -1,0 +1,7 @@
+{
+  "name": "python-ocr",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "uv run pyinstaller --onefile fanyi_ocr.py"
+  }
+}

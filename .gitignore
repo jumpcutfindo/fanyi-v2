@@ -1,0 +1,27 @@
+# Node.js
+# ========================
+# Ignores all node_modules directories, no matter where they are.
+**/node_modules
+# Ignores pnpm-lock file for individual packages
+**/pnpm-lock.yaml
+
+# Build artifacts
+dist
+out
+build
+coverage
+
+# Editor and IDE
+# ========================
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs and temporary files
+# ========================
+npm-debug.log*
+yarn-debug.log*
+.env
+.env.local
+.cache
