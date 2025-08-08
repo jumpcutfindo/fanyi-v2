@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "pnpm run build:ocr && pnpm run dev:electron",
     "dev:electron": "pnpm --filter electron-app dev",
-    "build:electron": "pnpm --filter electron-app build",
+    "build": "pnpm --filter electron-app build",
     "build:ocr": "pnpm --filter python-ocr build"
   },
   "devDependencies": {

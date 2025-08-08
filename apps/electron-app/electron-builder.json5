@@ -15,6 +15,10 @@
     {
       "from": "../python-ocr/dist/fanyi_ocr",
       "to": "."
+    },
+    {
+      "from": "../python-ocr/dist/fanyi_ocr.exe",
+      "to": "."
     }
   ],
   "mac": {
