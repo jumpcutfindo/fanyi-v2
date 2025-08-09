@@ -8,6 +8,7 @@ dependencies = [
     "easyocr>=1.7.2",
     "jieba>=0.42.1",
     "pillow>=11.3.0",
+    "ruff>=0.12.8",
 ]
 
 [dependency-groups]
