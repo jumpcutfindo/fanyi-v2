@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "uv run pyinstaller --onefile fanyi_ocr.py",
+    "build:conditional": "git diff --name-only | findstr /R \"fanyi_ocr.py\" >nul && pnpm run build || echo \"No changes found for 'fanyi_ocr.py', skipping build.\"",
     "lint": "ruff check",
     "format": "ruff check --fix"
   }
