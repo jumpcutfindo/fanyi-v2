@@ -1,3 +1,8 @@
+/**
+ * Note: If VSCode is not showing some eslint errors as expected, you
+ * may need to follow https://stackoverflow.com/a/59856092 to fix
+ */
+
 module.exports = {
   root: true,
   env: {
@@ -59,7 +64,10 @@ module.exports = {
     },
     'import/resolver': {
       typescript: {
-        project: '.',
+        alwaysTryTypes: true,
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
   },
