@@ -12,7 +12,10 @@ module.exports = {
   endOfLine: 'crlf',
 
   // Since prettier 3.0, manually specifying plugins is required
-  plugins: ['@ianvs/prettier-plugin-sort-imports'],
+  plugins: [
+    '@ianvs/prettier-plugin-sort-imports',
+    'prettier-plugin-tailwindcss',
+  ],
   // This plugin's options
   importOrder: [
     '^@main/(.*)$',
