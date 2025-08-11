@@ -24,4 +24,8 @@ declare namespace NodeJS {
 // Used in Renderer process, expose in `preload.ts`
 interface Window {
   ipcRenderer: import('electron').IpcRenderer;
+  api: {
+    screenshot: () => Promise<Buffer>;
+    performOcr: (imageData: Buffer) => Promise<string>;
+  };
 }

@@ -1,7 +1,7 @@
-import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { app, BrowserWindow, desktopCapturer, ipcMain } from 'electron';
+import { app, BrowserWindow } from 'electron';
+import { registerIpcHandlers } from '@main/ipc';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -68,4 +68,7 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  registerIpcHandlers();
+  createWindow();
+});
