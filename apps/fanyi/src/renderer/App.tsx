@@ -8,6 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@renderer/components/ui/Select';
+import { ScreenshotSettings } from '@renderer/features/screenshot/components/ScreenshotSettings';
 
 function App() {
   const [imageString, setImageString] = useState('');
@@ -33,6 +34,7 @@ function App() {
   return (
     <div className="flex h-full flex-row">
       <div className="flex w-72 flex-col gap-4 p-4">
+        <ScreenshotSettings />
         <div className="flex flex-col gap-2">
           <Label>Presets</Label>
           <Select>

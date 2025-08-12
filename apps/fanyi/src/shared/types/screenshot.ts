@@ -1,17 +1,24 @@
+export type ScreenshotSourceType = 'screen' | 'window';
+
 export interface ScreenshotSource {
-  type: 'screen' | 'window';
+  type: ScreenshotSourceType;
   id: string;
   name: string;
 }
 
 type BaseScreenshotOptions = {
-  type: 'screen' | 'window';
   id: string;
 };
 
+interface ScreenScreenshotOptions extends BaseScreenshotOptions {
+  type: 'screen';
+  preset: unknown; // TODO: Implement preset system
+}
+
+interface WindowScreenshotOptions extends BaseScreenshotOptions {
+  type: 'window';
+}
+
 export type ScreenshotOptions =
-  | (BaseScreenshotOptions & {
-      type: 'screen';
-      preset: unknown; // TODO: Implement preset system
-    })
-  | (BaseScreenshotOptions & { type: 'window' });
+  | ScreenScreenshotOptions
+  | WindowScreenshotOptions;
