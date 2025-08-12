@@ -23,6 +23,5 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
 contextBridge.exposeInMainWorld('api', {
   screenshot: (): Promise<Buffer> => ipcRenderer.invoke('screenshot'),
-  performOcr: (imageData: Buffer): Promise<string> =>
-    ipcRenderer.invoke('perform-ocr', imageData),
+  performOcr: (): Promise<string> => ipcRenderer.invoke('perform-ocr'),
 });

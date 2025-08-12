@@ -23,12 +23,9 @@ export function registerIpcHandlers() {
    * Listen for OCR requests with image data and invoke the OCR service.
    * ipcMain.handle is used to return the OCR result to the renderer.
    */
-  ipcMain.handle('perform-ocr', async (_event, imageData) => {
+  ipcMain.handle('perform-ocr', async (_event) => {
     try {
-      if (!imageData) {
-        throw new Error('No image data provided for OCR.');
-      }
-      const ocrResult = await runOcr(imageData);
+      const ocrResult = await runOcr();
       return ocrResult;
     } catch (error) {
       console.error('Failed to handle OCR request:', error);

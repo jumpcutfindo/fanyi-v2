@@ -1,10 +1,18 @@
 import { spawn } from 'child_process';
+import fs from 'fs';
 import path from 'node:path';
 
 function getPythonExecutablePath(): string {
   // In development, the executable is in the pyinstaller dist folder
   if (process.env.NODE_ENV === 'development') {
-    return path.join(__dirname, '..', '..', 'python-ocr', 'dist', 'fanyi_ocr');
+    return path.join(
+      process.env.VITE_PUBLIC,
+      '..',
+      '..',
+      'python-ocr',
+      'dist',
+      'fanyi_ocr'
+    );
   }
 
   // In a packaged app, the executable is in the resources path
@@ -13,7 +21,11 @@ function getPythonExecutablePath(): string {
   return path.join(process.resourcesPath, executableName);
 }
 
-function runOcr(imageData: Buffer): Promise<string> {
+function runOcr(): Promise<string> {
+  const sampleImage = fs.readFileSync(
+    path.join(process.env.VITE_PUBLIC, 'example-image.png')
+  );
+
   return new Promise((resolve, reject) => {
     const pythonExecutable = getPythonExecutablePath();
     try {
@@ -61,7 +73,7 @@ function runOcr(imageData: Buffer): Promise<string> {
       });
 
       console.log('Writing image data to Python process...');
-      pythonProcess.stdin.write(imageData);
+      pythonProcess.stdin.write(sampleImage);
       pythonProcess.stdin.end();
     } catch (err) {
       console.error('Error in runOcr function:', err);
