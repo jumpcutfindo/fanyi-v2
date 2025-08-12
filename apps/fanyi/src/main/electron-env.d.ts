@@ -26,6 +26,7 @@ interface Window {
   ipcRenderer: import('electron').IpcRenderer;
   api: {
     screenshot: () => Promise<Buffer>;
+    getScreenshotSources: () => Promise<ScreenshotSource[]>;
     performOcr: () => Promise<string>;
   };
 }

@@ -1,10 +1,13 @@
+import { ScreenshotOptions, ScreenshotSource } from '@shared/types/screenshot';
 import { desktopCapturer } from 'electron';
 
 /**
  * Captures a screenshot of the primary screen and returns it as a Buffer.
  * @returns A Promise that resolves with the screenshot data as a Buffer.
  */
-export async function takeScreenshot(_options: unknown): Promise<Buffer> {
+export async function takeScreenshot(
+  options: ScreenshotOptions
+): Promise<Buffer> {
   try {
     const sources = await desktopCapturer.getSources({
       types: ['screen'],
@@ -22,4 +25,16 @@ export async function takeScreenshot(_options: unknown): Promise<Buffer> {
     console.error('Failed to capture screenshot:', err);
     throw err;
   }
+}
+
+export async function getScreenshotSources(): Promise<ScreenshotSource[]> {
+  const sources = await desktopCapturer.getSources({
+    types: ['screen', 'window'],
+  });
+
+  return sources.map((s) => ({
+    id: s.id,
+    name: s.name,
+    type: s.id.includes('window') ? 'window' : 'screen',
+  }));
 }

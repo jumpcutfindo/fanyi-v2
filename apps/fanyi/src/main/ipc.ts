@@ -1,6 +1,9 @@
 // src/main/ipc.ts
 import { ipcMain } from 'electron';
-import { takeScreenshot } from '@main/services/screenshot';
+import {
+  getScreenshotSources,
+  takeScreenshot,
+} from '@main/services/screenshot';
 
 import { runOcr } from './services/ocr';
 
@@ -15,6 +18,16 @@ export function registerIpcHandlers() {
       return screenshotBuffer;
     } catch (error) {
       console.error('Failed to handle screenshot request:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('get-screenshot-sources', async (_event) => {
+    try {
+      const sources = await getScreenshotSources();
+      return sources;
+    } catch (error) {
+      console.error('Failed to get screenshot sources:', error);
       throw error;
     }
   });
