@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { Button } from '@renderer/components/ui/Button';
 import { Label } from '@renderer/components/ui/Label';
 import {
@@ -8,6 +10,20 @@ import {
 } from '@renderer/components/ui/Select';
 
 function App() {
+  const [imageString, setImageString] = useState('');
+
+  const handleScreenshot = async () => {
+    const screenshotBuffer = await window.api.screenshot();
+
+    const imageB64 = btoa(
+      new Uint8Array(screenshotBuffer).reduce(function (data, byte) {
+        return data + String.fromCharCode(byte);
+      }, '')
+    );
+
+    setImageString(imageB64);
+  };
+
   return (
     <div className="flex h-full flex-row">
       <div className="flex w-72 flex-col gap-4 p-4">
@@ -22,9 +38,15 @@ function App() {
             </SelectContent>
           </Select>
         </div>
-        <Button variant="outline">Take Screenshot</Button>
+        <Button variant="outline" onClick={handleScreenshot}>
+          Take Screenshot
+        </Button>
       </div>
-      <div className="h-full w-full"></div>
+      <div className="h-full w-full">
+        {imageString ? (
+          <img src={`data:image/png;base64,${imageString}`} alt="Captured" />
+        ) : null}
+      </div>
     </div>
   );
 }
