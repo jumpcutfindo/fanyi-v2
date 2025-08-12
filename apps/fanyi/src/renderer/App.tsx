@@ -24,6 +24,12 @@ function App() {
     setImageString(imageB64);
   };
 
+  const handleOcr = async () => {
+    const ocrResult = await window.api.performOcr();
+
+    console.log(ocrResult);
+  };
+
   return (
     <div className="flex h-full flex-row">
       <div className="flex w-72 flex-col gap-4 p-4">
@@ -40,6 +46,9 @@ function App() {
         </div>
         <Button variant="outline" onClick={handleScreenshot}>
           Take Screenshot
+        </Button>
+        <Button variant="outline" onClick={handleOcr}>
+          Take OCR
         </Button>
       </div>
       <div className="h-full w-full">
