@@ -6,19 +6,19 @@ export interface ScreenshotSource {
   name: string;
 }
 
-type BaseScreenshotOptions = {
-  id: string;
+export type ScreenshotOptions = {
+  type: 'screen' | 'window';
+  sourceId: string;
+  crop?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
 };
 
-interface ScreenScreenshotOptions extends BaseScreenshotOptions {
-  type: 'screen';
-  preset: unknown; // TODO: Implement preset system
+export interface ScreenshotPreset {
+  name: string;
+  description: string;
+  options: ScreenshotOptions;
 }
-
-interface WindowScreenshotOptions extends BaseScreenshotOptions {
-  type: 'window';
-}
-
-export type ScreenshotOptions =
-  | ScreenScreenshotOptions
-  | WindowScreenshotOptions;
