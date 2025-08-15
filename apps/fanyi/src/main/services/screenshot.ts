@@ -1,4 +1,8 @@
-import { ScreenshotOptions, ScreenshotSource } from '@shared/types/screenshot';
+import {
+  ScreenshotOptions,
+  ScreenshotPreset,
+  ScreenshotSource,
+} from '@shared/types/screenshot';
 import { desktopCapturer } from 'electron';
 
 /**
@@ -37,4 +41,39 @@ export async function getScreenshotSources(): Promise<ScreenshotSource[]> {
     name: s.name,
     type: s.id.includes('window') ? 'window' : 'screen',
   }));
+}
+
+export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
+  // TODO: Implement storing to local storage and retrieval
+
+  return [
+    {
+      name: 'Screen',
+      description: 'Take a screenshot of the primary screen.',
+      options: {
+        type: 'screen',
+        sourceId: '',
+        crop: {
+          x: 0,
+          y: 0,
+          width: 1920,
+          height: 1080,
+        },
+      },
+    },
+    {
+      name: 'Window',
+      description: 'Take a screenshot of a specific window.',
+      options: {
+        type: 'window',
+        sourceId: '',
+        crop: {
+          x: 0,
+          y: 0,
+          width: 1920,
+          height: 1080,
+        },
+      },
+    },
+  ];
 }

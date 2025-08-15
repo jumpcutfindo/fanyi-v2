@@ -1,4 +1,4 @@
-import { ScreenshotSource } from '@shared/types/screenshot';
+import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -26,5 +26,7 @@ contextBridge.exposeInMainWorld('api', {
   screenshot: (): Promise<Buffer> => ipcRenderer.invoke('screenshot'),
   getScreenshotSources: (): Promise<ScreenshotSource[]> =>
     ipcRenderer.invoke('get-screenshot-sources'),
+  getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
+    ipcRenderer.invoke('get-screenshot-presets'),
   performOcr: (): Promise<string> => ipcRenderer.invoke('perform-ocr'),
 });

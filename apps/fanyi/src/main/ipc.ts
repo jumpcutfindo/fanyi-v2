@@ -1,6 +1,7 @@
 // src/main/ipc.ts
 import { ipcMain } from 'electron';
 import {
+  getScreenshotPresets,
   getScreenshotSources,
   takeScreenshot,
 } from '@main/services/screenshot';
@@ -28,6 +29,16 @@ export function registerIpcHandlers() {
       return sources;
     } catch (error) {
       console.error('Failed to get screenshot sources:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('get-screenshot-presets', async (_event) => {
+    try {
+      const presets = await getScreenshotPresets();
+      return presets;
+    } catch (error) {
+      console.error('Failed to get screenshot presets:', error);
       throw error;
     }
   });
