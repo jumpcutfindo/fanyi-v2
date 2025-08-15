@@ -8,6 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@renderer/components/ui/Select';
+import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 
 function App() {
   const [imageString, setImageString] = useState('');
@@ -32,7 +33,8 @@ function App() {
 
   return (
     <div className="flex h-full flex-row">
-      <div className="flex w-72 flex-col gap-4 p-4">
+      <div className="flex min-w-70 flex-col gap-4 p-4">
+        <PresetManager />
         <div className="flex flex-col gap-2">
           <Label>Presets</Label>
           <Select>
