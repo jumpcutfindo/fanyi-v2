@@ -57,7 +57,7 @@ export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
       description: 'Take a screenshot of the primary screen.',
       options: {
         type: 'screen',
-        sourceId: '',
+        sourceId: 'screen:0:0',
         crop: {
           x: 0,
           y: 0,
@@ -71,7 +71,7 @@ export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
       description: 'Take a screenshot of a specific window.',
       options: {
         type: 'window',
-        sourceId: '',
+        sourceId: 'window:788620:0',
         crop: {
           x: 0,
           y: 0,

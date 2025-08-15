@@ -1,20 +1,25 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
-import { AppWindow, Monitor } from 'lucide-react';
-import { useState } from 'react';
+import { AppWindow, Monitor, Plus } from 'lucide-react';
 
+import { Button } from '@renderer/components/ui/Button';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
+import { usePresetStore } from '@renderer/stores/usePresetStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
 
-  const [activePreset, setActivePreset] = useState<ScreenshotPreset | null>(
-    null
-  );
+  const activePreset = usePresetStore((state) => state.activePreset);
+  const setActivePreset = usePresetStore((state) => state.setActivePreset);
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <h1 className="text-sm font-bold">Presets</h1>
+      <div className="flex flex-row items-center">
+        <h1 className="text-sm font-bold">Presets</h1>
+        <Button variant="ghost" type="button" className="ms-auto">
+          <Plus className="size-4" />
+        </Button>
+      </div>
       <div className="flex flex-col gap-2">
         {presets?.map((p) => (
           <PresetItem
