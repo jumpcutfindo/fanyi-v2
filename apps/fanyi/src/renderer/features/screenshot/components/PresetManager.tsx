@@ -13,10 +13,14 @@ export function PresetManager() {
   const setActivePreset = usePresetStore((state) => state.setActivePreset);
 
   return (
-    <div className="flex w-full flex-col gap-2">
-      <div className="flex flex-row items-center">
+    <div className="flex w-full flex-col gap-4">
+      <div className="relative">
         <h1 className="text-sm font-bold">Presets</h1>
-        <Button variant="ghost" type="button" className="ms-auto">
+        <Button
+          variant="ghost"
+          type="button"
+          className="absolute top-[-2.5px] right-0 size-6 rounded-full"
+        >
           <Plus className="size-4" />
         </Button>
       </div>
