@@ -23,10 +23,12 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 });
 
 contextBridge.exposeInMainWorld('api', {
-  screenshot: (): Promise<Buffer> => ipcRenderer.invoke('screenshot'),
+  getScreenshotWithPreset: (preset: ScreenshotPreset): Promise<Buffer> =>
+    ipcRenderer.invoke('take-screenshot-with-preset', preset),
   getScreenshotSources: (): Promise<ScreenshotSource[]> =>
     ipcRenderer.invoke('get-screenshot-sources'),
   getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
     ipcRenderer.invoke('get-screenshot-presets'),
+
   performOcr: (): Promise<string> => ipcRenderer.invoke('perform-ocr'),
 });

@@ -3,22 +3,18 @@ import { ipcMain } from 'electron';
 import {
   getScreenshotPresets,
   getScreenshotSources,
-  takeScreenshot,
+  takeScreenshotWithPreset,
 } from '@main/services/screenshot';
 
 import { runOcr } from './services/ocr';
 
 export function registerIpcHandlers() {
-  /**
-   * Listen for screenshot requests from the renderer and invoke the screenshot service.
-   * ipcMain.handle is used for a request-reply pattern.
-   */
-  ipcMain.handle('screenshot', async (_event, options) => {
+  ipcMain.handle('take-screenshot-with-preset', async (_event, preset) => {
     try {
-      const screenshotBuffer = await takeScreenshot(options);
-      return screenshotBuffer;
+      const screenshot = await takeScreenshotWithPreset(preset);
+      return screenshot;
     } catch (error) {
-      console.error('Failed to handle screenshot request:', error);
+      console.error('Failed to take screenshot with preset:', error);
       throw error;
     }
   });
