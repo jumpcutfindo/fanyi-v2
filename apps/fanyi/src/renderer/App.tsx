@@ -58,9 +58,13 @@ function App() {
           </CSSTransition>
         </TransitionGroup>
       </div>
-      <div className="h-full w-full">
+      <div className="bg-muted flex h-full w-full items-center justify-center transition-all">
         {imageString ? (
-          <img src={`data:image/png;base64,${imageString}`} alt="Captured" />
+          <img
+            className="max-h-80"
+            src={`data:image/png;base64,${imageString}`}
+            alt="Captured"
+          />
         ) : null}
       </div>
     </div>
