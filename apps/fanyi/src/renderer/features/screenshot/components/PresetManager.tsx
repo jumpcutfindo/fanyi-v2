@@ -99,7 +99,7 @@ function PresetItem({
         </span>
       </button>
       <button
-        className="text-muted-foreground hover:bg-muted absolute top-2 right-2 rounded-sm p-2 opacity-0 group-hover:opacity-100 hover:cursor-pointer focus:opacity-100"
+        className="text-muted-foreground hover:bg-muted absolute top-2 right-2 rounded-full p-2 opacity-0 group-hover:opacity-100 hover:cursor-pointer focus:opacity-100"
         onClick={handleEdit}
       >
         <Pencil className="size-3.5" />
