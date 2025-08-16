@@ -38,6 +38,12 @@ export function PresetManager() {
         </Button>
       </SidebarHeader>
       <SidebarContent>
+        {presets?.length === 0 && (
+          <span className="text-muted-foreground w-full text-center text-sm">
+            No presets found
+          </span>
+        )}
+
         {presets?.map((p) => (
           <PresetItem
             key={p.id}
