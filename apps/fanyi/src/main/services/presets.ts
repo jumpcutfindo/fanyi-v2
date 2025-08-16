@@ -26,3 +26,11 @@ export async function addScreenshotPreset(preset: AddScreenshotPresetPayload) {
 export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
   return presetStore.get('presets', []);
 }
+
+export async function updateScreenshotPreset(preset: ScreenshotPreset) {
+  const presets = await getScreenshotPresets();
+  presetStore.set(
+    'presets',
+    presets.map((p) => (p.id === preset.id ? preset : p))
+  );
+}

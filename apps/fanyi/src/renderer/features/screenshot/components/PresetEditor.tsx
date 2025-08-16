@@ -23,6 +23,7 @@ import { Separator } from '@renderer/components/ui/Separator';
 import { Slider } from '@renderer/components/ui/Slider';
 import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/queries/addScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
+import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
@@ -36,7 +37,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const setActivePreset = usePresetStore((state) => state.setActivePreset);
 
   const { data: screenshotSources } = useGetScreenshotSources();
+
   const { mutate: addScreenshotPreset } = useAddScreenshotPresetMutation();
+  const { mutate: updateScreenshotPreset } =
+    useUpdateScreenshotPresetMutation();
 
   const { control, register, watch, setValue, handleSubmit } =
     useForm<ScreenshotPreset>({
@@ -69,7 +73,11 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
-    addScreenshotPreset(data);
+    if (mode === 'create') {
+      addScreenshotPreset(data);
+    } else if (mode === 'edit') {
+      updateScreenshotPreset(data);
+    }
   };
 
   const renderSliderWithInput = ({
@@ -261,7 +269,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           </div>
         </SidebarContent>
         <SidebarFooter className="w-full justify-end">
-          <Button type="submit">Save</Button>
+          <Button type="submit">{mode === 'create' ? 'Create' : 'Save'}</Button>
         </SidebarFooter>
       </form>
     </SidebarContainer>

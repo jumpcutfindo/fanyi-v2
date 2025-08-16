@@ -4,6 +4,7 @@ import {
   ScreenshotSource,
 } from '@shared/types/screenshot';
 import { contextBridge, ipcRenderer } from 'electron';
+import { updateScreenshotPreset } from '@main/services/presets';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
@@ -34,6 +35,8 @@ contextBridge.exposeInMainWorld('api', {
 
   addScreenshotPreset: (preset: AddScreenshotPresetPayload): Promise<void> =>
     ipcRenderer.invoke('add-screenshot-preset', preset),
+  updateScreenshotPreset: (preset: ScreenshotPreset): Promise<void> =>
+    ipcRenderer.invoke('update-screenshot-preset', preset),
   getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
     ipcRenderer.invoke('get-screenshot-presets'),
 

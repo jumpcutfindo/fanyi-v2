@@ -3,6 +3,7 @@ import { ipcMain } from 'electron';
 import {
   addScreenshotPreset,
   getScreenshotPresets,
+  updateScreenshotPreset,
 } from '@main/services/presets';
 import {
   getScreenshotSources,
@@ -37,6 +38,14 @@ export function registerIpcHandlers() {
       await addScreenshotPreset(preset);
     } catch (error) {
       console.error('Failed to add screenshot preset:', error);
+      throw error;
+    }
+  });
+  ipcMain.handle('update-screenshot-preset', async (_event, preset) => {
+    try {
+      await updateScreenshotPreset(preset);
+    } catch (error) {
+      console.error('Failed to update screenshot preset:', error);
       throw error;
     }
   });
