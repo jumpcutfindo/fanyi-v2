@@ -1,17 +1,34 @@
 import { ArrowLeft } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/Button';
+import { cn } from '@renderer/lib/utils';
 
-type SidebarContainerProps = React.ComponentPropsWithRef<'div'>;
+type SidebarContainerProps = React.ComponentProps<'div'>;
 
-export function SidebarContainer({ children }: SidebarContainerProps) {
-  return <div className="flex flex-col gap-4 p-4">{children}</div>;
+export function SidebarContainer({
+  children,
+  className,
+  ...props
+}: SidebarContainerProps) {
+  return (
+    <div className={cn('flex flex-col gap-4 p-4', className)} {...props}>
+      {children}
+    </div>
+  );
 }
 
-type SidebarContentProps = React.ComponentPropsWithRef<'div'>;
+type SidebarContentProps = React.ComponentProps<'div'>;
 
-export function SidebarContent({ children }: SidebarContentProps) {
-  return <div className="flex w-full flex-col gap-2">{children}</div>;
+export function SidebarContent({
+  children,
+  className,
+  ...props
+}: SidebarContentProps) {
+  return (
+    <div className={cn('flex w-full flex-col gap-2', className)} {...props}>
+      {children}
+    </div>
+  );
 }
 
 interface SidebarHeaderProps {
