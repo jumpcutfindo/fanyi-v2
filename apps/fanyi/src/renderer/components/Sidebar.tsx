@@ -5,7 +5,7 @@ import { Button } from '@renderer/components/ui/Button';
 type SidebarContainerProps = React.ComponentPropsWithRef<'div'>;
 
 export function SidebarContainer({ children }: SidebarContainerProps) {
-  return <div className="flex w-full flex-col gap-4">{children}</div>;
+  return <div className="flex flex-col gap-4 p-4">{children}</div>;
 }
 
 type SidebarContentProps = React.ComponentPropsWithRef<'div'>;

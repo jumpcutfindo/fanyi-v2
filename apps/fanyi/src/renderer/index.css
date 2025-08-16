@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -174,4 +174,34 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* The element's initial state as it enters */
+.sidebar-enter {
+  opacity: 1;
+}
+
+/* The element's final state as it enters */
+.sidebar-enter-active {
+  opacity: 1;
+}
+
+/* The element's initial state as it exits */
+.sidebar-exit {
+  opacity: 0;
+}
+
+/* The element's final state as it exits */
+.sidebar-exit-active {
+  opacity: 0;
 }
