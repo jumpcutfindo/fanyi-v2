@@ -1,7 +1,11 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import { AppWindow, Monitor, Plus } from 'lucide-react';
 
-import { SidebarHeader } from '@renderer/components/SidebarHeader';
+import {
+  SidebarContainer,
+  SidebarContent,
+  SidebarHeader,
+} from '@renderer/components/Sidebar';
 import { Button } from '@renderer/components/ui/Button';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
@@ -14,13 +18,13 @@ export function PresetManager() {
   const setActivePreset = usePresetStore((state) => state.setActivePreset);
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <SidebarContainer>
       <SidebarHeader title="Presets">
         <Button variant="ghost" type="button" className="size-6 rounded-full">
           <Plus className="size-4" />
         </Button>
       </SidebarHeader>
-      <div className="flex flex-col gap-2">
+      <SidebarContent>
         {presets?.map((p) => (
           <PresetItem
             preset={p}
@@ -28,8 +32,8 @@ export function PresetManager() {
             handleSelect={setActivePreset}
           />
         ))}
-      </div>
-    </div>
+      </SidebarContent>
+    </SidebarContainer>
   );
 }
 

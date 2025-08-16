@@ -2,6 +2,18 @@ import { ArrowLeft } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/Button';
 
+type SidebarContainerProps = React.ComponentPropsWithRef<'div'>;
+
+export function SidebarContainer({ children }: SidebarContainerProps) {
+  return <div className="flex w-full flex-col gap-4">{children}</div>;
+}
+
+type SidebarContentProps = React.ComponentPropsWithRef<'div'>;
+
+export function SidebarContent({ children }: SidebarContentProps) {
+  return <div className="flex w-full flex-col gap-2">{children}</div>;
+}
+
 interface SidebarHeaderProps {
   title: string;
   children?: React.ReactNode;
