@@ -45,17 +45,23 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const { mutate: deleteScreenshotPreset } =
     useDeleteScreenshotPresetMutation();
 
-  const { control, register, watch, setValue, handleSubmit } =
-    useForm<ScreenshotPreset>({
-      defaultValues: initialValues ?? {
-        options: {
-          type: 'screen',
-          sourceId: '',
-          crop: undefined,
-        },
+  const {
+    control,
+    register,
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ScreenshotPreset>({
+    defaultValues: initialValues ?? {
+      options: {
+        type: 'screen',
+        sourceId: '',
+        crop: undefined,
       },
-      mode: 'onChange',
-    });
+    },
+    mode: 'onChange',
+  });
 
   const selectedType = watch('options.type');
   const selectedSourceId = watch('options.sourceId');
@@ -76,6 +82,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
+    console.log(data);
     if (mode === 'create') {
       addScreenshotPreset(data);
     } else if (mode === 'edit') {
@@ -198,7 +205,11 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         <SidebarContent className="gap-3">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name">Name</Label>
-            <Input className="text-sm" {...register('name')} />
+            <Input
+              className="text-sm"
+              {...register('name', { required: true })}
+            />
+            {errors.name && <p className="text-xs text-red-500">Required</p>}
           </div>
           <div className="flex flex-col gap-1">
             <Label htmlFor="description">Description</Label>
@@ -213,15 +224,21 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => {
                 return (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Select a type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="screen">Screen</SelectItem>
-                      <SelectItem value="window">Window</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <>
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Select a type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="screen">Screen</SelectItem>
+                        <SelectItem value="window">Window</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {errors.options?.sourceId ? (
+                      <p className="text-xs text-red-500">Required</p>
+                    ) : null}
+                  </>
                 );
               }}
             />
@@ -234,18 +251,23 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => {
                 return (
-                  <Select value={value} onValueChange={onChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a source" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sourceOptions.map((source) => (
-                        <SelectItem key={source.id} value={source.id}>
-                          {source.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <>
+                    <Select value={value} onValueChange={onChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sourceOptions.map((source) => (
+                          <SelectItem key={source.id} value={source.id}>
+                            {source.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.options?.sourceId ? (
+                      <p className="text-xs text-red-500">Required</p>
+                    ) : null}
+                  </>
                 );
               }}
             />
