@@ -118,6 +118,13 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     );
   };
 
+  // If initial value is provided, set active preset
+  useEffect(() => {
+    if (initialValues) {
+      setActivePreset(initialValues);
+    }
+  }, [initialValues, setActivePreset]);
+
   // Update preview on form update
   useEffect(() => {
     if (selectedType && selectedSourceId) {

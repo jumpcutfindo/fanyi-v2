@@ -1,5 +1,5 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
-import { AppWindow, Monitor, Plus } from 'lucide-react';
+import { AppWindow, Monitor, Pencil, Plus } from 'lucide-react';
 
 import {
   SidebarContainer,
@@ -40,9 +40,16 @@ export function PresetManager() {
       <SidebarContent>
         {presets?.map((p) => (
           <PresetItem
+            key={p.id}
             preset={p}
             isActive={p === activePreset}
-            handleSelect={setActivePreset}
+            handleSelect={() => setActivePreset(p)}
+            handleEdit={() =>
+              setSidebarState({
+                state: 'editor',
+                options: { mode: 'edit', initialPreset: p },
+              })
+            }
           />
         ))}
       </SidebarContent>
@@ -53,30 +60,44 @@ export function PresetManager() {
 interface PresetItemProps {
   preset: ScreenshotPreset | null;
   isActive: boolean;
-  handleSelect: (preset: ScreenshotPreset) => void;
+  handleSelect: () => void;
+  handleEdit: () => void;
 }
 
-function PresetItem({ preset, handleSelect, isActive }: PresetItemProps) {
+function PresetItem({
+  preset,
+  handleSelect,
+  handleEdit,
+  isActive,
+}: PresetItemProps) {
   if (!preset) return null;
 
   return (
-    <button
-      type="button"
-      className={cn(
-        'hover:bg-muted flex flex-col gap-2 rounded-sm border p-2 hover:cursor-pointer',
-        isActive ? 'border-primary' : ''
-      )}
-      onClick={() => handleSelect(preset)}
-    >
-      <span className="text-sm">{preset.name}</span>
-      <span className="text-muted-foreground flex flex-row items-center gap-2 text-xs">
-        {preset.options.type === 'screen' ? (
-          <Monitor className="size-4" />
-        ) : (
-          <AppWindow className="size-4" />
-        )}{' '}
-        <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
-      </span>
-    </button>
+    <div className="group relative">
+      <button
+        type="button"
+        className={cn(
+          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 hover:cursor-pointer',
+          isActive ? 'border-primary' : ''
+        )}
+        onClick={handleSelect}
+      >
+        <span className="text-sm">{preset.name}</span>
+        <span className="text-muted-foreground flex flex-row items-center gap-2 text-xs">
+          {preset.options.type === 'screen' ? (
+            <Monitor className="size-4" />
+          ) : (
+            <AppWindow className="size-4" />
+          )}{' '}
+          <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
+        </span>
+      </button>
+      <button
+        className="text-muted-foreground hover:bg-muted absolute top-2 right-2 rounded-sm p-2 opacity-0 group-hover:opacity-100 hover:cursor-pointer focus:opacity-100"
+        onClick={handleEdit}
+      >
+        <Pencil className="size-3.5" />
+      </button>
+    </div>
   );
 }

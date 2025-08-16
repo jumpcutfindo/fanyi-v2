@@ -13,6 +13,7 @@ const presetStore = new Store<StoreType>({ name: 'presets' });
 
 export async function addScreenshotPreset(preset: AddScreenshotPresetPayload) {
   const presets = await getScreenshotPresets();
+
   presetStore.set('presets', [
     ...presets,
     {
