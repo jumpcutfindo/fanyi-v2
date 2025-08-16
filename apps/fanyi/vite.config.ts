@@ -11,6 +11,7 @@ import electron from 'vite-plugin-electron/simple';
 const alias = {
   '@main': path.resolve(__dirname, 'src/main'),
   '@renderer': path.resolve(__dirname, 'src/renderer'),
+  '@shared': path.resolve(__dirname, 'src/shared'),
 };
 
 // https://vitejs.dev/config/

@@ -1,20 +1,69 @@
 // src/main/ipc.ts
 import { ipcMain } from 'electron';
-import { takeScreenshot } from '@main/services/screenshot';
+import {
+  addScreenshotPreset,
+  deleteScreenshotPreset,
+  getScreenshotPresets,
+  updateScreenshotPreset,
+} from '@main/services/presets';
+import {
+  getScreenshotSources,
+  takeScreenshotWithPreset,
+} from '@main/services/screenshot';
 
 import { runOcr } from './services/ocr';
 
 export function registerIpcHandlers() {
-  /**
-   * Listen for screenshot requests from the renderer and invoke the screenshot service.
-   * ipcMain.handle is used for a request-reply pattern.
-   */
-  ipcMain.handle('screenshot', async (_event, options) => {
+  ipcMain.handle('take-screenshot-with-preset', async (_event, preset) => {
     try {
-      const screenshotBuffer = await takeScreenshot(options);
-      return screenshotBuffer;
+      const screenshot = await takeScreenshotWithPreset(preset);
+      return screenshot;
     } catch (error) {
-      console.error('Failed to handle screenshot request:', error);
+      console.error('Failed to take screenshot with preset:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('get-screenshot-sources', async (_event) => {
+    try {
+      const sources = await getScreenshotSources();
+      return sources;
+    } catch (error) {
+      console.error('Failed to get screenshot sources:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('add-screenshot-preset', async (_event, preset) => {
+    try {
+      await addScreenshotPreset(preset);
+    } catch (error) {
+      console.error('Failed to add screenshot preset:', error);
+      throw error;
+    }
+  });
+  ipcMain.handle('get-screenshot-presets', async (_event) => {
+    try {
+      const presets = await getScreenshotPresets();
+      return presets;
+    } catch (error) {
+      console.error('Failed to get screenshot presets:', error);
+      throw error;
+    }
+  });
+  ipcMain.handle('update-screenshot-preset', async (_event, preset) => {
+    try {
+      await updateScreenshotPreset(preset);
+    } catch (error) {
+      console.error('Failed to update screenshot preset:', error);
+      throw error;
+    }
+  });
+  ipcMain.handle('delete-screenshot-preset', async (_event, id) => {
+    try {
+      await deleteScreenshotPreset(id);
+    } catch (error) {
+      console.error('Failed to delete screenshot preset:', error);
       throw error;
     }
   });

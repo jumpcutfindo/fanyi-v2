@@ -25,7 +25,14 @@ declare namespace NodeJS {
 interface Window {
   ipcRenderer: import('electron').IpcRenderer;
   api: {
-    screenshot: () => Promise<Buffer>;
     performOcr: () => Promise<string>;
+
+    addScreenshotPreset: (preset: AddScreenshotPresetPayload) => Promise<void>;
+    getScreenshotPresets: () => Promise<ScreenshotPreset[]>;
+    updateScreenshotPreset: (preset: ScreenshotPreset) => Promise<void>;
+    deleteScreenshotPreset: (id: string) => Promise<void>;
+
+    getScreenshotWithPreset: (preset: ScreenshotPreset) => Promise<Buffer>;
+    getScreenshotSources: () => Promise<ScreenshotSource[]>;
   };
 }

@@ -1,59 +1,70 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-import { Button } from '@renderer/components/ui/Button';
-import { Label } from '@renderer/components/ui/Label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from '@renderer/components/ui/Select';
+import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
+import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
+import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
+import { usePresetStore } from '@renderer/stores/usePresetStore';
+import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 function App() {
-  const [imageString, setImageString] = useState('');
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const handleScreenshot = async () => {
-    const screenshotBuffer = await window.api.screenshot();
+  const sidebarState = useSidebarStore((state) => state.sidebarState);
+  const activePreset = usePresetStore((state) => state.activePreset);
 
-    const imageB64 = btoa(
-      new Uint8Array(screenshotBuffer).reduce(function (data, byte) {
-        return data + String.fromCharCode(byte);
-      }, '')
-    );
+  const { data: screenshot } = useGetScreenshotWithPreset(activePreset);
 
-    setImageString(imageB64);
-  };
+  const imageString = screenshot
+    ? btoa(
+        new Uint8Array(screenshot).reduce(function (data, byte) {
+          return data + String.fromCharCode(byte);
+        }, '')
+      )
+    : null;
 
-  const handleOcr = async () => {
-    const ocrResult = await window.api.performOcr();
-
-    console.log(ocrResult);
+  const renderSidebar = () => {
+    switch (sidebarState.state) {
+      case 'manager':
+        return <PresetManager />;
+      case 'editor':
+        return (
+          <PresetEditor
+            mode={sidebarState.options?.mode}
+            initialValues={sidebarState.options?.initialPreset}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
     <div className="flex h-full flex-row">
-      <div className="flex w-72 flex-col gap-4 p-4">
-        <div className="flex flex-col gap-2">
-          <Label>Presets</Label>
-          <Select>
-            <SelectTrigger className="w-full">Trigger</SelectTrigger>
-            <SelectContent>
-              <SelectItem value="item-1">Item 1</SelectItem>
-              <SelectItem value="item-1">Item 2</SelectItem>
-              <SelectItem value="item-1">Item 3</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button variant="outline" onClick={handleScreenshot}>
-          Take Screenshot
-        </Button>
-        <Button variant="outline" onClick={handleOcr}>
-          Take OCR
-        </Button>
+      <div className="relative h-full min-w-70 gap-4">
+        <TransitionGroup>
+          <CSSTransition
+            key={sidebarState.state}
+            nodeRef={sidebarRef}
+            timeout={200}
+            classNames="sidebar"
+          >
+            <div
+              ref={sidebarRef}
+              className="absolute h-full w-full transition-all"
+            >
+              {renderSidebar()}
+            </div>
+          </CSSTransition>
+        </TransitionGroup>
       </div>
-      <div className="h-full w-full">
+      <div className="bg-muted flex h-full w-full items-center justify-center transition-all">
         {imageString ? (
-          <img src={`data:image/png;base64,${imageString}`} alt="Captured" />
+          <img
+            className="max-h-80"
+            src={`data:image/png;base64,${imageString}`}
+            alt="Captured"
+          />
         ) : null}
       </div>
     </div>
