@@ -63,6 +63,52 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
 
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
 
+  const renderSliderWithInput = ({
+    name,
+    label,
+    min,
+    max,
+  }: {
+    name:
+      | 'options.crop.x'
+      | 'options.crop.y'
+      | 'options.crop.width'
+      | 'options.crop.height';
+    label: string;
+    min: number;
+    max: number;
+  }) => {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row items-center justify-between">
+          <Label htmlFor={name}>{label}</Label>
+          <Input
+            className="h-8 w-24 text-sm"
+            value={watch(name)}
+            {...register(name, {
+              valueAsNumber: true,
+            })}
+          />
+        </div>
+        <Controller
+          control={control}
+          name={name}
+          render={({ field: { value, onChange } }) => {
+            return (
+              <Slider
+                min={min}
+                max={max}
+                step={1}
+                value={[value]}
+                onValueChange={([num]) => onChange(num)}
+              />
+            );
+          }}
+        />
+      </div>
+    );
+  };
+
   // Update preview on form update
   useEffect(() => {
     if (selectedType && selectedSourceId) {
@@ -102,12 +148,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       return;
     }
 
-    setValue('options.crop', {
-      x: 0,
-      y: 0,
-      width: selectedSource.size.width,
-      height: selectedSource.size.height,
-    });
+    setValue('options.crop.x', 0);
+    setValue('options.crop.y', 0);
+    setValue('options.crop.width', selectedSource?.size.width || 0);
+    setValue('options.crop.height', selectedSource?.size.height || 0);
   }, [selectedSource, setValue]);
 
   return (
@@ -173,106 +217,30 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         </div>
         <div className="flex flex-col gap-4">
           <Label>Crop</Label>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center justify-between">
-              <Label htmlFor="X">X</Label>
-              <Input
-                className="h-8 w-16 text-sm"
-                {...register('options.crop.x')}
-              />
-            </div>
-            <Controller
-              control={control}
-              name="options.crop.x"
-              render={({ field: { value, onChange } }) => {
-                return (
-                  <Slider
-                    min={0}
-                    max={selectedSource?.size.width}
-                    step={1}
-                    value={[value]}
-                    onValueChange={([num]) => onChange(num)}
-                  />
-                );
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center justify-between">
-              <Label htmlFor="X">Y</Label>
-              <Input
-                className="h-8 w-16 text-sm"
-                {...register('options.crop.y')}
-              />
-            </div>
-            <Controller
-              control={control}
-              name="options.crop.y"
-              render={({ field: { value, onChange } }) => {
-                return (
-                  <Slider
-                    min={0}
-                    max={selectedSource?.size.height}
-                    step={1}
-                    value={[value]}
-                    onValueChange={([num]) => onChange(num)}
-                  />
-                );
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center justify-between">
-              <Label htmlFor="X">Width</Label>
-              <Input
-                className="h-8 w-16 text-sm"
-                {...register('options.crop.width')}
-              />
-            </div>
-            <Controller
-              control={control}
-              name="options.crop.width"
-              render={({ field: { value, onChange } }) => {
-                return (
-                  <Slider
-                    min={0}
-                    max={selectedSource?.size.width}
-                    step={1}
-                    value={[value]}
-                    onValueChange={([num]) => onChange(num)}
-                  />
-                );
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center justify-between">
-              <Label htmlFor="X">Height</Label>
-              <Input
-                className="h-8 w-16 text-sm"
-                {...register('options.crop.height')}
-              />
-            </div>
-            <Controller
-              control={control}
-              name="options.crop.height"
-              render={({ field: { value, onChange } }) => {
-                return (
-                  <Slider
-                    min={0}
-                    max={selectedSource?.size.height}
-                    step={1}
-                    value={[value]}
-                    onValueChange={([num]) => onChange(num)}
-                  />
-                );
-              }}
-            />
-          </div>
+          {renderSliderWithInput({
+            label: 'X',
+            name: 'options.crop.x',
+            min: 0,
+            max: selectedSource?.size.width || 0,
+          })}
+          {renderSliderWithInput({
+            label: 'Y',
+            name: 'options.crop.y',
+            min: 0,
+            max: selectedSource?.size.height || 0,
+          })}
+          {renderSliderWithInput({
+            label: 'Width',
+            name: 'options.crop.width',
+            min: 0,
+            max: selectedSource?.size.width || 0,
+          })}
+          {renderSliderWithInput({
+            label: 'Height',
+            name: 'options.crop.height',
+            min: 0,
+            max: selectedSource?.size.height || 0,
+          })}
         </div>
       </SidebarContent>
     </SidebarContainer>
