@@ -11,7 +11,7 @@ export function SidebarContainer({
   ...props
 }: SidebarContainerProps) {
   return (
-    <div className={cn('flex flex-col gap-4 p-4', className)} {...props}>
+    <div className={cn('flex h-full flex-col gap-4 p-4', className)} {...props}>
       {children}
     </div>
   );
@@ -56,4 +56,11 @@ export function SidebarHeader({ title, children, onBack }: SidebarHeaderProps) {
       {children}
     </div>
   );
+}
+
+export function SidebarFooter({
+  children,
+  className,
+}: React.ComponentProps<'div'>) {
+  return <div className={cn('mt-auto flex', className)}>{children}</div>;
 }

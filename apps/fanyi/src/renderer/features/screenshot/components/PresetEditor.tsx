@@ -6,8 +6,10 @@ import { useDebouncedCallback } from 'use-debounce';
 import {
   SidebarContainer,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
 } from '@renderer/components/Sidebar';
+import { Button } from '@renderer/components/ui/Button';
 import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
 import {
@@ -34,16 +36,17 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
 
   const { data: screenshotSources } = useGetScreenshotSources();
 
-  const { control, register, watch, setValue } = useForm<ScreenshotPreset>({
-    defaultValues: initialValues ?? {
-      options: {
-        type: 'screen',
-        sourceId: '',
-        crop: undefined,
+  const { control, register, watch, setValue, handleSubmit } =
+    useForm<ScreenshotPreset>({
+      defaultValues: initialValues ?? {
+        options: {
+          type: 'screen',
+          sourceId: '',
+          crop: undefined,
+        },
       },
-    },
-    mode: 'onChange',
-  });
+      mode: 'onChange',
+    });
 
   const selectedType = watch('options.type');
   const selectedSourceId = watch('options.sourceId');
@@ -62,6 +65,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   }, [screenshotSources, selectedType]);
 
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
+
+  const onSubmit = (data: ScreenshotPreset) => {
+    console.log('yay');
+  };
 
   const renderSliderWithInput = ({
     name,
@@ -160,89 +167,94 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         title={mode === 'create' ? 'Create a preset' : 'Edit preset'}
         onBack={() => setSidebarState({ state: 'manager' })}
       />
-      <SidebarContent className="gap-3">
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="name">Name</Label>
-          <Input className="text-sm" {...register('name')} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="description">Description</Label>
-          <Input className="text-sm" {...register('description')} />
-        </div>
-        <Separator className="my-2" />
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="type">Type</Label>
-          <Controller
-            control={control}
-            name="options.type"
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => {
-              return (
-                <Select value={value} onValueChange={onChange}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="screen">Screen</SelectItem>
-                    <SelectItem value="window">Window</SelectItem>
-                  </SelectContent>
-                </Select>
-              );
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="source">Source</Label>
-          <Controller
-            control={control}
-            name="options.sourceId"
-            rules={{ required: true }}
-            render={({ field: { value, onChange } }) => {
-              return (
-                <Select value={value} onValueChange={onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sourceOptions.map((source) => (
-                      <SelectItem key={source.id} value={source.id}>
-                        {source.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              );
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          <Label>Crop</Label>
-          {renderSliderWithInput({
-            label: 'X',
-            name: 'options.crop.x',
-            min: 0,
-            max: selectedSource?.size.width || 0,
-          })}
-          {renderSliderWithInput({
-            label: 'Y',
-            name: 'options.crop.y',
-            min: 0,
-            max: selectedSource?.size.height || 0,
-          })}
-          {renderSliderWithInput({
-            label: 'Width',
-            name: 'options.crop.width',
-            min: 0,
-            max: selectedSource?.size.width || 0,
-          })}
-          {renderSliderWithInput({
-            label: 'Height',
-            name: 'options.crop.height',
-            min: 0,
-            max: selectedSource?.size.height || 0,
-          })}
-        </div>
-      </SidebarContent>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex grow flex-col">
+        <SidebarContent className="gap-3">
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="name">Name</Label>
+            <Input className="text-sm" {...register('name')} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="description">Description</Label>
+            <Input className="text-sm" {...register('description')} />
+          </div>
+          <Separator className="my-2" />
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="type">Type</Label>
+            <Controller
+              control={control}
+              name="options.type"
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => {
+                return (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="screen">Screen</SelectItem>
+                      <SelectItem value="window">Window</SelectItem>
+                    </SelectContent>
+                  </Select>
+                );
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="source">Source</Label>
+            <Controller
+              control={control}
+              name="options.sourceId"
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => {
+                return (
+                  <Select value={value} onValueChange={onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sourceOptions.map((source) => (
+                        <SelectItem key={source.id} value={source.id}>
+                          {source.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                );
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-4">
+            <Label>Crop</Label>
+            {renderSliderWithInput({
+              label: 'X',
+              name: 'options.crop.x',
+              min: 0,
+              max: selectedSource?.size.width || 0,
+            })}
+            {renderSliderWithInput({
+              label: 'Y',
+              name: 'options.crop.y',
+              min: 0,
+              max: selectedSource?.size.height || 0,
+            })}
+            {renderSliderWithInput({
+              label: 'Width',
+              name: 'options.crop.width',
+              min: 0,
+              max: selectedSource?.size.width || 0,
+            })}
+            {renderSliderWithInput({
+              label: 'Height',
+              name: 'options.crop.height',
+              min: 0,
+              max: selectedSource?.size.height || 0,
+            })}
+          </div>
+        </SidebarContent>
+        <SidebarFooter className="w-full justify-end">
+          <Button type="submit">Save</Button>
+        </SidebarFooter>
+      </form>
     </SidebarContainer>
   );
 }

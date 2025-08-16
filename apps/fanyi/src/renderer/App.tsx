@@ -41,7 +41,7 @@ function App() {
 
   return (
     <div className="flex h-full flex-row">
-      <div className="relative min-w-70 gap-4">
+      <div className="relative h-full min-w-70 gap-4">
         <TransitionGroup>
           <CSSTransition
             key={sidebarState.state}
@@ -49,7 +49,10 @@ function App() {
             timeout={200}
             classNames="sidebar"
           >
-            <div ref={sidebarRef} className="absolute w-full transition-all">
+            <div
+              ref={sidebarRef}
+              className="absolute h-full w-full transition-all"
+            >
               {renderSidebar()}
             </div>
           </CSSTransition>
