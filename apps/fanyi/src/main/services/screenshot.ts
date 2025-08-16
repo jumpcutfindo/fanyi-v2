@@ -39,6 +39,7 @@ export async function takeScreenshotWithPreset(preset: ScreenshotPreset) {
 export async function getScreenshotSources(): Promise<ScreenshotSource[]> {
   const sources = await desktopCapturer.getSources({
     types: ['screen', 'window'],
+    thumbnailSize: { width: 2560, height: 1440 },
   });
 
   return sources.map((s) => ({
