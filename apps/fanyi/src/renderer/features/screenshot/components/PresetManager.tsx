@@ -10,6 +10,7 @@ import { Button } from '@renderer/components/ui/Button';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
+import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
@@ -17,10 +18,22 @@ export function PresetManager() {
   const activePreset = usePresetStore((state) => state.activePreset);
   const setActivePreset = usePresetStore((state) => state.setActivePreset);
 
+  const setSidebarState = useSidebarStore((state) => state.setSidebarState);
+
   return (
     <SidebarContainer>
       <SidebarHeader title="Presets">
-        <Button variant="ghost" type="button" className="size-6 rounded-full">
+        <Button
+          variant="ghost"
+          type="button"
+          className="size-6 rounded-full"
+          onClick={() =>
+            setSidebarState({
+              state: 'editor',
+              options: { mode: 'create' },
+            })
+          }
+        >
           <Plus className="size-4" />
         </Button>
       </SidebarHeader>
