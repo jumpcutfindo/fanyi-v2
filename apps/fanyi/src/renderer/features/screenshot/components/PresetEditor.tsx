@@ -1,6 +1,7 @@
 import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 
 import {
@@ -86,16 +87,25 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       addScreenshotPreset(data, {
         onSuccess: () => {
           setSidebarState({ state: 'manager' });
+          toast.success(`Preset "${data.name}" created`);
         },
       });
     } else if (mode === 'edit') {
-      updateScreenshotPreset(data);
+      updateScreenshotPreset(data, {
+        onSuccess: () => {
+          toast.success('Preset updated');
+        },
+      });
     }
   };
 
   const handleDelete = () => {
     if (mode === 'edit' && initialValues) {
-      deleteScreenshotPreset(initialValues.id);
+      deleteScreenshotPreset(initialValues.id, {
+        onSuccess: () => {
+          toast.success('Preset deleted');
+        },
+      });
       setSidebarState({ state: 'manager' });
     }
   };
