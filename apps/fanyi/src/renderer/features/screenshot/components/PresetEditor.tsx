@@ -1,6 +1,7 @@
 import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useDebouncedCallback } from 'use-debounce';
 
 import {
   SidebarContainer,
@@ -60,15 +61,17 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     return screenshotSources.filter((s) => s.type === selectedType);
   }, [screenshotSources, selectedType]);
 
+  const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
+
   // Update preview on form update
   useEffect(() => {
     if (selectedType && selectedSourceId) {
-      setActivePreset(watch());
+      debounceSetActivePreset(watch());
     } else {
-      setActivePreset(null);
+      debounceSetActivePreset(null);
     }
   }, [
-    setActivePreset,
+    debounceSetActivePreset,
     watch,
     selectedType,
     selectedSourceId,
