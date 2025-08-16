@@ -34,3 +34,11 @@ export async function updateScreenshotPreset(preset: ScreenshotPreset) {
     presets.map((p) => (p.id === preset.id ? preset : p))
   );
 }
+
+export async function deleteScreenshotPreset(id: string) {
+  const presets = await getScreenshotPresets();
+  presetStore.set(
+    'presets',
+    presets.filter((p) => p.id !== id)
+  );
+}

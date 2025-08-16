@@ -22,6 +22,7 @@ import {
 import { Separator } from '@renderer/components/ui/Separator';
 import { Slider } from '@renderer/components/ui/Slider';
 import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/queries/addScreenshotPreset.mutation';
+import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
 import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
@@ -41,6 +42,8 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const { mutate: addScreenshotPreset } = useAddScreenshotPresetMutation();
   const { mutate: updateScreenshotPreset } =
     useUpdateScreenshotPresetMutation();
+  const { mutate: deleteScreenshotPreset } =
+    useDeleteScreenshotPresetMutation();
 
   const { control, register, watch, setValue, handleSubmit } =
     useForm<ScreenshotPreset>({
@@ -77,6 +80,13 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       addScreenshotPreset(data);
     } else if (mode === 'edit') {
       updateScreenshotPreset(data);
+    }
+  };
+
+  const handleDelete = () => {
+    if (mode === 'edit' && initialValues) {
+      deleteScreenshotPreset(initialValues.id);
+      setSidebarState({ state: 'manager' });
     }
   };
 
@@ -268,8 +278,13 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
             })}
           </div>
         </SidebarContent>
-        <SidebarFooter className="w-full justify-end">
+        <SidebarFooter className="w-full justify-end gap-2">
           <Button type="submit">{mode === 'create' ? 'Create' : 'Save'}</Button>
+          {mode === 'edit' ? (
+            <Button type="button" variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          ) : null}
         </SidebarFooter>
       </form>
     </SidebarContainer>

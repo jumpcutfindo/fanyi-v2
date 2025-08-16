@@ -35,10 +35,12 @@ contextBridge.exposeInMainWorld('api', {
 
   addScreenshotPreset: (preset: AddScreenshotPresetPayload): Promise<void> =>
     ipcRenderer.invoke('add-screenshot-preset', preset),
-  updateScreenshotPreset: (preset: ScreenshotPreset): Promise<void> =>
-    ipcRenderer.invoke('update-screenshot-preset', preset),
   getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
     ipcRenderer.invoke('get-screenshot-presets'),
+  updateScreenshotPreset: (preset: ScreenshotPreset): Promise<void> =>
+    ipcRenderer.invoke('update-screenshot-preset', preset),
+  deleteScreenshotPreset: (id: string): Promise<void> =>
+    ipcRenderer.invoke('delete-screenshot-preset', id),
 
   performOcr: (): Promise<string> => ipcRenderer.invoke('perform-ocr'),
 });

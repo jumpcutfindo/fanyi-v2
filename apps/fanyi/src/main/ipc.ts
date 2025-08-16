@@ -2,6 +2,7 @@
 import { ipcMain } from 'electron';
 import {
   addScreenshotPreset,
+  deleteScreenshotPreset,
   getScreenshotPresets,
   updateScreenshotPreset,
 } from '@main/services/presets';
@@ -41,6 +42,15 @@ export function registerIpcHandlers() {
       throw error;
     }
   });
+  ipcMain.handle('get-screenshot-presets', async (_event) => {
+    try {
+      const presets = await getScreenshotPresets();
+      return presets;
+    } catch (error) {
+      console.error('Failed to get screenshot presets:', error);
+      throw error;
+    }
+  });
   ipcMain.handle('update-screenshot-preset', async (_event, preset) => {
     try {
       await updateScreenshotPreset(preset);
@@ -49,12 +59,11 @@ export function registerIpcHandlers() {
       throw error;
     }
   });
-  ipcMain.handle('get-screenshot-presets', async (_event) => {
+  ipcMain.handle('delete-screenshot-preset', async (_event, id) => {
     try {
-      const presets = await getScreenshotPresets();
-      return presets;
+      await deleteScreenshotPreset(id);
     } catch (error) {
-      console.error('Failed to get screenshot presets:', error);
+      console.error('Failed to delete screenshot preset:', error);
       throw error;
     }
   });
