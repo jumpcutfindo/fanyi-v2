@@ -82,9 +82,12 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
-    console.log(data);
     if (mode === 'create') {
-      addScreenshotPreset(data);
+      addScreenshotPreset(data, {
+        onSuccess: () => {
+          setSidebarState({ state: 'manager' });
+        },
+      });
     } else if (mode === 'edit') {
       updateScreenshotPreset(data);
     }
