@@ -17,7 +17,7 @@ export async function addScreenshotPreset(preset: AddScreenshotPresetPayload) {
   presetStore.set('presets', [
     ...presets,
     {
-      id: uuidv4,
+      id: uuidv4(),
       ...preset,
     },
   ]);
