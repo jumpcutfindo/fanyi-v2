@@ -1,7 +1,10 @@
 // src/main/ipc.ts
 import { ipcMain } from 'electron';
 import {
+  addScreenshotPreset,
   getScreenshotPresets,
+} from '@main/services/presets';
+import {
   getScreenshotSources,
   takeScreenshotWithPreset,
 } from '@main/services/screenshot';
@@ -29,6 +32,14 @@ export function registerIpcHandlers() {
     }
   });
 
+  ipcMain.handle('add-screenshot-preset', async (_event, preset) => {
+    try {
+      await addScreenshotPreset(preset);
+    } catch (error) {
+      console.error('Failed to add screenshot preset:', error);
+      throw error;
+    }
+  });
   ipcMain.handle('get-screenshot-presets', async (_event) => {
     try {
       const presets = await getScreenshotPresets();

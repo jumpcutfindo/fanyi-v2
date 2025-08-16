@@ -21,6 +21,7 @@ import {
 } from '@renderer/components/ui/Select';
 import { Separator } from '@renderer/components/ui/Separator';
 import { Slider } from '@renderer/components/ui/Slider';
+import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/queries/addScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
@@ -35,6 +36,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const setActivePreset = usePresetStore((state) => state.setActivePreset);
 
   const { data: screenshotSources } = useGetScreenshotSources();
+  const { mutate: addScreenshotPreset } = useAddScreenshotPresetMutation();
 
   const { control, register, watch, setValue, handleSubmit } =
     useForm<ScreenshotPreset>({
@@ -67,7 +69,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
-    console.log('yay');
+    addScreenshotPreset(data);
   };
 
   const renderSliderWithInput = ({

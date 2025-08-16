@@ -22,7 +22,11 @@ export type ScreenshotOptions = {
 };
 
 export interface ScreenshotPreset {
+  id: string;
   name: string;
   description: string;
   options: ScreenshotOptions;
 }
+
+export interface AddScreenshotPresetPayload
+  extends Omit<ScreenshotPreset, 'id'> {}

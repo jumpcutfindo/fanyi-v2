@@ -52,38 +52,3 @@ export async function getScreenshotSources(): Promise<ScreenshotSource[]> {
     },
   }));
 }
-
-export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
-  // TODO: Implement storing to local storage and retrieval
-
-  return [
-    {
-      name: 'Screen',
-      description: 'Take a screenshot of the primary screen.',
-      options: {
-        type: 'screen',
-        sourceId: 'screen:0:0',
-        crop: {
-          x: 0,
-          y: 0,
-          width: 1920,
-          height: 1080,
-        },
-      },
-    },
-    {
-      name: 'Window',
-      description: 'Take a screenshot of a specific window.',
-      options: {
-        type: 'window',
-        sourceId: 'window:788620:0',
-        crop: {
-          x: 0,
-          y: 0,
-          width: 1920,
-          height: 1080,
-        },
-      },
-    },
-  ];
-}

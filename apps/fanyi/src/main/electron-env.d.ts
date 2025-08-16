@@ -27,6 +27,8 @@ interface Window {
   api: {
     performOcr: () => Promise<string>;
 
+    addScreenshotPreset: (preset: AddScreenshotPresetPayload) => Promise<void>;
+
     getScreenshotWithPreset: (preset: ScreenshotPreset) => Promise<Buffer>;
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
     getScreenshotPresets: () => Promise<ScreenshotPreset[]>;
