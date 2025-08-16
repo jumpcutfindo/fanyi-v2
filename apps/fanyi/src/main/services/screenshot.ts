@@ -45,6 +45,10 @@ export async function getScreenshotSources(): Promise<ScreenshotSource[]> {
     id: s.id,
     name: s.name,
     type: s.id.includes('window') ? 'window' : 'screen',
+    size: {
+      width: s.thumbnail.getSize().width,
+      height: s.thumbnail.getSize().height,
+    },
   }));
 }
 

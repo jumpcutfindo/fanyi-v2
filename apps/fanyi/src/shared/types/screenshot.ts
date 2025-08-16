@@ -4,6 +4,10 @@ export interface ScreenshotSource {
   type: ScreenshotSourceType;
   id: string;
   name: string;
+  size: {
+    width: number;
+    height: number;
+  };
 }
 
 export type ScreenshotOptions = {
