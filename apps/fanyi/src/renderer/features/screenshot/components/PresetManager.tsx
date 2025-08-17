@@ -83,7 +83,7 @@ function PresetItem({
       <button
         type="button"
         className={cn(
-          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 hover:cursor-pointer',
+          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 text-start hover:cursor-pointer',
           isActive ? 'border-primary' : ''
         )}
         onClick={handleSelect}
@@ -107,3 +107,4 @@ function PresetItem({
     </div>
   );
 }
+
