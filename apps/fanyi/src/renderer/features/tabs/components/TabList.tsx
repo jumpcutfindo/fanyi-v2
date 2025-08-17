@@ -8,7 +8,9 @@ export function TabList() {
   }
 
   return (
-    <div className="flex flex-row">{tabs.map((tab) => TabItem({ tab }))}</div>
+    <div className="no-scrollbar flex h-8 w-full flex-row overflow-x-scroll">
+      {tabs.map((tab) => TabItem({ tab }))}
+    </div>
   );
 }
 
@@ -20,7 +22,7 @@ export function TabItem({ tab }: TabItemProps) {
   return (
     <button
       type="button"
-      className="bg-card not-last:border-e-muted hover:bg-muted flex h-8 items-center truncate border-e border-e-transparent p-2 text-sm hover:cursor-pointer"
+      className="bg-card not-last:border-e-muted hover:bg-muted flex h-8 min-w-fit items-center truncate border-e border-e-transparent p-2 text-sm hover:cursor-pointer"
     >
       {tab.title}
     </button>

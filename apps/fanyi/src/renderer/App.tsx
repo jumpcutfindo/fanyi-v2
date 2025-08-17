@@ -59,7 +59,7 @@ function App() {
           </CSSTransition>
         </TransitionGroup>
       </div>
-      <div className="bg-muted flex h-full w-full">
+      <div className="bg-muted flex h-full w-0 grow">
         <TabList />
       </div>
     </div>
