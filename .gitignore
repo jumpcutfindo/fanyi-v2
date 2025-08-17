@@ -2,8 +2,6 @@
 # ========================
 # Ignores all node_modules directories, no matter where they are.
 **/node_modules
-# Ignores pnpm-lock file for individual packages
-**/pnpm-lock.yaml
 
 # Build artifacts
 dist

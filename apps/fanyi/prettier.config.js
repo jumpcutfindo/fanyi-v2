@@ -4,12 +4,12 @@
  * @see https://prettier.io/docs/configuration
  * @type {import("prettier").Config}
  */
-module.exports = {
+export default {
   trailingComma: 'es5',
   tabWidth: 2,
   semi: true,
   singleQuote: true,
-  endOfLine: 'crlf',
+  endOfLine: 'lf',
 
   // Since prettier 3.0, manually specifying plugins is required
   plugins: [

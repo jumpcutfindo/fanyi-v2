@@ -28,5 +28,4 @@ export interface ScreenshotPreset {
   options: ScreenshotOptions;
 }
 
-export interface AddScreenshotPresetPayload
-  extends Omit<ScreenshotPreset, 'id'> {}
+export type AddScreenshotPresetPayload = Omit<ScreenshotPreset, 'id'>;
