@@ -1,36 +1,36 @@
-import { ScreenshotPreset, ScreenshotSource } from "@shared/types/screenshot";
-import { useEffect, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useDebouncedCallback } from "use-debounce";
+import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
+import { useEffect, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { useDebouncedCallback } from 'use-debounce';
 
 import {
   SidebarContainer,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-} from "@renderer/components/Sidebar";
-import { Button } from "@renderer/components/ui/Button";
-import { Input } from "@renderer/components/ui/Input";
-import { Label } from "@renderer/components/ui/Label";
+} from '@renderer/components/Sidebar';
+import { Button } from '@renderer/components/ui/Button';
+import { Input } from '@renderer/components/ui/Input';
+import { Label } from '@renderer/components/ui/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@renderer/components/ui/Select";
-import { Separator } from "@renderer/components/ui/Separator";
-import { Slider } from "@renderer/components/ui/Slider";
-import { useAddScreenshotPresetMutation } from "@renderer/features/screenshot/queries/addScreenshotPreset.mutation";
-import { useDeleteScreenshotPresetMutation } from "@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation";
-import { useGetScreenshotSources } from "@renderer/features/screenshot/queries/getScreenshotSources.query";
-import { useUpdateScreenshotPresetMutation } from "@renderer/features/screenshot/queries/updateScreenshotPreset.mutation";
-import { usePresetStore } from "@renderer/stores/usePresetStore";
-import { useSidebarStore } from "@renderer/stores/useSidebarStore";
+} from '@renderer/components/ui/Select';
+import { Separator } from '@renderer/components/ui/Separator';
+import { Slider } from '@renderer/components/ui/Slider';
+import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/queries/addScreenshotPreset.mutation';
+import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation';
+import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
+import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
+import { usePresetStore } from '@renderer/stores/usePresetStore';
+import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 interface PresetEditorProps {
-  mode: "create" | "edit";
+  mode: 'create' | 'edit';
   initialValues?: ScreenshotPreset;
 }
 
@@ -56,17 +56,17 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   } = useForm<ScreenshotPreset>({
     defaultValues: initialValues ?? {
       options: {
-        type: "screen",
-        sourceId: "",
+        type: 'screen',
+        sourceId: '',
         crop: undefined,
       },
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
-  const selectedType = watch("options.type");
-  const selectedSourceId = watch("options.sourceId");
-  const selectedCrop = watch("options.crop");
+  const selectedType = watch('options.type');
+  const selectedSourceId = watch('options.sourceId');
+  const selectedCrop = watch('options.crop');
 
   const selectedSource: ScreenshotSource | undefined = useMemo(() => {
     if (!screenshotSources) return null;
@@ -83,30 +83,30 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
-    if (mode === "create") {
+    if (mode === 'create') {
       addScreenshotPreset(data, {
         onSuccess: () => {
-          setSidebarState({ state: "manager" });
+          setSidebarState({ state: 'manager' });
           toast.success(`Preset "${data.name}" created`);
         },
       });
-    } else if (mode === "edit") {
+    } else if (mode === 'edit') {
       updateScreenshotPreset(data, {
         onSuccess: () => {
-          toast.success("Preset updated");
+          toast.success('Preset updated');
         },
       });
     }
   };
 
   const handleDelete = () => {
-    if (mode === "edit" && initialValues) {
+    if (mode === 'edit' && initialValues) {
       deleteScreenshotPreset(initialValues.id, {
         onSuccess: () => {
-          toast.success("Preset deleted");
+          toast.success('Preset deleted');
         },
       });
-      setSidebarState({ state: "manager" });
+      setSidebarState({ state: 'manager' });
     }
   };
 
@@ -117,10 +117,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     max,
   }: {
     name:
-      | "options.crop.x"
-      | "options.crop.y"
-      | "options.crop.width"
-      | "options.crop.height";
+      | 'options.crop.x'
+      | 'options.crop.y'
+      | 'options.crop.width'
+      | 'options.crop.height';
     label: string;
     min: number;
     max: number;
@@ -191,7 +191,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       // If not, set source to first available
       const firstAvailableSource = sourceOptions[0];
       if (firstAvailableSource) {
-        setValue("options.sourceId", firstAvailableSource.id);
+        setValue('options.sourceId', firstAvailableSource.id);
       }
     }
   }, [selectedSourceId, setValue, sourceOptions]);
@@ -202,17 +202,17 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       return;
     }
 
-    setValue("options.crop.x", 0);
-    setValue("options.crop.y", 0);
-    setValue("options.crop.width", selectedSource?.size.width || 0);
-    setValue("options.crop.height", selectedSource?.size.height || 0);
+    setValue('options.crop.x', 0);
+    setValue('options.crop.y', 0);
+    setValue('options.crop.width', selectedSource?.size.width || 0);
+    setValue('options.crop.height', selectedSource?.size.height || 0);
   }, [selectedSource, setValue]);
 
   return (
     <SidebarContainer>
       <SidebarHeader
-        title={mode === "create" ? "Create a preset" : "Edit preset"}
-        onBack={() => setSidebarState({ state: "manager" })}
+        title={mode === 'create' ? 'Create a preset' : 'Edit preset'}
+        onBack={() => setSidebarState({ state: 'manager' })}
       />
       <form onSubmit={handleSubmit(onSubmit)} className="flex grow flex-col">
         <SidebarContent className="gap-3">
@@ -220,13 +220,13 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
             <Label htmlFor="name">Name</Label>
             <Input
               className="text-sm"
-              {...register("name", { required: true })}
+              {...register('name', { required: true })}
             />
             {errors.name && <p className="text-xs text-red-500">Required</p>}
           </div>
           <div className="flex flex-col gap-1">
             <Label htmlFor="description">Description</Label>
-            <Input className="text-sm" {...register("description")} />
+            <Input className="text-sm" {...register('description')} />
           </div>
           <Separator className="my-2" />
           <div className="flex flex-col gap-1">
@@ -288,34 +288,34 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           <div className="flex flex-col gap-4">
             <Label>Crop</Label>
             {renderSliderWithInput({
-              label: "X",
-              name: "options.crop.x",
+              label: 'X',
+              name: 'options.crop.x',
               min: 0,
               max: selectedSource?.size.width || 0,
             })}
             {renderSliderWithInput({
-              label: "Y",
-              name: "options.crop.y",
+              label: 'Y',
+              name: 'options.crop.y',
               min: 0,
               max: selectedSource?.size.height || 0,
             })}
             {renderSliderWithInput({
-              label: "Width",
-              name: "options.crop.width",
+              label: 'Width',
+              name: 'options.crop.width',
               min: 0,
               max: selectedSource?.size.width || 0,
             })}
             {renderSliderWithInput({
-              label: "Height",
-              name: "options.crop.height",
+              label: 'Height',
+              name: 'options.crop.height',
               min: 0,
               max: selectedSource?.size.height || 0,
             })}
           </div>
         </SidebarContent>
         <SidebarFooter className="w-full justify-end gap-2">
-          <Button type="submit">{mode === "create" ? "Create" : "Save"}</Button>
-          {mode === "edit" ? (
+          <Button type="submit">{mode === 'create' ? 'Create' : 'Save'}</Button>
+          {mode === 'edit' ? (
             <Button type="button" variant="destructive" onClick={handleDelete}>
               Delete
             </Button>

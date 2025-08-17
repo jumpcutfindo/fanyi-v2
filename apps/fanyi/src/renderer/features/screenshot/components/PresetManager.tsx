@@ -1,16 +1,16 @@
-import { ScreenshotPreset } from "@shared/types/screenshot";
-import { AppWindow, Monitor, Pencil, Plus } from "lucide-react";
+import { ScreenshotPreset } from '@shared/types/screenshot';
+import { AppWindow, Monitor, Pencil, Plus } from 'lucide-react';
 
 import {
   SidebarContainer,
   SidebarContent,
   SidebarHeader,
-} from "@renderer/components/Sidebar";
-import { Button } from "@renderer/components/ui/Button";
-import { useGetScreenshotPresets } from "@renderer/features/screenshot/queries/getScreenshotPresets.query";
-import { cn } from "@renderer/lib/utils";
-import { usePresetStore } from "@renderer/stores/usePresetStore";
-import { useSidebarStore } from "@renderer/stores/useSidebarStore";
+} from '@renderer/components/Sidebar';
+import { Button } from '@renderer/components/ui/Button';
+import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
+import { cn } from '@renderer/lib/utils';
+import { usePresetStore } from '@renderer/stores/usePresetStore';
+import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
@@ -29,8 +29,8 @@ export function PresetManager() {
           className="size-6 rounded-full"
           onClick={() =>
             setSidebarState({
-              state: "editor",
-              options: { mode: "create" },
+              state: 'editor',
+              options: { mode: 'create' },
             })
           }
         >
@@ -52,8 +52,8 @@ export function PresetManager() {
             handleSelect={() => setActivePreset(p)}
             handleEdit={() =>
               setSidebarState({
-                state: "editor",
-                options: { mode: "edit", initialPreset: p },
+                state: 'editor',
+                options: { mode: 'edit', initialPreset: p },
               })
             }
           />
@@ -83,19 +83,19 @@ function PresetItem({
       <button
         type="button"
         className={cn(
-          "hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 hover:cursor-pointer",
-          isActive ? "border-primary" : "",
+          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 hover:cursor-pointer',
+          isActive ? 'border-primary' : ''
         )}
         onClick={handleSelect}
       >
         <span className="text-sm">{preset.name}</span>
         <span className="text-muted-foreground flex flex-row items-center gap-2 text-xs">
-          {preset.options.type === "screen" ? (
+          {preset.options.type === 'screen' ? (
             <Monitor className="size-4" />
           ) : (
             <AppWindow className="size-4" />
-          )}{" "}
-          <span>{`${preset.options.type === "screen" ? "Screen" : "Window"} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
+          )}{' '}
+          <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
         </span>
       </button>
       <button

@@ -1,5 +1,5 @@
-import { ScreenshotPreset } from "@shared/types/screenshot";
-import { create } from "zustand";
+import { ScreenshotPreset } from '@shared/types/screenshot';
+import { create } from 'zustand';
 
 interface BaseTab {
   id: string;
@@ -7,12 +7,12 @@ interface BaseTab {
 }
 
 interface PreviewTab extends BaseTab {
-  type: "preview";
+  type: 'preview';
   activePreset: ScreenshotPreset;
 }
 
 interface TranslationTab extends BaseTab {
-  type: "translation";
+  type: 'translation';
   preset: ScreenshotPreset;
 }
 

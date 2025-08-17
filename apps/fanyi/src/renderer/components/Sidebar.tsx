@@ -1,9 +1,9 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from 'lucide-react';
 
-import { Button } from "@renderer/components/ui/Button";
-import { cn } from "@renderer/lib/utils";
+import { Button } from '@renderer/components/ui/Button';
+import { cn } from '@renderer/lib/utils';
 
-type SidebarContainerProps = React.ComponentProps<"div">;
+type SidebarContainerProps = React.ComponentProps<'div'>;
 
 export function SidebarContainer({
   children,
@@ -11,13 +11,13 @@ export function SidebarContainer({
   ...props
 }: SidebarContainerProps) {
   return (
-    <div className={cn("flex h-full flex-col gap-4 p-4", className)} {...props}>
+    <div className={cn('flex h-full flex-col gap-4 p-4', className)} {...props}>
       {children}
     </div>
   );
 }
 
-type SidebarContentProps = React.ComponentProps<"div">;
+type SidebarContentProps = React.ComponentProps<'div'>;
 
 export function SidebarContent({
   children,
@@ -25,7 +25,7 @@ export function SidebarContent({
   ...props
 }: SidebarContentProps) {
   return (
-    <div className={cn("flex w-full flex-col gap-2", className)} {...props}>
+    <div className={cn('flex w-full flex-col gap-2', className)} {...props}>
       {children}
     </div>
   );
@@ -61,6 +61,6 @@ export function SidebarHeader({ title, children, onBack }: SidebarHeaderProps) {
 export function SidebarFooter({
   children,
   className,
-}: React.ComponentProps<"div">) {
-  return <div className={cn("mt-auto flex", className)}>{children}</div>;
+}: React.ComponentProps<'div'>) {
+  return <div className={cn('mt-auto flex', className)}>{children}</div>;
 }

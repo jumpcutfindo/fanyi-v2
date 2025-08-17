@@ -1,5 +1,5 @@
-import { ScreenshotPreset } from "@shared/types/screenshot";
-import { create } from "zustand";
+import { ScreenshotPreset } from '@shared/types/screenshot';
+import { create } from 'zustand';
 
 type PresetStore = {
   activePreset: ScreenshotPreset | null;

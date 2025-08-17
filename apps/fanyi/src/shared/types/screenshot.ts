@@ -1,4 +1,4 @@
-export type ScreenshotSourceType = "screen" | "window";
+export type ScreenshotSourceType = 'screen' | 'window';
 
 export interface ScreenshotSource {
   type: ScreenshotSourceType;
@@ -11,7 +11,7 @@ export interface ScreenshotSource {
 }
 
 export type ScreenshotOptions = {
-  type: "screen" | "window";
+  type: 'screen' | 'window';
   sourceId: string;
   crop?: {
     x: number;
@@ -29,4 +29,4 @@ export interface ScreenshotPreset {
 }
 
 export interface AddScreenshotPresetPayload
-  extends Omit<ScreenshotPreset, "id"> {}
+  extends Omit<ScreenshotPreset, 'id'> {}
