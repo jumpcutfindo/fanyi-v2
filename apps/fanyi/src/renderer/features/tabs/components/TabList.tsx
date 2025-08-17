@@ -2,6 +2,7 @@ import { Tab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function TabList() {
   const tabs = useTabStore((state) => state.tabs);
+  const setActiveTab = useTabStore((state) => state.setActiveTab);
 
   if (tabs.length === 0) {
     return null;
@@ -9,20 +10,28 @@ export function TabList() {
 
   return (
     <div className="no-scrollbar flex h-8 w-full flex-row overflow-x-scroll">
-      {tabs.map((tab) => TabItem({ tab }))}
+      {tabs.map((tab) => (
+        <TabItem
+          key={tab.id}
+          tab={tab}
+          handleSelect={() => setActiveTab(tab)}
+        />
+      ))}
     </div>
   );
 }
 
 export interface TabItemProps {
   tab: Tab;
+  handleSelect: () => void;
 }
 
-export function TabItem({ tab }: TabItemProps) {
+export function TabItem({ tab, handleSelect }: TabItemProps) {
   return (
     <button
       type="button"
       className="bg-card not-last:border-e-muted hover:bg-muted flex h-8 min-w-fit items-center truncate border-e border-e-transparent p-2 text-sm hover:cursor-pointer"
+      onClick={handleSelect}
     >
       {tab.title}
     </button>

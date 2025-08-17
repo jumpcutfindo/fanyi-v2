@@ -4,6 +4,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
+import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
 import { TabList } from '@renderer/features/tabs/components/TabList';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
@@ -59,8 +60,9 @@ function App() {
           </CSSTransition>
         </TransitionGroup>
       </div>
-      <div className="bg-muted flex h-full w-0 grow">
+      <div className="bg-muted flex h-full w-0 grow flex-col">
         <TabList />
+        <TabDisplay />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 
 interface BaseTab {
@@ -30,7 +31,8 @@ type TabStore = {
 export const useTabStore = create<TabStore>((set, get) => ({
   tabs: [],
   activeTab: null,
-  addTab: (tab: Tab) => set((prev) => ({ tabs: [...prev.tabs, tab] })),
+  addTab: (tab: Tab) =>
+    set((prev) => ({ tabs: [...prev.tabs, { ...tab, id: uuidv4() }] })),
   removeTab: (tabId: string) =>
     set((prev) => ({ tabs: prev.tabs.filter((tab) => tab.id !== tabId) })),
   setActiveTab: (tab: Tab) => set({ activeTab: tab }),
