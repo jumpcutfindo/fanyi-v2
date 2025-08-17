@@ -1,5 +1,5 @@
-import { AddScreenshotPresetPayload } from '@shared/types/screenshot';
-import { useMutation } from '@tanstack/react-query';
+import { AddScreenshotPresetPayload } from "@shared/types/screenshot";
+import { useMutation } from "@tanstack/react-query";
 
 export function useAddScreenshotPresetMutation() {
   return useMutation({

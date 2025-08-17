@@ -2,14 +2,14 @@ import {
   AddScreenshotPresetPayload,
   ScreenshotPreset,
   ScreenshotSource,
-} from '@shared/types/screenshot';
-import { contextBridge, ipcRenderer } from 'electron';
+} from "@shared/types/screenshot";
+import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld('ipcRenderer', {
+contextBridge.exposeInMainWorld("ipcRenderer", {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
     const [channel, listener] = args;
     return ipcRenderer.on(channel, (event, ...args) =>
-      listener(event, ...args)
+      listener(event, ...args),
     );
   },
   off: (...args: Parameters<typeof ipcRenderer.off>) => {
@@ -26,20 +26,20 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 });
 
-contextBridge.exposeInMainWorld('api', {
+contextBridge.exposeInMainWorld("api", {
   getScreenshotWithPreset: (preset: ScreenshotPreset): Promise<Buffer> =>
-    ipcRenderer.invoke('take-screenshot-with-preset', preset),
+    ipcRenderer.invoke("take-screenshot-with-preset", preset),
   getScreenshotSources: (): Promise<ScreenshotSource[]> =>
-    ipcRenderer.invoke('get-screenshot-sources'),
+    ipcRenderer.invoke("get-screenshot-sources"),
 
   addScreenshotPreset: (preset: AddScreenshotPresetPayload): Promise<void> =>
-    ipcRenderer.invoke('add-screenshot-preset', preset),
+    ipcRenderer.invoke("add-screenshot-preset", preset),
   getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
-    ipcRenderer.invoke('get-screenshot-presets'),
+    ipcRenderer.invoke("get-screenshot-presets"),
   updateScreenshotPreset: (preset: ScreenshotPreset): Promise<void> =>
-    ipcRenderer.invoke('update-screenshot-preset', preset),
+    ipcRenderer.invoke("update-screenshot-preset", preset),
   deleteScreenshotPreset: (id: string): Promise<void> =>
-    ipcRenderer.invoke('delete-screenshot-preset', id),
+    ipcRenderer.invoke("delete-screenshot-preset", id),
 
-  performOcr: (): Promise<string> => ipcRenderer.invoke('perform-ocr'),
+  performOcr: (): Promise<string> => ipcRenderer.invoke("perform-ocr"),
 });

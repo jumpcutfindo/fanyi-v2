@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 export function useGetScreenshotSources() {
   return useQuery({
-    queryKey: ['screenshot-sources'],
+    queryKey: ["screenshot-sources"],
     queryFn: () => window.api.getScreenshotSources(),
   });
 }

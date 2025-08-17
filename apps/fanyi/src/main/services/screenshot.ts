@@ -2,8 +2,8 @@ import {
   ScreenshotOptions,
   ScreenshotPreset,
   ScreenshotSource,
-} from '@shared/types/screenshot';
-import { desktopCapturer } from 'electron';
+} from "@shared/types/screenshot";
+import { desktopCapturer } from "electron";
 
 /**
  * Captures a screenshot of the primary screen and returns it as a Buffer.
@@ -12,13 +12,13 @@ import { desktopCapturer } from 'electron';
 async function takeScreenshot(options: ScreenshotOptions): Promise<Buffer> {
   try {
     const sources = await desktopCapturer.getSources({
-      types: ['screen', 'window'],
+      types: ["screen", "window"],
       thumbnailSize: { width: 2560, height: 1440 },
     });
 
     const source = sources.find((s) => s.id === options.sourceId);
     if (!source) {
-      throw new Error('No screen found to capture.');
+      throw new Error("No screen found to capture.");
     }
 
     if (!options.crop) {
@@ -27,7 +27,7 @@ async function takeScreenshot(options: ScreenshotOptions): Promise<Buffer> {
       return source.thumbnail.crop(options.crop).toPNG();
     }
   } catch (err) {
-    console.error('Failed to capture screenshot:', err);
+    console.error("Failed to capture screenshot:", err);
     throw err;
   }
 }
@@ -38,14 +38,14 @@ export async function takeScreenshotWithPreset(preset: ScreenshotPreset) {
 
 export async function getScreenshotSources(): Promise<ScreenshotSource[]> {
   const sources = await desktopCapturer.getSources({
-    types: ['screen', 'window'],
+    types: ["screen", "window"],
     thumbnailSize: { width: 2560, height: 1440 },
   });
 
   return sources.map((s) => ({
     id: s.id,
     name: s.name,
-    type: s.id.includes('window') ? 'window' : 'screen',
+    type: s.id.includes("window") ? "window" : "screen",
     size: {
       width: s.thumbnail.getSize().width,
       height: s.thumbnail.getSize().height,

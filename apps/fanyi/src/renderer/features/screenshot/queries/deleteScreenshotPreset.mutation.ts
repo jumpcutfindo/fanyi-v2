@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useDeleteScreenshotPresetMutation() {
   const queryClient = useQueryClient();
@@ -8,7 +8,7 @@ export function useDeleteScreenshotPresetMutation() {
       return window.api.deleteScreenshotPreset(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['screenshot-presets'] });
+      queryClient.invalidateQueries({ queryKey: ["screenshot-presets"] });
     },
   });
 }

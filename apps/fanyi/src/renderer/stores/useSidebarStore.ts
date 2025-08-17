@@ -1,18 +1,18 @@
-import { ScreenshotPreset } from '@shared/types/screenshot';
-import { create } from 'zustand';
+import { ScreenshotPreset } from "@shared/types/screenshot";
+import { create } from "zustand";
 
 interface ManagerOptions {
   selectedPreset: ScreenshotPreset | null;
 }
 
 interface EditorOptions {
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   initialPreset?: ScreenshotPreset;
 }
 
 type SidebarUnionState =
-  | { state: 'manager'; options?: ManagerOptions }
-  | { state: 'editor'; options: EditorOptions };
+  | { state: "manager"; options?: ManagerOptions }
+  | { state: "editor"; options: EditorOptions };
 
 interface SidebarStore {
   sidebarState: SidebarUnionState;
@@ -20,7 +20,7 @@ interface SidebarStore {
 }
 
 export const useSidebarStore = create<SidebarStore>((set) => ({
-  sidebarState: { state: 'manager' },
+  sidebarState: { state: "manager" },
   setSidebarState: (state: SidebarUnionState) =>
     set(() => ({ sidebarState: state })),
 }));
