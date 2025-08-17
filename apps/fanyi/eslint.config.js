@@ -96,6 +96,8 @@ export default defineConfig([
   },
   globalIgnores([
     '**/dist',
+    '**/dist-electron',
+    'release',
     '**/node_modules',
     '**/*.js',
     '**/*.cjs',
