@@ -12,7 +12,7 @@ export function TabList() {
   }
 
   return (
-    <div className="no-scrollbar flex h-8 w-full flex-row overflow-x-scroll">
+    <div className="grid grid-cols-5">
       {tabs.map((tab) => (
         <TabItem
           key={tab.id}
@@ -36,7 +36,7 @@ export function TabItem({ tab, isActive, handleSelect }: TabItemProps) {
     <button
       type="button"
       className={cn(
-        'bg-card not-last:border-e-muted hover:bg-muted flex h-8 min-w-fit items-center truncate border-e border-e-transparent p-2 text-sm hover:cursor-pointer',
+        'bg-card not-last:border-e-muted hover:bg-muted flex h-8 items-center justify-center truncate border-e border-e-transparent p-2 text-sm hover:cursor-pointer',
         isActive ? 'border-b-primary border-b' : ''
       )}
       onClick={handleSelect}
