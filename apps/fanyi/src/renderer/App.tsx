@@ -4,6 +4,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
+import { TabList } from '@renderer/features/tabs/components/TabList';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
@@ -58,17 +59,12 @@ function App() {
           </CSSTransition>
         </TransitionGroup>
       </div>
-      <div className="bg-muted flex h-full w-full items-center justify-center transition-all">
-        {imageString ? (
-          <img
-            className="max-h-80"
-            src={`data:image/png;base64,${imageString}`}
-            alt="Captured"
-          />
-        ) : null}
+      <div className="bg-muted flex h-full w-full">
+        <TabList />
       </div>
     </div>
   );
 }
 
 export default App;
+

@@ -11,12 +11,14 @@ import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/g
 import { cn } from '@renderer/lib/utils';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
 
   const activePreset = usePresetStore((state) => state.activePreset);
   const setActivePreset = usePresetStore((state) => state.setActivePreset);
+  const addTab = useTabStore((state) => state.addTab);
 
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
@@ -49,7 +51,15 @@ export function PresetManager() {
             key={p.id}
             preset={p}
             isActive={p === activePreset}
-            handleSelect={() => setActivePreset(p)}
+            handleSelect={() => {
+              // FIXME: Replace with actual tab preview setting
+              addTab({
+                id: p.id,
+                title: p.name,
+                type: 'preview',
+                activePreset: p,
+              });
+            }}
             handleEdit={() =>
               setSidebarState({
                 state: 'editor',
