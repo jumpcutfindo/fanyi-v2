@@ -22,14 +22,8 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:import/typescript',
   ],
-  plugins: ['react-refresh', '@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import'],
   rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      {
-        allowConstantExport: true,
-      },
-    ],
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {

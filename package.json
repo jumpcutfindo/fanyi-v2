@@ -15,7 +15,9 @@
     "dev": "pnpm run build:ocr && pnpm run dev:electron",
     "dev:electron": "pnpm --filter fanyi dev",
     "build": "pnpm --filter fanyi build",
-    "build:ocr": "pnpm --filter python-ocr build:conditional"
+    "build:ocr": "pnpm --filter python-ocr build:conditional",
+    "lint": "pnpm --filter fanyi lint & pnpm --filter python-ocr lint",
+    "format": "pnpm --filter fanyi format & pnpm --filter python-ocr format"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
