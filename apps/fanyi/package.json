@@ -8,7 +8,7 @@
     "build": "tsc && vite build && electron-builder",
     "lint": "eslint . --fix --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
-    "format:check": "prettier --check . --log-level debug",
+    "format:check": "prettier --check .",
     "preview": "vite preview",
     "postinstall": "node ./node_modules/electron/install.js && electron-builder install-app-deps"
   },

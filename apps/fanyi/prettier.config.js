@@ -9,7 +9,7 @@ export default {
   tabWidth: 2,
   semi: true,
   singleQuote: true,
-  endOfLine: 'crlf',
+  endOfLine: 'lf',
 
   // Since prettier 3.0, manually specifying plugins is required
   plugins: [
