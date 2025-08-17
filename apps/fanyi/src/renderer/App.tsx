@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';

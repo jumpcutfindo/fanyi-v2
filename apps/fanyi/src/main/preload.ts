@@ -4,7 +4,6 @@ import {
   ScreenshotSource,
 } from '@shared/types/screenshot';
 import { contextBridge, ipcRenderer } from 'electron';
-import { updateScreenshotPreset } from '@main/services/presets';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {

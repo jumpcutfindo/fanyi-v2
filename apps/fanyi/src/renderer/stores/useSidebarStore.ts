@@ -1,8 +1,6 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import { create } from 'zustand';
 
-type SidebarState = 'manager' | 'editor';
-
 interface ManagerOptions {
   selectedPreset: ScreenshotPreset | null;
 }
