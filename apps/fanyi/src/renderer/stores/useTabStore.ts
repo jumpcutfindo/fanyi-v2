@@ -34,8 +34,33 @@ export const useTabStore = create<TabStore>((set, get) => ({
   addTab: (tab: Tab) =>
     set((prev) => ({ tabs: [...prev.tabs, { ...tab, id: uuidv4() }] })),
   removeTab: (tabId: string) =>
-    set((prev) => ({ tabs: prev.tabs.filter((tab) => tab.id !== tabId) })),
+    set((prev) => {
+      const tabs = prev.tabs.filter((tab) => tab.id !== tabId);
+
+      let newActiveTab = null;
+
+      // Check if current active tab was removed
+      if (prev.activeTab?.id === tabId) {
+        const currActiveTabIdx = prev.tabs.findIndex((tab) => tab.id === tabId);
+
+        // Switch to the one after
+        newActiveTab =
+          currActiveTabIdx >= 0 && currActiveTabIdx < tabs.length
+            ? tabs[currActiveTabIdx]
+            : null;
+
+        // If still null, switch to the one before
+        if (!newActiveTab) {
+          newActiveTab =
+            currActiveTabIdx >= 0 ? tabs[currActiveTabIdx - 1] : null;
+        }
+      }
+
+      return {
+        tabs,
+        activeTab: newActiveTab,
+      };
+    }),
   setActiveTab: (tab: Tab) => set({ activeTab: tab }),
   isTabActive: (tab: Tab) => get().activeTab?.id === tab.id,
 }));
-
