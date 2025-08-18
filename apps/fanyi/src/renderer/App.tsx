@@ -3,27 +3,14 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
-import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
 import { TabList } from '@renderer/features/tabs/components/TabList';
-import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 function App() {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
-  const activePreset = usePresetStore((state) => state.activePreset);
-
-  const { data: screenshot } = useGetScreenshotWithPreset(activePreset);
-
-  const imageString = screenshot
-    ? btoa(
-        new Uint8Array(screenshot).reduce(function (data, byte) {
-          return data + String.fromCharCode(byte);
-        }, '')
-      )
-    : null;
 
   const renderSidebar = () => {
     switch (sidebarState.state) {
@@ -69,4 +56,3 @@ function App() {
 }
 
 export default App;
-
