@@ -1,5 +1,5 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
-import { AppWindow, Monitor, Pencil, Plus } from 'lucide-react';
+import { AppWindow, Monitor, Plus } from 'lucide-react';
 
 import {
   SidebarContainer,
@@ -9,14 +9,11 @@ import {
 import { Button } from '@renderer/components/ui/Button';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
-import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
-
-  const activePreset = usePresetStore((state) => state.activePreset);
 
   const setActiveTab = useTabStore((state) => state.setActiveTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);
@@ -51,7 +48,6 @@ export function PresetManager() {
           <PresetItem
             key={p.id}
             preset={p}
-            isActive={p === activePreset}
             handleSelect={() => {
               const tab: PreviewTab = {
                 id: p.id,
@@ -63,12 +59,6 @@ export function PresetManager() {
               setPreviewTab(tab);
               setActiveTab(tab);
             }}
-            handleEdit={() =>
-              setSidebarState({
-                state: 'editor',
-                options: { mode: 'edit', initialPreset: p },
-              })
-            }
           />
         ))}
       </SidebarContent>
@@ -78,17 +68,11 @@ export function PresetManager() {
 
 interface PresetItemProps {
   preset: ScreenshotPreset | null;
-  isActive: boolean;
+  isActive?: boolean;
   handleSelect: () => void;
-  handleEdit: () => void;
 }
 
-function PresetItem({
-  preset,
-  handleSelect,
-  handleEdit,
-  isActive,
-}: PresetItemProps) {
+function PresetItem({ preset, handleSelect, isActive }: PresetItemProps) {
   if (!preset) return null;
 
   return (
@@ -110,12 +94,6 @@ function PresetItem({
           )}{' '}
           <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
         </span>
-      </button>
-      <button
-        className="text-muted-foreground hover:bg-muted absolute top-2 right-2 rounded-full p-2 opacity-0 group-hover:opacity-100 hover:cursor-pointer focus:opacity-100"
-        onClick={handleEdit}
-      >
-        <Pencil className="size-3.5" />
       </button>
     </div>
   );

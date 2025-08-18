@@ -26,8 +26,8 @@ import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/qu
 import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
 import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
-import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { useTabStore } from '@renderer/stores/useTabStore';
 
 interface PresetEditorProps {
   mode: 'create' | 'edit';
@@ -36,7 +36,9 @@ interface PresetEditorProps {
 
 export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
-  const setActivePreset = usePresetStore((state) => state.setActivePreset);
+
+  const previewTab = useTabStore((state) => state.previewTab);
+  const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
   const { data: screenshotSources } = useGetScreenshotSources();
 
@@ -80,7 +82,12 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     return screenshotSources.filter((s) => s.type === selectedType);
   }, [screenshotSources, selectedType]);
 
-  const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
+  const debounceSetActivePreset = useDebouncedCallback((preset) => {
+    setPreviewTab({
+      ...previewTab!,
+      activePreset: preset,
+    });
+  }, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
     if (mode === 'create') {
@@ -155,13 +162,6 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       </div>
     );
   };
-
-  // If initial value is provided, set active preset
-  useEffect(() => {
-    if (initialValues) {
-      setActivePreset(initialValues);
-    }
-  }, [initialValues, setActivePreset]);
 
   // Update preview on form update
   useEffect(() => {

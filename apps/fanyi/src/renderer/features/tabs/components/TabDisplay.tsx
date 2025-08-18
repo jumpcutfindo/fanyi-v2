@@ -2,12 +2,14 @@ import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Pencil, Play } from 'lucide-react';
 
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
+import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 const containerStyle = 'flex grow items-center justify-center';
 
 export function TabDisplay() {
   const activeTab = useTabStore((state) => state.activeTab);
+  const previewTab = useTabStore((state) => state.previewTab);
 
   if (!activeTab) {
     return (
@@ -19,8 +21,8 @@ export function TabDisplay() {
     );
   }
 
-  if (activeTab.type === 'preview') {
-    return <PreviewTabDisplay preset={activeTab.activePreset} />;
+  if (activeTab.type === 'preview' && previewTab) {
+    return <PreviewTabDisplay preset={previewTab.activePreset} />;
   }
 
   return (
@@ -37,6 +39,8 @@ interface PreviewTabDisplayProps {
 function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
   const { data: screenshot } = useGetScreenshotWithPreset(preset);
 
+  const setSidebarState = useSidebarStore((state) => state.setSidebarState);
+
   return (
     <div className="flex h-full w-full flex-col">
       <div className="p-12">
@@ -52,7 +56,15 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
         <button className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-100">
           <Play className="text-green-500" />
         </button>
-        <button className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-100">
+        <button
+          className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-100"
+          onClick={() =>
+            setSidebarState({
+              state: 'editor',
+              options: { mode: 'edit', initialPreset: preset },
+            })
+          }
+        >
           <Pencil className="text-amber-500" />
         </button>
       </div>
