@@ -1,3 +1,7 @@
+import { ScreenshotPreset } from '@shared/types/screenshot';
+import { Pencil, Play } from 'lucide-react';
+
+import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 const containerStyle = 'flex grow items-center justify-center';
@@ -15,9 +19,43 @@ export function TabDisplay() {
     );
   }
 
+  if (activeTab.type === 'preview') {
+    return <PreviewTabDisplay preset={activeTab.activePreset} />;
+  }
+
   return (
     <div className={containerStyle}>
       {activeTab.title} ({activeTab.id}) selected
+    </div>
+  );
+}
+
+interface PreviewTabDisplayProps {
+  preset: ScreenshotPreset;
+}
+
+function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
+  const { data: screenshot } = useGetScreenshotWithPreset(preset);
+
+  return (
+    <div className="flex h-full w-full flex-col">
+      <div className="p-12">
+        <img src={screenshot} />
+      </div>
+      <div className="text-center">
+        <h1 className="text-lg font-semibold">{preset.name}</h1>
+        <span>
+          {preset.options.crop?.width}x{preset.options.crop?.height}
+        </span>
+      </div>
+      <div className="flex grow flex-row items-center justify-center gap-8 px-32">
+        <button className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-100">
+          <Play className="text-green-500" />
+        </button>
+        <button className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-100">
+          <Pencil className="text-amber-500" />
+        </button>
+      </div>
     </div>
   );
 }
