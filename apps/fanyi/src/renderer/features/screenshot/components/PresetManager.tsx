@@ -11,14 +11,15 @@ import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/g
 import { cn } from '@renderer/lib/utils';
 import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
-import { useTabStore } from '@renderer/stores/useTabStore';
+import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
 
   const activePreset = usePresetStore((state) => state.activePreset);
-  const setActivePreset = usePresetStore((state) => state.setActivePreset);
-  const addTab = useTabStore((state) => state.addTab);
+
+  const setActiveTab = useTabStore((state) => state.setActiveTab);
+  const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
@@ -52,13 +53,15 @@ export function PresetManager() {
             preset={p}
             isActive={p === activePreset}
             handleSelect={() => {
-              // FIXME: Replace with actual tab preview setting
-              addTab({
+              const tab: PreviewTab = {
                 id: p.id,
-                title: p.name,
+                title: 'Preview',
                 type: 'preview',
                 activePreset: p,
-              });
+              };
+
+              setPreviewTab(tab);
+              setActiveTab(tab);
             }}
             handleEdit={() =>
               setSidebarState({
@@ -117,4 +120,3 @@ function PresetItem({
     </div>
   );
 }
-

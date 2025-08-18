@@ -10,9 +10,8 @@ export function TabList() {
   const setActiveTab = useTabStore((state) => state.setActiveTab);
   const removeTab = useTabStore((state) => state.removeTab);
 
-  if (tabs.length === 0) {
-    return null;
-  }
+  const previewTab = useTabStore((state) => state.previewTab);
+  const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
   return (
     <div className="grid grid-cols-5">
@@ -25,6 +24,15 @@ export function TabList() {
           handleClose={() => removeTab(tab.id)}
         />
       ))}
+      {previewTab ? (
+        <TabItem
+          tab={previewTab}
+          isActive={activeTab?.id === previewTab.id}
+          handleSelect={() => setActiveTab(previewTab)}
+          handleClose={() => setPreviewTab(null)}
+          isPreview
+        />
+      ) : null}
     </div>
   );
 }
@@ -32,6 +40,7 @@ export function TabList() {
 export interface TabItemProps {
   tab: Tab;
   isActive: boolean;
+  isPreview?: boolean;
   handleSelect: () => void;
   handleClose: () => void;
 }
@@ -39,6 +48,7 @@ export interface TabItemProps {
 export function TabItem({
   tab,
   isActive,
+  isPreview,
   handleSelect,
   handleClose,
 }: TabItemProps) {
@@ -52,7 +62,9 @@ export function TabItem({
         )}
         onClick={handleSelect}
       >
-        <span className="max-w-[90%] truncate">{tab.title}</span>
+        <span className={cn('max-w-[90%] truncate', isPreview ? 'italic' : '')}>
+          {tab.title}
+        </span>
       </button>
 
       <button

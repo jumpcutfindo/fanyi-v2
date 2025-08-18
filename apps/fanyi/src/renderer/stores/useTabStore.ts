@@ -7,12 +7,12 @@ interface BaseTab {
   title: string;
 }
 
-interface PreviewTab extends BaseTab {
+export interface PreviewTab extends BaseTab {
   type: 'preview';
   activePreset: ScreenshotPreset;
 }
 
-interface TranslationTab extends BaseTab {
+export interface TranslationTab extends BaseTab {
   type: 'translation';
   preset: ScreenshotPreset;
 }
@@ -26,6 +26,8 @@ type TabStore = {
   removeTab: (tabId: string) => void;
   setActiveTab: (tab: Tab) => void;
   isTabActive: (tab: Tab) => boolean;
+  previewTab: PreviewTab | null;
+  setPreviewTab: (tab: PreviewTab | null) => void;
 };
 
 export const useTabStore = create<TabStore>((set, get) => ({
@@ -63,4 +65,6 @@ export const useTabStore = create<TabStore>((set, get) => ({
     }),
   setActiveTab: (tab: Tab) => set({ activeTab: tab }),
   isTabActive: (tab: Tab) => get().activeTab?.id === tab.id,
+  previewTab: null,
+  setPreviewTab: (tab: PreviewTab | null) => set({ previewTab: tab }),
 }));
