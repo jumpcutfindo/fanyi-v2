@@ -29,7 +29,7 @@ export function TabList() {
           tab={previewTab}
           isActive={activeTab?.id === previewTab.id}
           handleSelect={() => setActiveTab(previewTab)}
-          handleClose={() => setPreviewTab(null)}
+          handleClose={() => removeTab(previewTab.id)}
           isPreview
         />
       ) : null}

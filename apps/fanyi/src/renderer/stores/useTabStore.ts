@@ -27,7 +27,7 @@ type TabStore = {
   setActiveTab: (tab: Tab) => void;
   isTabActive: (tab: Tab) => boolean;
   previewTab: PreviewTab | null;
-  setPreviewTab: (tab: PreviewTab | null) => void;
+  setPreviewTab: (tab: PreviewTab) => void;
 };
 
 export const useTabStore = create<TabStore>((set, get) => ({
@@ -38,6 +38,7 @@ export const useTabStore = create<TabStore>((set, get) => ({
   removeTab: (tabId: string) =>
     set((prev) => {
       const tabs = prev.tabs.filter((tab) => tab.id !== tabId);
+      const previewTab = prev.previewTab?.id === tabId ? null : prev.previewTab;
 
       let newActiveTab = null;
 
@@ -60,11 +61,12 @@ export const useTabStore = create<TabStore>((set, get) => ({
 
       return {
         tabs,
+        previewTab,
         activeTab: newActiveTab,
       };
     }),
   setActiveTab: (tab: Tab) => set({ activeTab: tab }),
   isTabActive: (tab: Tab) => get().activeTab?.id === tab.id,
   previewTab: null,
-  setPreviewTab: (tab: PreviewTab | null) => set({ previewTab: tab }),
+  setPreviewTab: (tab: PreviewTab) => set({ previewTab: tab }),
 }));
