@@ -54,7 +54,8 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     watch,
     setValue,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
+    reset,
   } = useForm<ScreenshotPreset>({
     defaultValues: initialValues ?? {
       options: {
@@ -95,12 +96,15 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         onSuccess: () => {
           setSidebarState({ state: 'manager' });
           toast.success(`Preset "${data.name}" created`);
+
+          reset(data, { keepDirty: false });
         },
       });
     } else if (mode === 'edit') {
       updateScreenshotPreset(data, {
         onSuccess: () => {
           toast.success('Preset updated');
+          reset(data, { keepDirty: false });
         },
       });
     }
@@ -214,7 +218,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         onBack={() => {
           setSidebarState({ state: 'manager' });
 
-          if (initialValues && initialValues !== watch()) {
+          if (isDirty && initialValues && initialValues !== watch()) {
             setPreviewTab({ ...previewTab!, activePreset: initialValues });
           }
         }}
