@@ -196,9 +196,8 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     }
   }, [selectedSourceId, setValue, sourceOptions]);
 
-  // Handle switching between selected sources
   useEffect(() => {
-    if (!selectedSource) {
+    if (!selectedSource || initialValues) {
       return;
     }
 
@@ -206,7 +205,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     setValue('options.crop.y', 0);
     setValue('options.crop.width', selectedSource?.size.width || 0);
     setValue('options.crop.height', selectedSource?.size.height || 0);
-  }, [selectedSource, setValue]);
+  }, [mode, selectedSource, initialValues, setValue]);
 
   return (
     <SidebarContainer>
