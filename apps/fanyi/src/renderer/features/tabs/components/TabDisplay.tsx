@@ -42,10 +42,11 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="p-12">
-        <img src={screenshot} />
-      </div>
+    <div className="flex h-full w-full flex-col space-y-4">
+      <img
+        src={screenshot}
+        className="h-120 w-full bg-black/20 object-scale-down"
+      />
       <div className="text-center">
         <h1 className="text-lg font-semibold">{preset.name}</h1>
         <span>
