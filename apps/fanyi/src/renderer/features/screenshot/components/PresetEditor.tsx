@@ -211,7 +211,13 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     <SidebarContainer>
       <SidebarHeader
         title={mode === 'create' ? 'Create a preset' : 'Edit preset'}
-        onBack={() => setSidebarState({ state: 'manager' })}
+        onBack={() => {
+          setSidebarState({ state: 'manager' });
+
+          if (initialValues && initialValues !== watch()) {
+            setPreviewTab({ ...previewTab!, activePreset: initialValues });
+          }
+        }}
       />
       <form onSubmit={handleSubmit(onSubmit)} className="flex grow flex-col">
         <SidebarContent className="gap-3">
