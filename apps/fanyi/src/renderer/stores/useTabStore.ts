@@ -77,6 +77,11 @@ export const useTabStore = create<TabStore>((set, get) => ({
     }),
   setActiveTab: (tabId) =>
     set((prev) => {
+      // Check preview tab
+      if (prev.previewTab?.id === tabId) {
+        return { activeTab: prev.previewTab };
+      }
+
       const newActiveTab = prev.tabs.find((t) => t.id === tabId);
 
       return { activeTab: newActiveTab };
