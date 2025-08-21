@@ -14,7 +14,6 @@ export function TabList() {
   const removeTab = useTabStore((state) => state.removeTab);
 
   const previewTab = useTabStore((state) => state.previewTab);
-  const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
   return (
     <div className="grid grid-cols-5">
@@ -23,7 +22,7 @@ export function TabList() {
           key={tab.id}
           tab={tab}
           isActive={activeTab?.id === tab.id}
-          handleSelect={() => setActiveTab(tab)}
+          handleSelect={() => setActiveTab(tab.id)}
           handleClose={() => removeTab(tab.id)}
           disabled={sidebarState.state === 'editor'}
         />
@@ -32,7 +31,7 @@ export function TabList() {
         <TabItem
           tab={previewTab}
           isActive={activeTab?.id === previewTab.id}
-          handleSelect={() => setActiveTab(previewTab)}
+          handleSelect={() => setActiveTab(previewTab.id)}
           handleClose={() => removeTab(previewTab.id)}
           isPreview
           disabled={sidebarState.state === 'editor'}

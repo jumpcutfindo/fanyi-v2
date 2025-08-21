@@ -24,10 +24,13 @@ type TabStore = {
   activeTab: Tab | null;
   addTab: (tab: Tab, options?: { setActive?: boolean }) => void;
   removeTab: (tabId: string) => void;
-  setActiveTab: (tab: Tab) => void;
-  isTabActive: (tab: Tab) => boolean;
+  setActiveTab: (tabId: string) => void;
+  isTabActive: (tabId: string) => boolean;
   previewTab: PreviewTab | null;
-  setPreviewTab: (tab: PreviewTab) => void;
+  setPreviewTab: (
+    tab: Omit<PreviewTab, 'id'>,
+    options?: { setActive?: boolean }
+  ) => void;
 };
 
 export const useTabStore = create<TabStore>((set, get) => ({
@@ -42,7 +45,7 @@ export const useTabStore = create<TabStore>((set, get) => ({
 
       return { tabs: newTabs, activeTab: newActiveTab };
     }),
-  removeTab: (tabId: string) =>
+  removeTab: (tabId) =>
     set((prev) => {
       const tabs = prev.tabs.filter((tab) => tab.id !== tabId);
       const previewTab = prev.previewTab?.id === tabId ? null : prev.previewTab;
@@ -72,8 +75,21 @@ export const useTabStore = create<TabStore>((set, get) => ({
         activeTab: newActiveTab,
       };
     }),
-  setActiveTab: (tab: Tab) => set({ activeTab: tab }),
-  isTabActive: (tab: Tab) => get().activeTab?.id === tab.id,
+  setActiveTab: (tabId) =>
+    set((prev) => {
+      const newActiveTab = prev.tabs.find((t) => t.id === tabId);
+
+      return { activeTab: newActiveTab };
+    }),
+  isTabActive: (tabId) => get().activeTab?.id === tabId,
   previewTab: null,
-  setPreviewTab: (tab: PreviewTab) => set({ previewTab: tab }),
+  setPreviewTab: (tab, opts) => {
+    const newPreviewTab = { ...tab, id: uuidv4() };
+
+    if (opts?.setActive) {
+      set({ previewTab: newPreviewTab, activeTab: newPreviewTab });
+    }
+
+    set({ previewTab: newPreviewTab });
+  },
 }));

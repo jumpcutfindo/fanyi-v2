@@ -39,6 +39,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
 
   const previewTab = useTabStore((state) => state.previewTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);
+  const removeTab = useTabStore((state) => state.removeTab);
 
   const { data: screenshotSources } = useGetScreenshotSources();
 
@@ -84,10 +85,15 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   }, [screenshotSources, selectedType]);
 
   const debounceSetActivePreset = useDebouncedCallback((preset) => {
-    setPreviewTab({
-      ...previewTab!,
-      activePreset: preset,
-    });
+    setPreviewTab(
+      {
+        ...previewTab!,
+        activePreset: preset,
+      },
+      {
+        setActive: true,
+      }
+    );
   }, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
@@ -97,6 +103,17 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           setSidebarState({ state: 'manager' });
           toast.success(`Preset "${data.name}" created`);
 
+          setPreviewTab(
+            {
+              title: 'Preview',
+              type: 'preview',
+              activePreset: data,
+            },
+            {
+              setActive: true,
+            }
+          );
+
           reset(data, { keepDirty: false });
         },
       });
@@ -104,6 +121,18 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
       updateScreenshotPreset(data, {
         onSuccess: () => {
           toast.success('Preset updated');
+
+          setPreviewTab(
+            {
+              title: 'Preview',
+              type: 'preview',
+              activePreset: data,
+            },
+            {
+              setActive: true,
+            }
+          );
+
           reset(data, { keepDirty: false });
         },
       });
@@ -117,7 +146,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           toast.success('Preset deleted');
         },
       });
+
       setSidebarState({ state: 'manager' });
+
+      removeTab(previewTab!.id);
     }
   };
 
@@ -218,7 +250,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         onBack={() => {
           setSidebarState({ state: 'manager' });
 
-          if (isDirty && initialValues && initialValues !== watch()) {
+          if (!initialValues && previewTab?.id) {
+            removeTab(previewTab?.id);
+          } else if (isDirty && initialValues && initialValues !== watch()) {
+            // Reset to the original preset
             setPreviewTab({ ...previewTab!, activePreset: initialValues });
           }
         }}

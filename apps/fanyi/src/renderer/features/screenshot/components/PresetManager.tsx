@@ -42,8 +42,7 @@ export function PresetManager() {
                 activePreset: null,
               };
 
-              setPreviewTab(tab);
-              setActiveTab(tab);
+              setPreviewTab(tab, { setActive: true });
             }
           }}
         >
@@ -69,8 +68,7 @@ export function PresetManager() {
                 activePreset: p,
               };
 
-              setPreviewTab(tab);
-              setActiveTab(tab);
+              setPreviewTab(tab, { setActive: true });
             }}
           />
         ))}
