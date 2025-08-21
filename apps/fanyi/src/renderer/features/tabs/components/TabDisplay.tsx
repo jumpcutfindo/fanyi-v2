@@ -54,11 +54,12 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
         </span>
       </div>
       <div className="flex grow flex-row items-center justify-center gap-8 px-32">
-        <button className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-100">
-          <Play className="text-green-500" />
+        <button
+          className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
+          <Play className="text-green-600 group-hover:fill-green-600" />
         </button>
         <button
-          className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-100"
+          className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-200 hover:bg-amber-300"
           onClick={() =>
             setSidebarState({
               state: 'editor',
@@ -66,7 +67,7 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
             })
           }
         >
-          <Pencil className="text-amber-500" />
+          <Pencil className="text-amber-600 group-hover:fill-amber-600" />
         </button>
       </div>
     </div>
