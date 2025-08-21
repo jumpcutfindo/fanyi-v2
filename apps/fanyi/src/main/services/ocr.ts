@@ -21,11 +21,7 @@ function getPythonExecutablePath(): string {
   return path.join(process.resourcesPath, executableName);
 }
 
-function runOcr(): Promise<string> {
-  const sampleImage = fs.readFileSync(
-    path.join(process.env.VITE_PUBLIC, 'example-image.png')
-  );
-
+function runOcr(imageBuffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
     const pythonExecutable = getPythonExecutablePath();
     try {
@@ -73,7 +69,7 @@ function runOcr(): Promise<string> {
       });
 
       console.log('Writing image data to Python process...');
-      pythonProcess.stdin.write(sampleImage);
+      pythonProcess.stdin.write(imageBuffer);
       pythonProcess.stdin.end();
     } catch (err) {
       console.error('Error in runOcr function:', err);
