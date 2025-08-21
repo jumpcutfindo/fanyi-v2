@@ -23,6 +23,8 @@ export function TabDisplay() {
   }
 
   if (activeTab.type === 'preview' && previewTab) {
+    if (!previewTab.activePreset) return null;
+
     return <PreviewTabDisplay preset={previewTab.activePreset} />;
   }
 

@@ -16,6 +16,7 @@ export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
 
   const setActiveTab = useTabStore((state) => state.setActiveTab);
+  const previewTab = useTabStore((state) => state.previewTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
@@ -27,12 +28,24 @@ export function PresetManager() {
           variant="ghost"
           type="button"
           className="size-6 rounded-full"
-          onClick={() =>
+          onClick={() => {
             setSidebarState({
               state: 'editor',
               options: { mode: 'create' },
-            })
-          }
+            });
+
+            if (!previewTab) {
+              const tab: PreviewTab = {
+                id: 'new',
+                title: 'Preview',
+                type: 'preview',
+                activePreset: null,
+              };
+
+              setPreviewTab(tab);
+              setActiveTab(tab);
+            }
+          }}
         >
           <Plus className="size-4" />
         </Button>

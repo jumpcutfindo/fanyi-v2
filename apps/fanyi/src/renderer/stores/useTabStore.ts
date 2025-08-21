@@ -9,7 +9,7 @@ interface BaseTab {
 
 export interface PreviewTab extends BaseTab {
   type: 'preview';
-  activePreset: ScreenshotPreset;
+  activePreset: ScreenshotPreset | null;
 }
 
 export interface TranslationTab extends BaseTab {
