@@ -22,7 +22,7 @@ export type Tab = PreviewTab | TranslationTab;
 type TabStore = {
   tabs: Tab[];
   activeTab: Tab | null;
-  addTab: (tab: Tab) => void;
+  addTab: (tab: Tab, options?: { setActive?: boolean }) => void;
   removeTab: (tabId: string) => void;
   setActiveTab: (tab: Tab) => void;
   isTabActive: (tab: Tab) => boolean;
@@ -33,8 +33,15 @@ type TabStore = {
 export const useTabStore = create<TabStore>((set, get) => ({
   tabs: [],
   activeTab: null,
-  addTab: (tab: Tab) =>
-    set((prev) => ({ tabs: [...prev.tabs, { ...tab, id: uuidv4() }] })),
+  addTab: (tab, opts) =>
+    set((prev) => {
+      const newTab = { ...tab, id: uuidv4() };
+
+      const newTabs = [...prev.tabs, newTab];
+      const newActiveTab = opts?.setActive ? newTab : prev.activeTab;
+
+      return { tabs: newTabs, activeTab: newActiveTab };
+    }),
   removeTab: (tabId: string) =>
     set((prev) => {
       const tabs = prev.tabs.filter((tab) => tab.id !== tabId);

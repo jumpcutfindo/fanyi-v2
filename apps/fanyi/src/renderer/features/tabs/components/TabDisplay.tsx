@@ -41,6 +41,8 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
 
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
+  const addTab = useTabStore((state) => state.addTab);
+
   return (
     <div className="flex h-full w-full flex-col space-y-4">
       <img
@@ -56,6 +58,18 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
       <div className="flex grow flex-row items-center justify-center gap-8 px-32">
         <button
           className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
+          onClick={() =>
+            addTab(
+              {
+                id: '',
+                type: 'translation',
+                preset: preset,
+                title: preset.name,
+              },
+              { setActive: true }
+            )
+          }
+        >
           <Play className="text-green-600 group-hover:fill-green-600" />
         </button>
         <button
