@@ -1,5 +1,5 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
-import { AppWindow, Monitor, Pencil, Plus } from 'lucide-react';
+import { AppWindow, Monitor, Plus } from 'lucide-react';
 
 import {
   SidebarContainer,
@@ -9,14 +9,15 @@ import {
 import { Button } from '@renderer/components/ui/Button';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
-import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
 
-  const activePreset = usePresetStore((state) => state.activePreset);
-  const setActivePreset = usePresetStore((state) => state.setActivePreset);
+  const setActiveTab = useTabStore((state) => state.setActiveTab);
+  const previewTab = useTabStore((state) => state.previewTab);
+  const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
@@ -27,12 +28,23 @@ export function PresetManager() {
           variant="ghost"
           type="button"
           className="size-6 rounded-full"
-          onClick={() =>
+          onClick={() => {
             setSidebarState({
               state: 'editor',
               options: { mode: 'create' },
-            })
-          }
+            });
+
+            if (!previewTab) {
+              const tab: PreviewTab = {
+                id: 'new',
+                title: 'Preview',
+                type: 'preview',
+                activePreset: null,
+              };
+
+              setPreviewTab(tab, { setActive: true });
+            }
+          }}
         >
           <Plus className="size-4" />
         </Button>
@@ -48,14 +60,16 @@ export function PresetManager() {
           <PresetItem
             key={p.id}
             preset={p}
-            isActive={p === activePreset}
-            handleSelect={() => setActivePreset(p)}
-            handleEdit={() =>
-              setSidebarState({
-                state: 'editor',
-                options: { mode: 'edit', initialPreset: p },
-              })
-            }
+            handleSelect={() => {
+              const tab: PreviewTab = {
+                id: p.id,
+                title: 'Preview',
+                type: 'preview',
+                activePreset: p,
+              };
+
+              setPreviewTab(tab, { setActive: true });
+            }}
           />
         ))}
       </SidebarContent>
@@ -65,17 +79,11 @@ export function PresetManager() {
 
 interface PresetItemProps {
   preset: ScreenshotPreset | null;
-  isActive: boolean;
+  isActive?: boolean;
   handleSelect: () => void;
-  handleEdit: () => void;
 }
 
-function PresetItem({
-  preset,
-  handleSelect,
-  handleEdit,
-  isActive,
-}: PresetItemProps) {
+function PresetItem({ preset, handleSelect, isActive }: PresetItemProps) {
   if (!preset) return null;
 
   return (
@@ -83,7 +91,7 @@ function PresetItem({
       <button
         type="button"
         className={cn(
-          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 hover:cursor-pointer',
+          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 text-start hover:cursor-pointer',
           isActive ? 'border-primary' : ''
         )}
         onClick={handleSelect}
@@ -97,12 +105,6 @@ function PresetItem({
           )}{' '}
           <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
         </span>
-      </button>
-      <button
-        className="text-muted-foreground hover:bg-muted absolute top-2 right-2 rounded-full p-2 opacity-0 group-hover:opacity-100 hover:cursor-pointer focus:opacity-100"
-        onClick={handleEdit}
-      >
-        <Pencil className="size-3.5" />
       </button>
     </div>
   );

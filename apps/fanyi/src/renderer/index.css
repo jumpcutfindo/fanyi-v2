@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -184,24 +184,4 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-}
-
-/* The element's initial state as it enters */
-.sidebar-enter {
-  opacity: 1;
-}
-
-/* The element's final state as it enters */
-.sidebar-enter-active {
-  opacity: 1;
-}
-
-/* The element's initial state as it exits */
-.sidebar-exit {
-  opacity: 0;
-}
-
-/* The element's final state as it exits */
-.sidebar-exit-active {
-  opacity: 0;
 }

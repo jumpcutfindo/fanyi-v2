@@ -26,8 +26,8 @@ import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/qu
 import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
 import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
-import { usePresetStore } from '@renderer/stores/usePresetStore';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { useTabStore } from '@renderer/stores/useTabStore';
 
 interface PresetEditorProps {
   mode: 'create' | 'edit';
@@ -36,7 +36,10 @@ interface PresetEditorProps {
 
 export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
-  const setActivePreset = usePresetStore((state) => state.setActivePreset);
+
+  const previewTab = useTabStore((state) => state.previewTab);
+  const setPreviewTab = useTabStore((state) => state.setPreviewTab);
+  const removeTab = useTabStore((state) => state.removeTab);
 
   const { data: screenshotSources } = useGetScreenshotSources();
 
@@ -52,7 +55,8 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     watch,
     setValue,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
+    reset,
   } = useForm<ScreenshotPreset>({
     defaultValues: initialValues ?? {
       options: {
@@ -80,7 +84,17 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     return screenshotSources.filter((s) => s.type === selectedType);
   }, [screenshotSources, selectedType]);
 
-  const debounceSetActivePreset = useDebouncedCallback(setActivePreset, 500);
+  const debounceSetActivePreset = useDebouncedCallback((preset) => {
+    setPreviewTab(
+      {
+        ...previewTab!,
+        activePreset: preset,
+      },
+      {
+        setActive: true,
+      }
+    );
+  }, 500);
 
   const onSubmit = (data: ScreenshotPreset) => {
     if (mode === 'create') {
@@ -88,12 +102,38 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         onSuccess: () => {
           setSidebarState({ state: 'manager' });
           toast.success(`Preset "${data.name}" created`);
+
+          setPreviewTab(
+            {
+              title: 'Preview',
+              type: 'preview',
+              activePreset: data,
+            },
+            {
+              setActive: true,
+            }
+          );
+
+          reset(data, { keepDirty: false });
         },
       });
     } else if (mode === 'edit') {
       updateScreenshotPreset(data, {
         onSuccess: () => {
           toast.success('Preset updated');
+
+          setPreviewTab(
+            {
+              title: 'Preview',
+              type: 'preview',
+              activePreset: data,
+            },
+            {
+              setActive: true,
+            }
+          );
+
+          reset(data, { keepDirty: false });
         },
       });
     }
@@ -106,7 +146,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           toast.success('Preset deleted');
         },
       });
+
       setSidebarState({ state: 'manager' });
+
+      removeTab(previewTab!.id);
     }
   };
 
@@ -156,13 +199,6 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     );
   };
 
-  // If initial value is provided, set active preset
-  useEffect(() => {
-    if (initialValues) {
-      setActivePreset(initialValues);
-    }
-  }, [initialValues, setActivePreset]);
-
   // Update preview on form update
   useEffect(() => {
     if (selectedType && selectedSourceId) {
@@ -196,9 +232,8 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     }
   }, [selectedSourceId, setValue, sourceOptions]);
 
-  // Handle switching between selected sources
   useEffect(() => {
-    if (!selectedSource) {
+    if (!selectedSource || initialValues) {
       return;
     }
 
@@ -206,13 +241,22 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     setValue('options.crop.y', 0);
     setValue('options.crop.width', selectedSource?.size.width || 0);
     setValue('options.crop.height', selectedSource?.size.height || 0);
-  }, [selectedSource, setValue]);
+  }, [mode, selectedSource, initialValues, setValue]);
 
   return (
     <SidebarContainer>
       <SidebarHeader
         title={mode === 'create' ? 'Create a preset' : 'Edit preset'}
-        onBack={() => setSidebarState({ state: 'manager' })}
+        onBack={() => {
+          setSidebarState({ state: 'manager' });
+
+          if (!initialValues && previewTab?.id) {
+            removeTab(previewTab?.id);
+          } else if (isDirty && initialValues && initialValues !== watch()) {
+            // Reset to the original preset
+            setPreviewTab({ ...previewTab!, activePreset: initialValues });
+          }
+        }}
       />
       <form onSubmit={handleSubmit(onSubmit)} className="flex grow flex-col">
         <SidebarContent className="gap-3">
