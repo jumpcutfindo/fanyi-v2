@@ -2,6 +2,7 @@ import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Pencil, Play } from 'lucide-react';
 
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
+import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
@@ -39,51 +40,58 @@ interface PreviewTabDisplayProps {
 function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
   const { data: screenshot } = useGetScreenshotWithPreset(preset);
 
+  const sidebarState = useSidebarStore((state) => state.sidebarState);
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
   const addTab = useTabStore((state) => state.addTab);
 
+  const showMetadataAndButtons = sidebarState.state !== 'editor';
+
   return (
-    <div className="flex h-full w-full flex-col space-y-4">
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
       <img
         src={screenshot}
-        className="h-120 w-full bg-black/20 object-scale-down"
+        className={cn('h-120 w-full bg-black/20 object-scale-down')}
       />
-      <div className="text-center">
-        <h1 className="text-lg font-semibold">{preset.name}</h1>
-        <span>
-          {preset.options.crop?.width}x{preset.options.crop?.height}
-        </span>
-      </div>
-      <div className="flex grow flex-row items-center justify-center gap-8 px-32">
-        <button
-          className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
-          onClick={() =>
-            addTab(
-              {
-                id: '',
-                type: 'translation',
-                preset: preset,
-                title: preset.name,
-              },
-              { setActive: true }
-            )
-          }
-        >
-          <Play className="text-green-600 group-hover:fill-green-600" />
-        </button>
-        <button
-          className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-200 hover:bg-amber-300"
-          onClick={() =>
-            setSidebarState({
-              state: 'editor',
-              options: { mode: 'edit', initialPreset: preset },
-            })
-          }
-        >
-          <Pencil className="text-amber-600 group-hover:fill-amber-600" />
-        </button>
-      </div>
+      {showMetadataAndButtons ? (
+        <>
+          <div className="text-center">
+            <h1 className="text-lg font-semibold">{preset.name}</h1>
+            <span>
+              {preset.options.crop?.width}x{preset.options.crop?.height}
+            </span>
+          </div>
+          <div className="flex grow flex-row items-center justify-center gap-8 px-32">
+            <button
+              className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
+              onClick={() =>
+                addTab(
+                  {
+                    id: '',
+                    type: 'translation',
+                    preset: preset,
+                    title: preset.name,
+                  },
+                  { setActive: true }
+                )
+              }
+            >
+              <Play className="text-green-600 group-hover:fill-green-600" />
+            </button>
+            <button
+              className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-200 hover:bg-amber-300"
+              onClick={() =>
+                setSidebarState({
+                  state: 'editor',
+                  options: { mode: 'edit', initialPreset: preset },
+                })
+              }
+            >
+              <Pencil className="text-amber-600 group-hover:fill-amber-600" />
+            </button>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
