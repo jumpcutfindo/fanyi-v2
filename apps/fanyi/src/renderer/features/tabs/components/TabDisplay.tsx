@@ -1,5 +1,5 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
-import { Pencil, Play } from 'lucide-react';
+import { Loader2Icon, Pencil, Play } from 'lucide-react';
 
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { cn } from '@renderer/lib/utils';
@@ -38,7 +38,8 @@ interface PreviewTabDisplayProps {
 }
 
 function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
-  const { data: screenshot } = useGetScreenshotWithPreset(preset);
+  const { data: screenshot, isPending: isScreenshotPending } =
+    useGetScreenshotWithPreset(preset);
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
@@ -49,10 +50,14 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
-      <img
-        src={screenshot}
-        className={cn('h-120 w-full bg-black/20 object-scale-down')}
-      />
+      {!isScreenshotPending ? (
+        <img
+          src={screenshot}
+          className={cn('h-120 w-full bg-black/20 object-scale-down')}
+        />
+      ) : (
+        <Loader2Icon className="animate-spin" />
+      )}
       {showMetadataAndButtons ? (
         <>
           <div className="text-center">
