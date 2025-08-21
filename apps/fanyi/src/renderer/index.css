@@ -185,23 +185,3 @@ body {
     scrollbar-width: none;
   }
 }
-
-/* The element's initial state as it enters */
-.sidebar-enter {
-  opacity: 1;
-}
-
-/* The element's final state as it enters */
-.sidebar-enter-active {
-  opacity: 1;
-}
-
-/* The element's initial state as it exits */
-.sidebar-exit {
-  opacity: 0;
-}
-
-/* The element's final state as it exits */
-.sidebar-exit-active {
-  opacity: 0;
-}
