@@ -47,6 +47,7 @@ def main():
             command = sys.stdin.readline().strip()
 
             if command == "run-ocr":
+                print("Received 'run-ocr' command.", file=sys.stderr)
                 try:
                     # Read the size of the incoming image data
                     size_str = sys.stdin.readline().strip()
@@ -56,10 +57,13 @@ def main():
                             file=sys.stderr,
                         )
                         continue
+
+                    print("Received image size:", size_str, file=sys.stderr)
                     image_size = int(size_str)
 
                     # Read the image data from stdin as a byte stream
                     image_data = sys.stdin.buffer.read(image_size)
+                    print("Received image data with expected size", file=sys.stderr)
 
                     if len(image_data) < image_size:
                         print(
@@ -69,7 +73,10 @@ def main():
                         continue
 
                     # Process the image
+                    print("Performing OCR and segmentation...", file=sys.stderr)
                     segmented_text = ocr_and_segment(image_data, reader)
+
+                    print("OCR and segmentation completed.", file=sys.stderr)
 
                     # Write the result back to stdout
                     sys.stdout.write(segmented_text + "\n")
