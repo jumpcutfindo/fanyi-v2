@@ -41,6 +41,8 @@ def main():
 
         print("Models are ready. Awaiting 'run-ocr' command...", file=sys.stderr)
 
+        sys.stderr.flush()
+
         while True:
             # Read a single line for the command
             command = sys.stdin.readline().strip()
