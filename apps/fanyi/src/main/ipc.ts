@@ -11,7 +11,7 @@ import {
   takeScreenshotWithPreset,
 } from '@main/services/screenshot';
 
-import { runOcr } from './services/ocr';
+import { getOcrStatus, runOcr } from './services/ocr';
 
 export function registerIpcHandlers() {
   ipcMain.handle('take-screenshot-with-preset', async (_event, preset) => {
@@ -81,5 +81,9 @@ export function registerIpcHandlers() {
       console.error('Failed to handle OCR request:', error);
       throw error;
     }
+  });
+
+  ipcMain.handle('get-ocr-status', async (_event) => {
+    return getOcrStatus();
   });
 }

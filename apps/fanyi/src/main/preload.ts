@@ -4,6 +4,7 @@ import {
   ScreenshotSource,
 } from '@shared/types/screenshot';
 import { contextBridge, ipcRenderer } from 'electron';
+import { getOcrStatus } from '@main/services/ocr';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
@@ -43,4 +44,5 @@ contextBridge.exposeInMainWorld('api', {
 
   performOcrWithPreset: (preset: ScreenshotPreset): Promise<string> =>
     ipcRenderer.invoke('perform-ocr-with-preset', preset),
+  getOcrStatus: () => ipcRenderer.invoke('get-ocr-status'),
 });

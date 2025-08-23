@@ -2,11 +2,13 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import { ChildProcess } from 'node:child_process';
 import path from 'node:path';
+import { OcrStatus } from '@shared/types/ocr';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import { PrefixedStream } from '@main/utils/prefixed-stream';
 
 let pythonOcr: ChildProcess | null;
+let ocrStatus: OcrStatus = 'startup';
 
 function getPythonExecutablePath(): string {
   // In development, the executable is in the pyinstaller dist folder
@@ -28,6 +30,8 @@ function getPythonExecutablePath(): string {
 }
 
 function initPythonOcr() {
+  ocrStatus = 'startup';
+
   const pythonExecutable = getPythonExecutablePath();
 
   console.log('Starting python OCR service', pythonExecutable);
@@ -40,13 +44,31 @@ function initPythonOcr() {
   // Directly pipe stdout and stderr to the Node.js console
   pythonOcr.stdout?.pipe(prefixedStdout);
   pythonOcr.stderr?.pipe(prefixedStderr);
+
+  const onReady = (data: Buffer) => {
+    if (data.toString().includes('Models are ready.')) {
+      console.log('Python OCR service is ready!');
+      ocrStatus = 'available';
+
+      // Remove the listener
+      pythonOcr?.stderr?.removeListener('data', onReady);
+    }
+  };
+
+  // Check for ready message
+  pythonOcr.stderr?.on('data', onReady);
 }
 
 function cleanUpPythonOcr() {
   if (pythonOcr) {
+    ocrStatus = 'shutdown';
     console.log('Stopping python OCR service');
     pythonOcr.kill();
   }
+}
+
+function getOcrStatus(): Promise<OcrStatus> {
+  return Promise.resolve(ocrStatus);
 }
 
 function runOcr(imageBuffer: Buffer): Promise<string> {
@@ -99,6 +121,7 @@ function runOcr(imageBuffer: Buffer): Promise<string> {
     const onClose = (code: number) => {
       process.stdout?.removeListener('data', onData);
       process.stderr?.removeListener('data', onError);
+      ocrStatus = 'unavailable';
       reject(new Error(`Python process disconnected with code ${code}.`));
     };
 
@@ -131,4 +154,4 @@ function runOcr(imageBuffer: Buffer): Promise<string> {
   });
 }
 
-export { initPythonOcr, cleanUpPythonOcr, runOcr };
+export { initPythonOcr, cleanUpPythonOcr, getOcrStatus, runOcr };
