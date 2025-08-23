@@ -26,7 +26,7 @@ interface Window {
   ipcRenderer: import('electron').IpcRenderer;
   api: {
     getOcrStatus: () => Promise<OcrStatus>;
-    performOcrWithPreset: (preset: ScreenshotPreset) => Promise<string>;
+    performOcrWithPreset: (preset: ScreenshotPreset) => Promise<OcrResult>;
 
     addScreenshotPreset: (preset: AddScreenshotPresetPayload) => Promise<void>;
     getScreenshotPresets: () => Promise<ScreenshotPreset[]>;

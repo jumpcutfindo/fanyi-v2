@@ -1,3 +1,4 @@
+import { OcrResult } from '@shared/types/ocr';
 import {
   AddScreenshotPresetPayload,
   ScreenshotPreset,
@@ -42,7 +43,7 @@ contextBridge.exposeInMainWorld('api', {
   deleteScreenshotPreset: (id: string): Promise<void> =>
     ipcRenderer.invoke('delete-screenshot-preset', id),
 
-  performOcrWithPreset: (preset: ScreenshotPreset): Promise<string> =>
+  performOcrWithPreset: (preset: ScreenshotPreset): Promise<OcrResult> =>
     ipcRenderer.invoke('perform-ocr-with-preset', preset),
   getOcrStatus: () => ipcRenderer.invoke('get-ocr-status'),
 });

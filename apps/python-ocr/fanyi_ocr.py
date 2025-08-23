@@ -1,3 +1,4 @@
+import json
 import sys
 import easyocr
 import jieba
@@ -12,10 +13,26 @@ def ocr_and_segment(image_path, reader):
         # Pass the file path directly to easyocr.readtext()
         results = reader.readtext(image_path)
 
+        # Extract the segmented text from the results
         text = "".join([result[1] for result in results])
         seg_list = jieba.cut(text, cut_all=False)
-        segmented_text = " ".join(seg_list)
-        return segmented_text
+
+        return {
+            "results": list(
+                map(
+                    lambda result: {
+                        # Convert coordinates to integers
+                        "coordinates": list(
+                            map(lambda point: [int(point[0]), int(point[1])], result[0])
+                        ),
+                        "text": result[1],
+                        "confidence": result[2],
+                    },
+                    results,
+                )
+            ),
+            "segmented_text": list(seg_list),
+        }
 
     except Exception as e:
         # Re-raise exceptions with a custom message for better debugging
@@ -61,12 +78,15 @@ def main():
                         sys.stdout.flush()
                         continue
 
-                    segmented_text = ocr_and_segment(image_path, reader)
-                    sys.stdout.write(segmented_text + "\n")
+                    ocr_result = ocr_and_segment(image_path, reader)
+
+                    # JSON stringify and send
+                    sys.stdout.write(json.dumps(ocr_result) + "\n")
                     sys.stdout.flush()
 
                 except Exception as e:
                     print(f"Error during OCR execution: {e}", file=sys.stderr)
+                    sys.stderr.flush()
                     sys.stdout.write("ERROR\n")
                     sys.stdout.flush()
 
