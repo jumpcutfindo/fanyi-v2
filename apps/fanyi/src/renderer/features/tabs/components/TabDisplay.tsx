@@ -1,7 +1,9 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Loader2Icon, Pencil, Play } from 'lucide-react';
 
+import { useGetOcrWithPresetMutation } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
+import { TranslationList } from '@renderer/features/translation/components/TranslationList';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
@@ -26,6 +28,8 @@ export function TabDisplay() {
     if (!previewTab.activePreset) return null;
 
     return <PreviewTabDisplay preset={previewTab.activePreset} />;
+  } else if (activeTab.type === 'translation') {
+    return <TranslationTabDisplay preset={activeTab.preset} />;
   }
 
   return (
@@ -99,6 +103,20 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
           </div>
         </>
       ) : null}
+    </div>
+  );
+}
+
+interface TranslationTabDisplayProps {
+  preset: ScreenshotPreset;
+}
+
+function TranslationTabDisplay({ preset }: TranslationTabDisplayProps) {
+  const { data: translations } = useGetOcrWithPresetMutation(preset);
+
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+      <TranslationList translations={translations} />
     </div>
   );
 }
