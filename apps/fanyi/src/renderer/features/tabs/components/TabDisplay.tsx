@@ -1,5 +1,6 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Loader2Icon, Pencil, Play } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { useGetOcrWithPresetMutation } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
@@ -112,11 +113,16 @@ interface TranslationTabDisplayProps {
 }
 
 function TranslationTabDisplay({ preset }: TranslationTabDisplayProps) {
-  const { data: translations } = useGetOcrWithPresetMutation(preset);
+  const { data: ocrText, mutate: getOcrText } =
+    useGetOcrWithPresetMutation(preset);
+
+  useEffect(() => {
+    getOcrText(preset);
+  }, [getOcrText, preset]);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
-      <TranslationList translations={translations} />
+      <TranslationList translations={ocrText} />
     </div>
   );
 }

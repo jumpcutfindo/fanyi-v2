@@ -1,6 +1,9 @@
 import { spawn } from 'child_process';
+import fs from 'fs';
 import { ChildProcess } from 'node:child_process';
 import path from 'node:path';
+import { app } from 'electron';
+import { v4 as uuidv4 } from 'uuid';
 import { PrefixedStream } from '@main/utils/prefixed-stream';
 
 let pythonOcr: ChildProcess | null;
@@ -102,13 +105,23 @@ function runOcr(imageBuffer: Buffer): Promise<string> {
     process.on('close', onClose);
 
     try {
-      const imageSize = imageBuffer.length;
+      const appDataDir = path.join(app.getPath('temp'), 'fanyi');
+
+      // Create folder if not exists
+      if (!fs.existsSync(appDataDir)) {
+        fs.mkdirSync(appDataDir);
+      }
+
+      const tempFileName = `ocr-image_${uuidv4()}.png`;
+      const tempFilePath = path.join(appDataDir, tempFileName);
+
+      fs.writeFileSync(tempFilePath, imageBuffer);
+
+      console.log(`Wrote image to ${tempFilePath}`);
 
       // 3. Write the command and data to the Python process's stdin
       process.stdin?.write('run-ocr\n');
-      process.stdin?.write(`${imageSize}\n`);
-      process.stdin?.write(imageBuffer);
-      process.stdin?.write('\n');
+      process.stdin?.write(`${tempFilePath}\n`);
     } catch (err) {
       // Clean up in case of an immediate write error
       process.stdout?.removeListener('data', onData);

@@ -1,30 +1,29 @@
 import sys
 import easyocr
 import jieba
+import os
 
 
-def ocr_and_segment(image_data, reader):
+def ocr_and_segment(image_path, reader):
     """
-    Performs OCR and text segmentation on the given image data.
+    Performs OCR and text segmentation on an image given its file path.
     """
     try:
-        # Perform OCR using the pre-initialized reader
-        results = reader.readtext(image_data)
-        text = "".join([result[1] for result in results])
+        # Pass the file path directly to easyocr.readtext()
+        results = reader.readtext(image_path)
 
-        # Run segmentation on the decoded text string
+        text = "".join([result[1] for result in results])
         seg_list = jieba.cut(text, cut_all=False)
         segmented_text = " ".join(seg_list)
-
         return segmented_text
 
     except Exception as e:
-        # Propagate exceptions for logging in the main loop
+        # Re-raise exceptions with a custom message for better debugging
         raise RuntimeError(f"OCR or segmentation failed: {e}") from e
 
 
 def main():
-    # Force UTF-8 encoding for stdout and stderr
+    # Force UTF-8 encoding for stdout and stderr to handle Chinese characters
     sys.stdout = open(sys.stdout.fileno(), "w", encoding="utf-8", closefd=False)
     sys.stderr = open(sys.stderr.fileno(), "w", encoding="utf-8", closefd=False)
 
@@ -34,7 +33,7 @@ def main():
     )
 
     try:
-        # Initialize models once outside the loop
+        # Initialize EasyOCR reader once
         reader = easyocr.Reader(["ch_sim"])
 
         # Perform a dummy call to 'jieba' to ensure the dictionary is loaded
@@ -47,44 +46,25 @@ def main():
             command = sys.stdin.readline().strip()
 
             if command == "run-ocr":
-                print("Received 'run-ocr' command.", file=sys.stderr)
                 try:
-                    # Read the size of the incoming image data
-                    size_str = sys.stdin.readline().strip()
-                    if not size_str.isdigit():
+                    # Read the full file path from stdin
+                    image_path = sys.stdin.readline().strip()
+
+                    if not image_path or not os.path.exists(image_path):
                         print(
-                            "Error: Expected image size after 'run-ocr' command.",
+                            f"Error: Invalid or non-existent image path received: {image_path}",
                             file=sys.stderr,
                         )
+                        sys.stdout.write("ERROR\n")
+                        sys.stdout.flush()
                         continue
 
-                    print("Received image size:", size_str, file=sys.stderr)
-                    image_size = int(size_str)
-
-                    # Read the image data from stdin as a byte stream
-                    image_data = sys.stdin.buffer.read(image_size)
-                    print("Received image data with expected size", file=sys.stderr)
-
-                    if len(image_data) < image_size:
-                        print(
-                            f"Error: Incomplete image data received. Expected {image_size} bytes, got {len(image_data)}.",
-                            file=sys.stderr,
-                        )
-                        continue
-
-                    # Process the image
-                    print("Performing OCR and segmentation...", file=sys.stderr)
-                    segmented_text = ocr_and_segment(image_data, reader)
-
-                    print("OCR and segmentation completed.", file=sys.stderr)
-
-                    # Write the result back to stdout
+                    segmented_text = ocr_and_segment(image_path, reader)
                     sys.stdout.write(segmented_text + "\n")
-                    sys.stdout.flush()  # Ensure the output is sent immediately
+                    sys.stdout.flush()
 
                 except Exception as e:
                     print(f"Error during OCR execution: {e}", file=sys.stderr)
-                    # Indicate an error to the parent process
                     sys.stdout.write("ERROR\n")
                     sys.stdout.flush()
 
