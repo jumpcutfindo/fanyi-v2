@@ -1,13 +1,12 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Loader2Icon, Pencil, Play } from 'lucide-react';
-import { useEffect } from 'react';
 
-import { useGetOcrWithPresetMutation } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
+import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
-import { useTabStore } from '@renderer/stores/useTabStore';
+import { TranslationTab, useTabStore } from '@renderer/stores/useTabStore';
 
 const containerStyle = 'flex grow items-center justify-center';
 
@@ -30,7 +29,7 @@ export function TabDisplay() {
 
     return <PreviewTabDisplay preset={previewTab.activePreset} />;
   } else if (activeTab.type === 'translation') {
-    return <TranslationTabDisplay preset={activeTab.preset} />;
+    return <TranslationTabDisplay tab={activeTab} />;
   }
 
   return (
@@ -76,17 +75,23 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
           <div className="flex grow flex-row items-center justify-center gap-8 px-32">
             <button
               className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
-              onClick={() =>
+              onClick={() => {
+                if (!screenshot) {
+                  return;
+                }
+
                 addTab(
                   {
                     id: '',
                     type: 'translation',
-                    preset: preset,
                     title: preset.name,
+                    preset: preset,
+                    screenshot,
                   },
                   { setActive: true }
-                )
-              }
+                );
+              }}
+              disabled={!screenshot}
             >
               <Play className="text-green-600 group-hover:fill-green-600" />
             </button>
@@ -109,20 +114,28 @@ function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
 }
 
 interface TranslationTabDisplayProps {
-  preset: ScreenshotPreset;
+  tab: TranslationTab;
 }
 
-function TranslationTabDisplay({ preset }: TranslationTabDisplayProps) {
-  const { data: ocrText, mutate: getOcrText } =
-    useGetOcrWithPresetMutation(preset);
+function TranslationTabDisplay({ tab }: TranslationTabDisplayProps) {
+  const { id, preset, screenshot } = tab;
 
-  useEffect(() => {
-    getOcrText(preset);
-  }, [getOcrText, preset]);
+  const { data: ocrText, isPending: isOcrTextPending } =
+    useGetOcrWithPresetQuery(id, preset);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
-      <TranslationList translations={ocrText} />
+      {isOcrTextPending ? (
+        <Loader2Icon className="animate-spin" />
+      ) : (
+        <>
+          <img
+            src={screenshot}
+            className={cn('h-120 w-full bg-black/20 object-scale-down')}
+          />
+          <TranslationList translations={ocrText} />
+        </>
+      )}
     </div>
   );
 }
