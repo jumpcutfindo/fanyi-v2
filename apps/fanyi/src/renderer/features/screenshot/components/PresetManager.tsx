@@ -4,9 +4,12 @@ import { AppWindow, Monitor, Plus } from 'lucide-react';
 import {
   SidebarContainer,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
 } from '@renderer/components/Sidebar';
 import { Button } from '@renderer/components/ui/Button';
+import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
+import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
@@ -14,8 +17,8 @@ import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
+  const { data: ocrStatus } = useGetOcrStatusQuery();
 
-  const setActiveTab = useTabStore((state) => state.setActiveTab);
   const previewTab = useTabStore((state) => state.previewTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
@@ -73,6 +76,9 @@ export function PresetManager() {
           />
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <OcrStatus />
+      </SidebarFooter>
     </SidebarContainer>
   );
 }
