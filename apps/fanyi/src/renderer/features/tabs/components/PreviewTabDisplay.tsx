@@ -1,6 +1,7 @@
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Loader2Icon, Pencil, Play } from 'lucide-react';
 
+import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
@@ -13,6 +14,7 @@ interface PreviewTabDisplayProps {
 export function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
   const { data: screenshot, isPending: isScreenshotPending } =
     useGetScreenshotWithPreset(preset);
+  const { data: ocrStatus } = useGetOcrStatusQuery();
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
@@ -20,6 +22,7 @@ export function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
   const addTab = useTabStore((state) => state.addTab);
 
   const showMetadataAndButtons = sidebarState.state !== 'editor';
+  const canRequestOcr = ocrStatus === 'available' && screenshot;
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
@@ -41,9 +44,9 @@ export function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
           </div>
           <div className="flex grow flex-row items-center justify-center gap-8 px-32">
             <button
-              className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
+              className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300 disabled:opacity-20"
               onClick={() => {
-                if (!screenshot) {
+                if (!canRequestOcr) {
                   return;
                 }
 
@@ -58,7 +61,7 @@ export function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
                   { setActive: true }
                 );
               }}
-              disabled={!screenshot}
+              disabled={!canRequestOcr}
             >
               <Play className="text-green-600 group-hover:fill-green-600" />
             </button>
