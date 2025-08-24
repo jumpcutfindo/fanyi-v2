@@ -1,8 +1,8 @@
+import os
 import json
 import sys
 import easyocr
 import jieba
-import os
 
 
 def ocr_and_segment(image_path, reader):
