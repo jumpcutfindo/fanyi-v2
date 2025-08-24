@@ -107,4 +107,12 @@ function initDictionary() {
   console.log(`Loaded dictionary with ${entries.length} entries`);
 }
 
-export { initDictionary };
+function getDictionaryEntries(queries: string[]) {
+  if (!dictionary) {
+    throw new Error('Dictionary not initialized');
+  }
+
+  return queries.map((query) => dictionary!.wordMap[query]);
+}
+
+export { initDictionary, getDictionaryEntries };

@@ -1,5 +1,6 @@
 // src/main/ipc.ts
 import { ipcMain } from 'electron';
+import { getDictionaryEntries } from '@main/services/dictionary';
 import {
   addScreenshotPreset,
   deleteScreenshotPreset,
@@ -76,7 +77,10 @@ export function registerIpcHandlers() {
     try {
       const imageResult = await takeScreenshotWithPreset(preset);
       const ocrResult = await runOcr(imageResult);
-      return ocrResult;
+
+      const translations = getDictionaryEntries(ocrResult.segmented_text);
+
+      return { ocrResult, translations };
     } catch (error) {
       console.error('Failed to handle OCR request:', error);
       throw error;

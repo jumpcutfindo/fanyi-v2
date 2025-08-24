@@ -25,7 +25,7 @@ export function TranslationTabDisplay({ tab }: TranslationTabDisplayProps) {
             src={screenshot}
             className={cn('h-120 w-full bg-black/20 object-scale-down')}
           />
-          <TranslationList translations={ocrText} />
+          <TranslationList translations={ocrText?.translations.join(', ')} />
         </>
       )}
     </div>
