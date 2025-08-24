@@ -5,11 +5,11 @@ import { TranslationList } from '@renderer/features/translation/components/Trans
 import { cn } from '@renderer/lib/utils';
 import { TranslationTab } from '@renderer/stores/useTabStore';
 
-interface TranslationTabDisplayProps {
+interface TranslationTabContentProps {
   tab: TranslationTab;
 }
 
-export function TranslationTabDisplay({ tab }: TranslationTabDisplayProps) {
+export function TranslationTabContent({ tab }: TranslationTabContentProps) {
   const { id, preset, screenshot } = tab;
 
   const { data: ocrResponse, isPending: isOcrTextPending } =

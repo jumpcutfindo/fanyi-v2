@@ -1,5 +1,5 @@
 import { PreviewTabContent } from '@renderer/features/screenshot/components/PreviewTabContent';
-import { TranslationTabDisplay } from '@renderer/features/tabs/components/TranslationTabDisplay';
+import { TranslationTabContent } from '@renderer/features/translation/components/TranslationTabContent';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 const containerStyle =
@@ -31,7 +31,7 @@ export function TabDisplay() {
       case 'preview':
         return <PreviewTabContent preset={activeTab.activePreset!} />;
       case 'translation':
-        return <TranslationTabDisplay tab={activeTab} />;
+        return <TranslationTabContent tab={activeTab} />;
       default:
         return null;
     }
