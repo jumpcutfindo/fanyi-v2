@@ -12,20 +12,30 @@ interface TranslationTabDisplayProps {
 export function TranslationTabDisplay({ tab }: TranslationTabDisplayProps) {
   const { id, preset, screenshot } = tab;
 
-  const { data: ocrText, isPending: isOcrTextPending } =
+  const { data: ocrResponse, isPending: isOcrTextPending } =
     useGetOcrWithPresetQuery(id, preset);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
       {isOcrTextPending ? (
-        <Loader2Icon className="animate-spin" />
-      ) : (
-        <>
+        <div className="flex flex-col items-center gap-8">
           <img
             src={screenshot}
             className={cn('h-120 w-full bg-black/20 object-scale-down')}
           />
-          <TranslationList translations={ocrText?.translations.join(', ')} />
+          <Loader2Icon className="animate-spin" />
+          <span>Reading and translating image...</span>
+        </div>
+      ) : (
+        <>
+          <img
+            src={screenshot}
+            className={cn('h-40 w-full bg-black/20 object-scale-down')}
+          />
+          <TranslationList
+            ocrResult={ocrResponse.ocrResult}
+            translations={ocrResponse.translations}
+          />
         </>
       )}
     </div>
