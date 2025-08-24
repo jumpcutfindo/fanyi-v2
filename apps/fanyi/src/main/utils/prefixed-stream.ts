@@ -11,7 +11,7 @@ export class PrefixedStream extends Writable {
 
   _write(
     chunk: Buffer,
-    encoding: BufferEncoding,
+    _encoding: BufferEncoding,
     callback: (error?: Error | null) => void
   ): void {
     const data = this.remainder + chunk.toString();
