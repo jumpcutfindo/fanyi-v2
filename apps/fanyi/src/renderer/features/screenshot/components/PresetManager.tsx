@@ -17,7 +17,7 @@ import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
-  const { data: ocrStatus } = useGetOcrStatusQuery();
+  useGetOcrStatusQuery();
 
   const previewTab = useTabStore((state) => state.previewTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);

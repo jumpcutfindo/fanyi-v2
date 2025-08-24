@@ -1,5 +1,3 @@
-import { Dot, Loader2 } from 'lucide-react';
-
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { cn } from '@renderer/lib/utils';
 
@@ -32,28 +30,6 @@ export function OcrStatus() {
         return 'Unavailable';
       default:
         return 'Unknown';
-    }
-  };
-
-  const getChildren = () => {
-    switch (ocrStatus) {
-      case 'startup':
-        return (
-          <span>
-            <Loader2 className="size-4 animate-spin" /> OCR starting...
-          </span>
-        );
-      case 'available':
-        return (
-          <span>
-            <span className="size-2 rounded-full bg-green-600" />
-            OCR available
-          </span>
-        );
-      case 'unavailable':
-        return <span className="text-red">Unavailable</span>;
-      default:
-        return <span className="text-gray">Starting...</span>;
     }
   };
 

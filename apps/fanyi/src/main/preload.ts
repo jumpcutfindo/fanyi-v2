@@ -5,7 +5,6 @@ import {
   ScreenshotSource,
 } from '@shared/types/screenshot';
 import { contextBridge, ipcRenderer } from 'electron';
-import { getOcrStatus } from '@main/services/ocr';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
