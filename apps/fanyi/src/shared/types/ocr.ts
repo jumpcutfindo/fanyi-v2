@@ -1,3 +1,5 @@
+import { DictionaryEntry } from '@shared/types/dictionary';
+
 export type OcrStatus = 'startup' | 'available' | 'unavailable' | 'shutdown';
 
 interface OcrResultItem {
@@ -9,4 +11,9 @@ interface OcrResultItem {
 export interface OcrResult {
   results: OcrResultItem[];
   segmented_text: string[];
+}
+
+export interface OcrResponse {
+  ocrResult: OcrResult;
+  translations: DictionaryEntry[];
 }

@@ -112,7 +112,9 @@ function getDictionaryEntries(queries: string[]) {
     throw new Error('Dictionary not initialized');
   }
 
-  return queries.map((query) => dictionary!.wordMap[query]);
+  return queries
+    .map((query) => dictionary!.wordMap[query])
+    .filter((entry) => entry !== undefined);
 }
 
 export { initDictionary, getDictionaryEntries };
