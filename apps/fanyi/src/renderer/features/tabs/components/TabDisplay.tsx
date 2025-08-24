@@ -1,4 +1,4 @@
-import { PreviewTabDisplay } from '@renderer/features/tabs/components/PreviewTabDisplay';
+import { PreviewTabContent } from '@renderer/features/screenshot/components/PreviewTabContent';
 import { TranslationTabDisplay } from '@renderer/features/tabs/components/TranslationTabDisplay';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
@@ -29,7 +29,7 @@ export function TabDisplay() {
 
     switch (activeTab.type) {
       case 'preview':
-        return <PreviewTabDisplay preset={activeTab.activePreset!} />;
+        return <PreviewTabContent preset={activeTab.activePreset!} />;
       case 'translation':
         return <TranslationTabDisplay tab={activeTab} />;
       default:

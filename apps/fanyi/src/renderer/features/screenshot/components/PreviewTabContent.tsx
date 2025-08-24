@@ -7,11 +7,11 @@ import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
-interface PreviewTabDisplayProps {
+interface PreviewTabContentProps {
   preset: ScreenshotPreset;
 }
 
-export function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
+export function PreviewTabContent({ preset }: PreviewTabContentProps) {
   const { data: screenshot, isPending: isScreenshotPending } =
     useGetScreenshotWithPreset(preset);
   const { data: ocrStatus } = useGetOcrStatusQuery();
