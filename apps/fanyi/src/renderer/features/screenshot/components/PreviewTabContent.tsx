@@ -1,17 +1,18 @@
-import { ScreenshotPreset } from '@shared/types/screenshot';
 import { Loader2Icon, Pencil, Play } from 'lucide-react';
 
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
-import { useTabStore } from '@renderer/stores/useTabStore';
+import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 interface PreviewTabContentProps {
-  preset: ScreenshotPreset;
+  tab: PreviewTab;
 }
 
-export function PreviewTabContent({ preset }: PreviewTabContentProps) {
+export function PreviewTabContent({ tab }: PreviewTabContentProps) {
+  const { activePreset: preset } = tab;
+
   const { data: screenshot, isPending: isScreenshotPending } =
     useGetScreenshotWithPreset(preset);
   const { data: ocrStatus } = useGetOcrStatusQuery();
@@ -23,6 +24,10 @@ export function PreviewTabContent({ preset }: PreviewTabContentProps) {
 
   const showMetadataAndButtons = sidebarState.state !== 'editor';
   const canRequestOcr = ocrStatus === 'available' && screenshot;
+
+  if (!preset) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-8">

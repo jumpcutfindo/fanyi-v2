@@ -3,7 +3,7 @@ import { TranslationTabContent } from '@renderer/features/translation/components
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 const containerStyle =
-  'flex grow h-0 items-center justify-center overflow-auto bg-black/5';
+  'flex grow h-0 items-center justify-center overflow-auto bg-muted';
 
 export function TabDisplay() {
   const activeTab = useTabStore((state) => state.activeTab);
@@ -29,7 +29,7 @@ export function TabDisplay() {
 
     switch (activeTab.type) {
       case 'preview':
-        return <PreviewTabContent preset={activeTab.activePreset!} />;
+        return <PreviewTabContent tab={activeTab} />;
       case 'translation':
         return <TranslationTabContent tab={activeTab} />;
       default:
