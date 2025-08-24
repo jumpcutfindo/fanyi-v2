@@ -2,11 +2,11 @@ import { PreviewTabDisplay } from '@renderer/features/tabs/components/PreviewTab
 import { TranslationTabDisplay } from '@renderer/features/tabs/components/TranslationTabDisplay';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
-const containerStyle = 'flex grow items-center justify-center';
+const containerStyle =
+  'flex grow h-0 items-center justify-center overflow-auto bg-black/5';
 
 export function TabDisplay() {
   const activeTab = useTabStore((state) => state.activeTab);
-  const previewTab = useTabStore((state) => state.previewTab);
 
   if (!activeTab) {
     return (
@@ -18,17 +18,24 @@ export function TabDisplay() {
     );
   }
 
-  if (activeTab.type === 'preview' && previewTab) {
-    if (!previewTab.activePreset) return null;
+  const renderTabContent = () => {
+    if (!activeTab) {
+      return (
+        <span className="text-muted-foreground text-center italic">
+          No tab selected
+        </span>
+      );
+    }
 
-    return <PreviewTabDisplay preset={previewTab.activePreset} />;
-  } else if (activeTab.type === 'translation') {
-    return <TranslationTabDisplay tab={activeTab} />;
-  }
+    switch (activeTab.type) {
+      case 'preview':
+        return <PreviewTabDisplay preset={activeTab.activePreset!} />;
+      case 'translation':
+        return <TranslationTabDisplay tab={activeTab} />;
+      default:
+        return null;
+    }
+  };
 
-  return (
-    <div className={containerStyle}>
-      {activeTab.title} ({activeTab.id}) selected
-    </div>
-  );
+  return <div className={containerStyle}>{renderTabContent()}</div>;
 }

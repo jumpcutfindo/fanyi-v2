@@ -34,7 +34,7 @@ function App() {
           {renderSidebar()}
         </div>
       </div>
-      <div className="bg-muted flex h-full w-0 grow flex-col">
+      <div className="flex h-full grow flex-col">
         <TabList />
         <TabDisplay />
       </div>

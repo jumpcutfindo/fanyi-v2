@@ -59,7 +59,7 @@ export function TabItem({
   disabled,
 }: TabItemProps) {
   return (
-    <div className="group relative w-full">
+    <div className="group relative h-8 w-full">
       <button
         type="button"
         className={cn(

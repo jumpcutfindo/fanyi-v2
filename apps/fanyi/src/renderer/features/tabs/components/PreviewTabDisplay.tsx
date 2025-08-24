@@ -25,7 +25,7 @@ export function PreviewTabDisplay({ preset }: PreviewTabDisplayProps) {
   const canRequestOcr = ocrStatus === 'available' && screenshot;
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col gap-8">
       {!isScreenshotPending ? (
         <img
           src={screenshot}
