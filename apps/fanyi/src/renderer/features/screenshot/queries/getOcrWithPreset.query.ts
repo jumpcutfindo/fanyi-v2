@@ -5,6 +5,7 @@ export function useGetOcrWithPresetQuery(id: string, preset: ScreenshotPreset) {
   return useQuery({
     queryKey: ['ocr-with-preset', id],
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
     queryFn: async () => {
       return await window.api.performOcrWithPreset(preset);
     },
