@@ -16,7 +16,7 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
     useGetOcrWithPresetQuery(id, preset);
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+    <div className="flex h-full w-full flex-col items-center justify-center">
       {isOcrTextPending ? (
         <div className="flex flex-col items-center gap-8">
           <img
