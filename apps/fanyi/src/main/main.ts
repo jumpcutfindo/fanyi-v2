@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow } from 'electron';
 import { registerIpcHandlers } from '@main/ipc';
+import { cleanUpPythonOcr, initPythonOcr } from '@main/services/ocr';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -68,7 +69,16 @@ app.on('activate', () => {
   }
 });
 
+app.on('before-quit', () => {
+  // Clean up underlying processes
+  cleanUpPythonOcr();
+});
+
 app.whenReady().then(() => {
   registerIpcHandlers();
+
+  // Setup underlying processes
+  initPythonOcr();
+
   createWindow();
 });

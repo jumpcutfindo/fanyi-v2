@@ -11,7 +11,7 @@ import {
   takeScreenshotWithPreset,
 } from '@main/services/screenshot';
 
-import { runOcr } from './services/ocr';
+import { getOcrStatus, runOcr } from './services/ocr';
 
 export function registerIpcHandlers() {
   ipcMain.handle('take-screenshot-with-preset', async (_event, preset) => {
@@ -72,13 +72,18 @@ export function registerIpcHandlers() {
    * Listen for OCR requests with image data and invoke the OCR service.
    * ipcMain.handle is used to return the OCR result to the renderer.
    */
-  ipcMain.handle('perform-ocr', async (_event) => {
+  ipcMain.handle('perform-ocr-with-preset', async (_event, preset) => {
     try {
-      const ocrResult = await runOcr();
+      const imageResult = await takeScreenshotWithPreset(preset);
+      const ocrResult = await runOcr(imageResult);
       return ocrResult;
     } catch (error) {
       console.error('Failed to handle OCR request:', error);
       throw error;
     }
+  });
+
+  ipcMain.handle('get-ocr-status', async (_event) => {
+    return getOcrStatus();
   });
 }

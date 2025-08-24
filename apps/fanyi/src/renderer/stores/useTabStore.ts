@@ -14,6 +14,7 @@ export interface PreviewTab extends BaseTab {
 
 export interface TranslationTab extends BaseTab {
   type: 'translation';
+  screenshot: string;
   preset: ScreenshotPreset;
 }
 
