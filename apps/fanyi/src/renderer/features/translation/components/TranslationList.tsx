@@ -11,7 +11,7 @@ export function TranslationList({
   translations,
 }: TranslationListProps) {
   return (
-    <div className="flex grow flex-col gap-2 overflow-auto py-4">
+    <div className="flex h-0 w-full grow flex-col items-center gap-2 overflow-auto py-4">
       {translations.map((t, index) => (
         <TranslationItem key={`${t.simplified}+${index}`} entry={t} />
       ))}
@@ -25,7 +25,7 @@ interface TranslationItemProps {
 
 function TranslationItem({ entry }: TranslationItemProps) {
   return (
-    <div className="bg-card flex w-200 flex-col rounded-md border p-4">
+    <div className="bg-card flex w-[70%] flex-col rounded-md border p-4">
       <span className="text-2xl">{entry.simplified}</span>
       <span className="text-sm">{entry.pinyin}</span>
       <div>{entry.definition}</div>

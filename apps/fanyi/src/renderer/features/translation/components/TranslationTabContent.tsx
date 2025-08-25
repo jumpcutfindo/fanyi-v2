@@ -27,7 +27,7 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
           <span>Reading and translating image...</span>
         </div>
       ) : (
-        <>
+        <div className="flex h-full w-full flex-col">
           <img
             src={screenshot}
             className={cn('h-40 w-full bg-black/20 object-scale-down')}
@@ -36,7 +36,7 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
             ocrResult={ocrResponse.ocrResult}
             translations={ocrResponse.translations}
           />
-        </>
+        </div>
       )}
     </div>
   );
