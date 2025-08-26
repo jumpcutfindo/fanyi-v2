@@ -1,8 +1,9 @@
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@renderer/components/ui/Button';
+import { cn } from '@renderer/lib/utils';
 
 const highlightClass = ['border-primary', 'bg-primary/10'];
 
@@ -15,27 +16,74 @@ export function TranslationList({
   ocrResult,
   translations,
 }: TranslationListProps) {
+  const translationItemsContainerRef = useRef<HTMLDivElement>(null);
   const wordToTranslationRef = useRef<Record<string, HTMLDivElement>>({});
 
-  const uniqueEntries = [...new Set(translations)];
+  const [activeWord, setActiveWord] = useState<string | null>(null);
+  const isObserverDisabled = useRef<boolean>(false);
+
+  const uniqueEntries = useMemo(
+    () => [...new Set(translations)],
+    [translations]
+  );
 
   const scrollToEntry = (word: string) => {
     const element = wordToTranslationRef.current[word];
 
     if (element) {
+      // Set active word and prevent observer from interfering
+      setActiveWord(word);
+      isObserverDisabled.current = true;
+
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       requestAnimationFrame(() => {
         // Add highlight to element
         element.classList.add(...highlightClass);
 
-        // Remove after 1 second
+        // Remove after some delay
         setTimeout(() => {
           element.classList.remove(...highlightClass);
+          isObserverDisabled.current = false;
         }, 1500);
       });
     }
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isObserverDisabled.current) return;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Find the corresponding word from our uniqueEntries
+            const intersectingWord = uniqueEntries.find(
+              (t) => wordToTranslationRef.current[t.simplified] === entry.target
+            );
+            if (intersectingWord) {
+              setActiveWord(intersectingWord.simplified);
+            }
+          }
+        });
+      },
+      {
+        root: translationItemsContainerRef.current,
+        rootMargin: '-45% 0px -45% 0px', // Margin in the centre
+        threshold: 0,
+      }
+    );
+
+    // Observe each translation item
+    Object.values(wordToTranslationRef.current).forEach((el) => {
+      observer.observe(el);
+    });
+
+    // Cleanup function
+    return () => {
+      observer.disconnect();
+    };
+  }, [uniqueEntries]);
 
   return (
     <div className="flex h-0 w-full grow flex-row">
@@ -45,7 +93,10 @@ export function TranslationList({
             <Button
               key={t.simplified}
               variant="outline"
-              className="flex-1 px-2 py-1 text-lg font-normal"
+              className={cn(
+                'flex-1 px-2 py-1 text-lg font-normal',
+                activeWord === t.simplified ? 'border-primary' : ''
+              )}
               onClick={() => scrollToEntry(t.simplified)}
             >
               {t.simplified}
@@ -53,7 +104,10 @@ export function TranslationList({
           ))}
         </div>
       </div>
-      <div className="flex grow flex-col items-center gap-2 overflow-auto p-2">
+      <div
+        ref={translationItemsContainerRef}
+        className="flex grow flex-col items-center gap-2 overflow-auto p-2"
+      >
         {uniqueEntries.map((t, index) => (
           <TranslationItem
             ref={(ref) => {
