@@ -3,6 +3,11 @@ import { OcrResult } from '@shared/types/ocr';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@renderer/components/ui/Button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@renderer/components/ui/Tooltip';
 import { cn } from '@renderer/lib/utils';
 
 const highlightClass = ['border-primary', 'bg-primary/10'];
@@ -90,17 +95,21 @@ export function TranslationList({
       <div className="flex h-full w-60 overflow-auto p-2">
         <div className="flex h-fit flex-row flex-wrap">
           {uniqueEntries.map((t) => (
-            <Button
-              key={t.simplified}
-              variant="outline"
-              className={cn(
-                'flex-1 px-2 py-1 text-lg font-normal',
-                activeWord === t.simplified ? 'border-primary' : ''
-              )}
-              onClick={() => scrollToEntry(t.simplified)}
-            >
-              {t.simplified}
-            </Button>
+            <Tooltip key={t.simplified}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'flex-1 px-2 py-1 text-lg font-normal',
+                    activeWord === t.simplified ? 'border-primary' : ''
+                  )}
+                  onClick={() => scrollToEntry(t.simplified)}
+                >
+                  {t.simplified}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t.pinyin}</TooltipContent>
+            </Tooltip>
           ))}
         </div>
       </div>
