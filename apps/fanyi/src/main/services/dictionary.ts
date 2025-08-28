@@ -24,7 +24,9 @@ function initDictionary() {
     entries.push({
       traditional: match.groups!.traditional,
       simplified: match.groups!.simplified,
-      pinyin: pinyin.convert(match.groups!.pinyin, { format: 'numToSymbol' }),
+      pinyin: pinyin.convert(match.groups!.pinyin.toLowerCase(), {
+        format: 'numToSymbol',
+      }),
       definition: match.groups!.definition,
     });
   }
