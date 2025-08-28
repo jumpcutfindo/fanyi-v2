@@ -10,18 +10,30 @@ import { cn } from '@renderer/lib/utils';
 import { TranslationTab, useTabStore } from '@renderer/stores/useTabStore';
 import { imageBase64ToBlob } from '@renderer/utils/image.util';
 
+type ImageSize = 'none' | 'small' | 'medium' | 'large' | 'full';
+
 interface TranslationTabContentProps {
   tab: TranslationTab;
 }
 
 export function TranslationTabContent({ tab }: TranslationTabContentProps) {
   const { updateTab } = useTabStore();
-  const { id, preset, screenshot, activeWord } = tab;
+  const { id, preset, screenshot, activeWord, imageSize } = tab;
 
   const setActiveWord = (word: string) => {
     updateTab({
       ...tab,
       activeWord: word,
+    });
+  };
+
+  const setImageSize = (size: ImageSize) => {
+    updateTab({
+      ...tab,
+      preset: {
+        ...preset,
+      },
+      imageSize: size,
     });
   };
 
@@ -48,6 +60,8 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
           <PreviewImage
             screenshot={screenshot}
             setTranslationsHidden={setIsTranslationsHidden}
+            imageSize={imageSize}
+            setImageSize={setImageSize}
           />
           {!isTranslationsHidden ? (
             <TranslationList
@@ -63,20 +77,20 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
   );
 }
 
-type ImageSize = 'none' | 'small' | 'medium' | 'large' | 'full';
-
 interface PreviewImageProps {
   screenshot: string;
-
   setTranslationsHidden: (hidden: boolean) => void;
+
+  imageSize: ImageSize;
+  setImageSize: (size: ImageSize) => void;
 }
 
 function PreviewImage({
   screenshot,
   setTranslationsHidden,
+  imageSize,
+  setImageSize,
 }: PreviewImageProps) {
-  const [imageSize, setImageSize] = useState<ImageSize>('small');
-
   const getImageSizeClass = () => {
     setTranslationsHidden(false);
     switch (imageSize) {
