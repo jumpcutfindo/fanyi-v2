@@ -16,6 +16,7 @@ export interface TranslationTab extends BaseTab {
   type: 'translation';
   screenshot: string;
   preset: ScreenshotPreset;
+  activeWord: string | null;
 }
 
 export type Tab = PreviewTab | TranslationTab;
@@ -25,6 +26,7 @@ type TabStore = {
   activeTab: Tab | null;
   addTab: (tab: Tab, options?: { setActive?: boolean }) => void;
   removeTab: (tabId: string) => void;
+  updateTab: (tab: Tab) => void;
   setActiveTab: (tabId: string) => void;
   isTabActive: (tabId: string) => boolean;
   previewTab: PreviewTab | null;
@@ -75,6 +77,18 @@ export const useTabStore = create<TabStore>((set, get) => ({
         previewTab,
         activeTab: newActiveTab,
       };
+    }),
+  updateTab: (tab) =>
+    set((prev) => {
+      const newTabs = prev.tabs.map((t) => {
+        if (t.id === tab.id) {
+          return tab;
+        }
+
+        return t;
+      });
+
+      return { tabs: newTabs };
     }),
   setActiveTab: (tabId) =>
     set((prev) => {

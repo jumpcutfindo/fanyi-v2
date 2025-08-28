@@ -15,18 +15,21 @@ const highlightClass = ['border-primary', 'bg-primary/10'];
 interface TranslationListProps {
   ocrResult: OcrResult;
   translations: DictionaryEntry[];
+
+  activeWord: string | null;
+  setActiveWord: (word: string) => void;
 }
 
 export function TranslationList({
   ocrResult,
   translations,
+  activeWord,
+  setActiveWord,
 }: TranslationListProps) {
   const translationItemsContainerRef = useRef<HTMLDivElement>(null);
 
   const wordToButtonRef = useRef<Record<string, HTMLButtonElement>>({});
   const wordToTranslationRef = useRef<Record<string, HTMLDivElement>>({});
-
-  const [activeWord, setActiveWord] = useState<string | null>(null);
   const isObserverDisabled = useRef<boolean>(false);
 
   const uniqueEntries = useMemo(
@@ -34,7 +37,10 @@ export function TranslationList({
     [translations]
   );
 
-  const scrollToEntry = (word: string) => {
+  const scrollToEntry = (
+    word: string,
+    opts?: { behavior?: ScrollBehavior }
+  ) => {
     const element = wordToTranslationRef.current[word];
 
     if (element) {
@@ -42,7 +48,10 @@ export function TranslationList({
       setActiveWord(word);
       isObserverDisabled.current = true;
 
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.scrollIntoView({
+        behavior: opts?.behavior || 'smooth',
+        block: 'center',
+      });
 
       requestAnimationFrame(() => {
         // Add highlight to element
@@ -56,6 +65,13 @@ export function TranslationList({
       });
     }
   };
+
+  // Scroll to active word if one is given at the start
+  useEffect(() => {
+    if (activeWord) {
+      scrollToEntry(activeWord, { behavior: 'instant' });
+    }
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

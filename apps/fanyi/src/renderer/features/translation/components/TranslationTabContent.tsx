@@ -3,14 +3,22 @@ import { Loader2Icon } from 'lucide-react';
 import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
 import { cn } from '@renderer/lib/utils';
-import { TranslationTab } from '@renderer/stores/useTabStore';
+import { TranslationTab, useTabStore } from '@renderer/stores/useTabStore';
 
 interface TranslationTabContentProps {
   tab: TranslationTab;
 }
 
 export function TranslationTabContent({ tab }: TranslationTabContentProps) {
-  const { id, preset, screenshot } = tab;
+  const { updateTab } = useTabStore();
+  const { id, preset, screenshot, activeWord } = tab;
+
+  const setActiveWord = (word: string) => {
+    updateTab({
+      ...tab,
+      activeWord: word,
+    });
+  };
 
   const { data: ocrResponse, isPending: isOcrTextPending } =
     useGetOcrWithPresetQuery(id, preset);
@@ -35,6 +43,8 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
           <TranslationList
             ocrResult={ocrResponse.ocrResult}
             translations={ocrResponse.translations}
+            activeWord={activeWord}
+            setActiveWord={setActiveWord}
           />
         </div>
       )}
