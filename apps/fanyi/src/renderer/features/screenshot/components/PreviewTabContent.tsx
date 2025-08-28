@@ -62,6 +62,7 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
                     title: preset.name,
                     preset: preset,
                     screenshot,
+                    activeWord: null,
                   },
                   { setActive: true }
                 );

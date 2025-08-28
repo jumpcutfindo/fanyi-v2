@@ -1,6 +1,6 @@
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { Button } from '@renderer/components/ui/Button';
 import {
@@ -21,7 +21,6 @@ interface TranslationListProps {
 }
 
 export function TranslationList({
-  ocrResult,
   translations,
   activeWord,
   setActiveWord,
