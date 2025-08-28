@@ -101,7 +101,7 @@ export function TranslationList({
 
   return (
     <div className="flex h-0 w-full grow flex-row">
-      <div className="flex h-full w-60 flex-col gap-2 overflow-auto p-2">
+      <div className="flex h-full w-60 flex-col gap-2 overflow-auto py-2 ps-2">
         <div className="h-6">
           <span className="text-muted-foreground text-sm">
             {uniqueEntries.length} words
