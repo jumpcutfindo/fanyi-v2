@@ -29,7 +29,9 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
         <div className="flex flex-col items-center gap-8">
           <img
             src={screenshot}
-            className={cn('h-120 w-full bg-black/20 object-scale-down')}
+            className={cn(
+              'max-h-120 w-full bg-black/20 object-scale-down lg:max-h-180'
+            )}
           />
           <Loader2Icon className="animate-spin" />
           <span>Reading and translating image...</span>
