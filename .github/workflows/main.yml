@@ -46,4 +46,4 @@ jobs:
           source apps/python-ocr/.venv/bin/activate
           pnpm run lint
           pnpm run format
-          pnpm run build
+          pnpm run compile

@@ -18,7 +18,8 @@
     "build:fanyi": "pnpm --filter fanyi build",
     "build:ocr": "pnpm --filter python-ocr build",
     "lint": "pnpm --filter fanyi lint && pnpm --filter python-ocr lint",
-    "format": "pnpm --filter fanyi format:check && pnpm --filter python-ocr format"
+    "format": "pnpm --filter fanyi format:check && pnpm --filter python-ocr format",
+    "compile": "pnpm --filter fanyi compile"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
