@@ -88,6 +88,10 @@ export const useTabStore = create<TabStore>((set, get) => ({
         return t;
       });
 
+      if (prev.activeTab?.id === tab.id) {
+        return { activeTab: tab, tabs: newTabs };
+      }
+
       return { tabs: newTabs };
     }),
   setActiveTab: (tabId) =>
