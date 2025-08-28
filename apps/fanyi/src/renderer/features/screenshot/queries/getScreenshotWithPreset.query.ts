@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 export function useGetScreenshotWithPreset(preset: ScreenshotPreset | null) {
   return useQuery({
     queryKey: ['screenshot-with-preset', preset],
+    refetchInterval: 1000,
     queryFn: async () => {
       const buffer = await window.api.getScreenshotWithPreset(preset);
 

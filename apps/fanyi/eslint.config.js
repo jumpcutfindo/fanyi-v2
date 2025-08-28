@@ -72,6 +72,7 @@ export default defineConfig([
           ],
         },
       ],
+      'react-hooks/exhaustive-deps': 'off',
     },
 
     settings: {

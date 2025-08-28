@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow } from 'electron';
 import { registerIpcHandlers } from '@main/ipc';
+import { initDictionary } from '@main/services/dictionary';
 import { cleanUpPythonOcr, initPythonOcr } from '@main/services/ocr';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -79,6 +80,7 @@ app.whenReady().then(() => {
 
   // Setup underlying processes
   initPythonOcr();
+  initDictionary();
 
   createWindow();
 });
