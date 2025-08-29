@@ -30,7 +30,7 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
   }
 
   return (
-    <div className="flex w-full flex-col gap-8">
+    <div className="flex w-full flex-col items-center gap-8">
       {!isScreenshotPending ? (
         <img
           src={screenshot}
