@@ -1,20 +1,28 @@
-import { Ban, Copy, Image, ImageUpscale } from 'lucide-react';
+import { OcrResult } from '@shared/types/ocr';
+import { Ban, Copy, Files, Image, Images, ImageUpscale } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@renderer/components/ui/Button';
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/Tabs';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@renderer/components/ui/Tooltip';
 import { cn } from '@renderer/lib/utils';
 import { imageBase64ToBlob } from '@renderer/utils/image.util';
 
 type ImageSize = 'none' | 'small' | 'medium' | 'large' | 'full';
 
 interface TranslationImageProps {
+  ocrResult: OcrResult;
   screenshot: string;
   setTranslationsHidden: (hidden: boolean) => void;
 }
 
 export function TranslationImage({
+  ocrResult,
   screenshot,
   setTranslationsHidden,
 }: TranslationImageProps) {
@@ -35,6 +43,14 @@ export function TranslationImage({
         setTranslationsHidden(true);
         return 'h-[90vh]';
     }
+  };
+
+  const handleCopyText = () => {
+    navigator.clipboard
+      .writeText(ocrResult.results.map((r) => r.text).join(''))
+      .then(() => {
+        toast.success('Text copied to clipboard');
+      });
   };
 
   const handleCopyImage = () => {
@@ -82,9 +98,22 @@ export function TranslationImage({
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <Button variant="secondary" onClick={handleCopyImage} type="button">
-          <Copy />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="secondary" onClick={handleCopyImage} type="button">
+              <Images />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Copy image</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="secondary" onClick={handleCopyText} type="button">
+              <Files />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Copy read text</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );

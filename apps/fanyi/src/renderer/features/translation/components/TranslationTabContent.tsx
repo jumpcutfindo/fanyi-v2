@@ -36,6 +36,7 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
       ) : (
         <div className="flex h-full w-full flex-col">
           <TranslationImage
+            ocrResult={ocrResponse.ocrResult}
             screenshot={screenshot}
             setTranslationsHidden={setIsTranslationsHidden}
           />
