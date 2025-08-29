@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { useState } from 'react';
 
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
@@ -58,6 +59,8 @@ export function TabItem({
   handleClose,
   disabled,
 }: TabItemProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <div className="group relative h-8 w-full">
       <button
@@ -70,6 +73,8 @@ export function TabItem({
         )}
         onClick={handleSelect}
         disabled={disabled}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       >
         <span className={cn('max-w-[90%] truncate', isPreview ? 'italic' : '')}>
           {tab.title}
@@ -78,7 +83,10 @@ export function TabItem({
 
       {!disabled ? (
         <button
-          className="hover:bg-muted absolute top-[50%] right-2 translate-y-[-50%] cursor-pointer rounded-full opacity-0 group-hover:opacity-100"
+          className={cn(
+            'hover:bg-muted absolute top-[50%] right-2 translate-y-[-50%] cursor-pointer rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100',
+            isFocused ? 'opacity-100' : ''
+          )}
           onClick={handleClose}
         >
           <X className="size-4" />

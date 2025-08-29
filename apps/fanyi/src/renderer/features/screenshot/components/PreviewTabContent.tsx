@@ -30,11 +30,13 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex w-full flex-col items-center gap-8">
       {!isScreenshotPending ? (
         <img
           src={screenshot}
-          className={cn('h-120 w-full bg-black/20 object-scale-down')}
+          className={cn(
+            'max-h-120 w-full bg-black/20 object-scale-down lg:max-h-180'
+          )}
         />
       ) : (
         <Loader2Icon className="animate-spin" />
@@ -62,7 +64,6 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
                     title: preset.name,
                     preset: preset,
                     screenshot,
-                    activeWord: null,
                   },
                   { setActive: true }
                 );
