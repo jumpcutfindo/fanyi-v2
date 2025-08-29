@@ -5,10 +5,9 @@ import { toast } from 'sonner';
 import { Button } from '@renderer/components/ui/Button';
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/Tabs';
 import { cn } from '@renderer/lib/utils';
-import { TranslationTab } from '@renderer/stores/useTabStore';
 import { imageBase64ToBlob } from '@renderer/utils/image.util';
 
-type ImageSize = TranslationTab['imageSize'];
+type ImageSize = 'none' | 'small' | 'medium' | 'large' | 'full';
 
 interface TranslationImageProps {
   screenshot: string;

@@ -16,8 +16,6 @@ export interface TranslationTab extends BaseTab {
   type: 'translation';
   screenshot: string;
   preset: ScreenshotPreset;
-  activeWord: string | null;
-  imageSize: 'none' | 'small' | 'medium' | 'large' | 'full';
 }
 
 export type Tab = PreviewTab | TranslationTab;

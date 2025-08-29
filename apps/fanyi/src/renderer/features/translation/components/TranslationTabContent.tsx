@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
 import { cn } from '@renderer/lib/utils';
-import { TranslationTab, useTabStore } from '@renderer/stores/useTabStore';
+import { TranslationTab } from '@renderer/stores/useTabStore';
 
 import { TranslationImage } from './TranslationImage';
 
@@ -13,15 +13,7 @@ interface TranslationTabContentProps {
 }
 
 export function TranslationTabContent({ tab }: TranslationTabContentProps) {
-  const { updateTab } = useTabStore();
-  const { id, preset, screenshot, activeWord, imageSize } = tab;
-
-  const setActiveWord = (word: string) => {
-    updateTab({
-      ...tab,
-      activeWord: word,
-    });
-  };
+  const { id, preset, screenshot } = tab;
 
   const { data: ocrResponse, isPending: isOcrTextPending } =
     useGetOcrWithPresetQuery(id, preset);
