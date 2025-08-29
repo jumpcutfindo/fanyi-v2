@@ -31,6 +31,10 @@ export function TranslationList({ translations }: TranslationListProps) {
 
   const [activeWord, setActiveWord] = useState<string | null>(null);
 
+  const [hoveredEntry, setHoveredEntry] = useState<DictionaryEntry | null>(
+    null
+  );
+
   const scrollToEntry = (
     word: string,
     opts?: { behavior?: ScrollBehavior }
@@ -59,8 +63,6 @@ export function TranslationList({ translations }: TranslationListProps) {
       });
     }
   };
-
-  console.log('TranslationList');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -107,34 +109,34 @@ export function TranslationList({ translations }: TranslationListProps) {
   return (
     <div className="flex h-0 w-full grow flex-row">
       <div className="flex h-full w-60 flex-col gap-2 overflow-auto py-2 ps-2">
-        <div className="h-6">
-          <span className="text-muted-foreground text-sm">
-            {uniqueEntries.length} words
-          </span>
+        <div className="text-muted-foreground flex h-6 flex-row justify-between text-sm">
+          <span className="">{uniqueEntries.length} words</span>
+          {hoveredEntry ? (
+            <span>
+              {hoveredEntry.simplified} ({hoveredEntry.pinyin})
+            </span>
+          ) : null}
         </div>
         <div className="grow overflow-auto">
           <div className="flex h-fit flex-row flex-wrap">
             {uniqueEntries.map((t) => (
-              <Tooltip key={t.simplified}>
-                <TooltipTrigger asChild>
-                  <Button
-                    ref={(ref) => {
-                      if (ref) {
-                        wordToButtonRef.current[t.simplified] = ref;
-                      }
-                    }}
-                    variant="outline"
-                    className={cn(
-                      'flex-1 px-2 py-1 text-lg font-normal',
-                      activeWord === t.simplified ? 'border-primary' : ''
-                    )}
-                    onClick={() => scrollToEntry(t.simplified)}
-                  >
-                    {t.simplified}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{t.pinyin}</TooltipContent>
-              </Tooltip>
+              <Button
+                ref={(ref) => {
+                  if (ref) {
+                    wordToButtonRef.current[t.simplified] = ref;
+                  }
+                }}
+                variant="outline"
+                className={cn(
+                  'flex-1 px-2 py-1 text-lg font-normal',
+                  activeWord === t.simplified ? 'border-primary' : ''
+                )}
+                onClick={() => scrollToEntry(t.simplified)}
+                onMouseOver={() => setHoveredEntry(t)}
+                onMouseOut={() => setHoveredEntry(null)}
+              >
+                {t.simplified}
+              </Button>
             ))}
           </div>
         </div>
