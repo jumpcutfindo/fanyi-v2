@@ -1,6 +1,6 @@
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@renderer/components/ui/Button';
 import {
@@ -15,16 +15,9 @@ const highlightClass = ['border-primary', 'bg-primary/10'];
 interface TranslationListProps {
   ocrResult: OcrResult;
   translations: DictionaryEntry[];
-
-  activeWord: string | null;
-  setActiveWord: (word: string) => void;
 }
 
-export function TranslationList({
-  translations,
-  activeWord,
-  setActiveWord,
-}: TranslationListProps) {
+export function TranslationList({ translations }: TranslationListProps) {
   const translationItemsContainerRef = useRef<HTMLDivElement>(null);
 
   const wordToButtonRef = useRef<Record<string, HTMLButtonElement>>({});
@@ -35,6 +28,8 @@ export function TranslationList({
     () => [...new Set(translations)],
     [translations]
   );
+
+  const [activeWord, setActiveWord] = useState<string | null>(null);
 
   const scrollToEntry = (
     word: string,
@@ -65,12 +60,7 @@ export function TranslationList({
     }
   };
 
-  // Scroll to active word if one is given at the start
-  useEffect(() => {
-    if (activeWord) {
-      scrollToEntry(activeWord, { behavior: 'instant' });
-    }
-  }, []);
+  console.log('TranslationList');
 
   useEffect(() => {
     const observer = new IntersectionObserver(
