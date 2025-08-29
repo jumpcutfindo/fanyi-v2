@@ -20,8 +20,6 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
 
   const [isTranslationsHidden, setIsTranslationsHidden] = useState(false);
 
-  console.log('TranslationTabContent');
-
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
       {isOcrTextPending ? (

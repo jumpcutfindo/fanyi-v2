@@ -47,8 +47,6 @@ export function TranslationImage({
     });
   };
 
-  console.log('TranslationImage');
-
   return (
     <div
       className={cn(
