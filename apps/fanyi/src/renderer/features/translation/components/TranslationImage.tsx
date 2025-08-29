@@ -1,5 +1,5 @@
 import { OcrResult } from '@shared/types/ocr';
-import { Ban, Copy, Files, Image, Images, ImageUpscale } from 'lucide-react';
+import { Ban, Files, Image, Images, ImageUpscale } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
