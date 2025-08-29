@@ -1,4 +1,5 @@
 import { Ban, Copy, Image, ImageUpscale } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@renderer/components/ui/Button';
@@ -12,17 +13,14 @@ type ImageSize = TranslationTab['imageSize'];
 interface TranslationImageProps {
   screenshot: string;
   setTranslationsHidden: (hidden: boolean) => void;
-
-  imageSize: ImageSize;
-  setImageSize: (size: ImageSize) => void;
 }
 
 export function TranslationImage({
   screenshot,
   setTranslationsHidden,
-  imageSize,
-  setImageSize,
 }: TranslationImageProps) {
+  const [imageSize, setImageSize] = useState<ImageSize>('small');
+
   const getImageSizeClass = () => {
     setTranslationsHidden(false);
     switch (imageSize) {

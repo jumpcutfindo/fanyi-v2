@@ -2,10 +2,11 @@ import { Loader2Icon } from 'lucide-react';
 import { useState } from 'react';
 
 import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
-import { TranslationImage } from '@renderer/features/translation/components/TranslationImage';
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
 import { cn } from '@renderer/lib/utils';
 import { TranslationTab, useTabStore } from '@renderer/stores/useTabStore';
+
+import { TranslationImage } from './TranslationImage';
 
 interface TranslationTabContentProps {
   tab: TranslationTab;
@@ -19,16 +20,6 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
     updateTab({
       ...tab,
       activeWord: word,
-    });
-  };
-
-  const setImageSize = (size: typeof imageSize) => {
-    updateTab({
-      ...tab,
-      preset: {
-        ...preset,
-      },
-      imageSize: size,
     });
   };
 
@@ -55,8 +46,6 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
           <TranslationImage
             screenshot={screenshot}
             setTranslationsHidden={setIsTranslationsHidden}
-            imageSize={imageSize}
-            setImageSize={setImageSize}
           />
           {!isTranslationsHidden ? (
             <TranslationList
