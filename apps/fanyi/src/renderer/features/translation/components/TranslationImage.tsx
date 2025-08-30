@@ -99,7 +99,7 @@ export function TranslationImage({
           </TabsList>
         </Tabs>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="secondary" onClick={handleCopyImage} type="button">
               <Images />
             </Button>
@@ -107,7 +107,7 @@ export function TranslationImage({
           <TooltipContent side="bottom">Copy image</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="secondary" onClick={handleCopyText} type="button">
               <Files />
             </Button>
