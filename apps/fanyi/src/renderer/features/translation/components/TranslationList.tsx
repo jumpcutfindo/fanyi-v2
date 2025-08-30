@@ -109,6 +109,7 @@ export function TranslationList({ translations }: TranslationListProps) {
           <div className="flex h-fit flex-row flex-wrap">
             {uniqueEntries.map((t, index) => (
               <Button
+                key={`${t.simplified}-${index}`}
                 variant="outline"
                 className={cn(
                   'flex-1 px-2 py-1 text-lg font-normal',

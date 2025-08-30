@@ -39,6 +39,7 @@ export default defineConfig([
       compat.extends(
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
+        'plugin:react/recommended',
         'plugin:react-hooks/recommended',
         'plugin:import/typescript'
       )
@@ -73,6 +74,7 @@ export default defineConfig([
         },
       ],
       'react-hooks/exhaustive-deps': 'off',
+      'react/react-in-jsx-scope': 'off',
     },
 
     settings: {

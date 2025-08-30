@@ -28,8 +28,20 @@ export function TranslationImage({
 }: TranslationImageProps) {
   const [imageSize, setImageSize] = useState<ImageSize>('small');
 
+  const handleSetImage = (size: ImageSize) => {
+    switch (size) {
+      case 'full':
+        setTranslationsHidden(true);
+        break;
+      default:
+        setTranslationsHidden(false);
+        break;
+    }
+
+    setImageSize(size);
+  };
+
   const getImageSizeClass = () => {
-    setTranslationsHidden(false);
     switch (imageSize) {
       case 'none':
         return 'hidden';
@@ -40,7 +52,6 @@ export function TranslationImage({
       case 'large':
         return 'h-120 lg:h-160';
       case 'full':
-        setTranslationsHidden(true);
         return 'h-[90vh]';
     }
   };
@@ -78,7 +89,7 @@ export function TranslationImage({
         <Tabs
           className="w-full items-center transition-all"
           value={imageSize}
-          onValueChange={(value) => setImageSize(value as ImageSize)}
+          onValueChange={(value) => handleSetImage(value as ImageSize)}
         >
           <TabsList>
             <TabsTrigger value="none">
@@ -99,7 +110,7 @@ export function TranslationImage({
           </TabsList>
         </Tabs>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="secondary" onClick={handleCopyImage} type="button">
               <Images />
             </Button>
@@ -107,7 +118,7 @@ export function TranslationImage({
           <TooltipContent side="bottom">Copy image</TooltipContent>
         </Tooltip>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="secondary" onClick={handleCopyText} type="button">
               <Files />
             </Button>
