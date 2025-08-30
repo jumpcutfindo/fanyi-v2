@@ -93,7 +93,10 @@ export function TranslationList({ translations }: TranslationListProps) {
       direction="horizontal"
       className="flex h-0 w-full grow flex-row"
     >
-      <Panel className="flex h-full w-60 flex-col gap-2 overflow-auto py-2 ps-2">
+      <Panel
+        className="flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
+        minSize={8}
+      >
         <div className="text-muted-foreground flex h-6 flex-row justify-between text-sm">
           <span className="">{uniqueEntries.length} words</span>
           {hoveredEntry ? (
@@ -127,7 +130,10 @@ export function TranslationList({ translations }: TranslationListProps) {
       <PanelResizeHandle className="flex h-full items-center hover:bg-black/10">
         <GripVertical className="text-muted-foreground size-4" />
       </PanelResizeHandle>
-      <Panel className="flex grow flex-col items-center gap-2 overflow-auto py-2 pe-2">
+      <Panel
+        className="flex grow flex-col items-center gap-2 overflow-auto py-2 pe-2"
+        minSize={50}
+      >
         <List
           listRef={virtualListRef}
           className="w-full"
