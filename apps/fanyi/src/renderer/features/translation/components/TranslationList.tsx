@@ -6,6 +6,7 @@ import { List, RowComponentProps, useListRef } from 'react-window';
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
+import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
 import { cn } from '@renderer/lib/utils';
 
 const highlightClass = ['border-primary', 'bg-primary/10'];
@@ -17,17 +18,13 @@ interface TranslationListProps {
 
 export function TranslationList({ translations }: TranslationListProps) {
   const virtualListRef = useListRef(null);
-  const itemsRef = useRef<Record<string, HTMLDivElement>>({});
+  const itemsRef = useRef<Record<string, HTMLButtonElement>>({});
 
   const uniqueEntries = useMemo(
     () => [...new Set(translations)],
     [translations]
   );
 
-  const [activeWord, setActiveWord] = useState<string | null>(null);
-  const [hoveredEntry, setHoveredEntry] = useState<DictionaryEntry | null>(
-    null
-  );
   const visibleIndices = useRef<{
     start: number;
     end: number;
@@ -35,6 +32,12 @@ export function TranslationList({ translations }: TranslationListProps) {
     start: 0,
     end: 0,
   });
+
+  const [activeWord, setActiveWord] = useState<string | null>(null);
+  const [hoveredWord, setHoveredWord] = useState<DictionaryEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<DictionaryEntry | null>(
+    null
+  );
 
   const scrollToEntry = (index: number) => {
     if (virtualListRef.current) {
@@ -99,9 +102,9 @@ export function TranslationList({ translations }: TranslationListProps) {
       >
         <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
           <span className="">{uniqueEntries.length} words</span>
-          <span className={!hoveredEntry ? 'italic' : ''}>
-            {hoveredEntry
-              ? `${hoveredEntry.simplified} (${hoveredEntry.pinyin})`
+          <span className={!hoveredWord ? 'italic' : ''}>
+            {hoveredWord
+              ? `${hoveredWord.simplified} (${hoveredWord.pinyin})`
               : 'No word hovered'}
           </span>
         </div>
@@ -119,8 +122,8 @@ export function TranslationList({ translations }: TranslationListProps) {
                   setActiveWord(t.simplified);
                   scrollToEntry(index);
                 }}
-                onMouseOver={() => setHoveredEntry(t)}
-                onMouseOut={() => setHoveredEntry(null)}
+                onMouseOver={() => setHoveredWord(t)}
+                onMouseOut={() => setHoveredWord(null)}
               >
                 {t.simplified}
               </Button>
@@ -140,13 +143,15 @@ export function TranslationList({ translations }: TranslationListProps) {
           className="w-full"
           rowComponent={TranslationItem}
           rowCount={uniqueEntries.length}
-          rowHeight={112}
+          rowHeight={116}
           rowProps={{
-            setRef: (key: string, ref: HTMLDivElement) => {
+            setRef: (key, ref) => {
               if (!ref) return;
               itemsRef.current[key] = ref;
             },
             entries: uniqueEntries,
+            handleSelect: setSelectedEntry,
+            isSelected: (entry) => entry === selectedEntry,
           }}
           onRowsRendered={({ startIndex, stopIndex }) => {
             visibleIndices.current = {
@@ -161,8 +166,10 @@ export function TranslationList({ translations }: TranslationListProps) {
 }
 
 type TranslationItemProps = RowComponentProps<{
-  setRef: (key: string, ref: HTMLDivElement) => void;
+  setRef: (key: string, ref: HTMLButtonElement) => void;
   entries: DictionaryEntry[];
+  handleSelect: (entry: DictionaryEntry) => void;
+  isSelected: (entry: DictionaryEntry) => boolean;
 }>;
 
 function TranslationItem({
@@ -170,22 +177,29 @@ function TranslationItem({
   entries,
   index,
   style,
+  handleSelect,
+  isSelected,
 }: TranslationItemProps) {
   const entry = entries[index];
 
   return (
-    <div className="mb-1" style={style}>
-      <div
+    <div className="mb-2" style={style}>
+      <button
+        type="button"
         ref={(ref) => {
           if (!ref) return;
           setRef(entry.simplified, ref);
         }}
-        className="bg-card flex h-fit w-full flex-col rounded-md border p-4 transition-all"
+        className={cn(
+          'bg-card hover:bg-muted flex h-fit w-full cursor-pointer flex-col rounded-md border p-4 text-start transition-all',
+          isSelected(entry) ? 'border-primary' : ''
+        )}
+        onClick={() => handleSelect(entry)}
       >
         <span className="text-2xl">{entry.simplified}</span>
         <span className="text-sm">{entry.pinyin}</span>
         <div>{entry.definition}</div>
-      </div>
+      </button>
     </div>
   );
 }
