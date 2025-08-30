@@ -1,6 +1,7 @@
-import { ScreenshotPreset } from '@shared/types/screenshot';
 import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
+
+import { ScreenshotPreset } from '@shared/types/screenshot';
 
 interface BaseTab {
   id: string;

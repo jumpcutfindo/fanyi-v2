@@ -1,6 +1,6 @@
-import { ScreenshotPreset } from '@shared/types/screenshot';
 import { AppWindow, Monitor, Plus } from 'lucide-react';
 
+import { ScreenshotPreset } from '@shared/types/screenshot';
 import {
   SidebarContainer,
   SidebarContent,

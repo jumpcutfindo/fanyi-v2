@@ -1,10 +1,10 @@
-import { DictionaryEntry } from '@shared/types/dictionary';
-import { OcrResult } from '@shared/types/ocr';
 import { GripVertical } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { List, RowComponentProps, useListRef } from 'react-window';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
+import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
 import { cn } from '@renderer/lib/utils';
 

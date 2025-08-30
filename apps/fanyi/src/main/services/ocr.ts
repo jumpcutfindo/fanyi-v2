@@ -2,9 +2,10 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import { ChildProcess } from 'node:child_process';
 import path from 'node:path';
-import { OcrResult, OcrStatus } from '@shared/types/ocr';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
+
+import { OcrResult, OcrStatus } from '@shared/types/ocr';
 import { PrefixedStream } from '@main/utils/prefixed-stream';
 
 let pythonOcr: ChildProcess | null;

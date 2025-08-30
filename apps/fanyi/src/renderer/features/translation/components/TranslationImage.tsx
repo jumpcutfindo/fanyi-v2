@@ -1,8 +1,8 @@
-import { OcrResult } from '@shared/types/ocr';
 import { Ban, Files, Image, Images, ImageUpscale } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
 import { Tabs, TabsList, TabsTrigger } from '@renderer/components/ui/Tabs';
 import {

@@ -1,9 +1,10 @@
+import { desktopCapturer } from 'electron';
+
 import {
   ScreenshotOptions,
   ScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
-import { desktopCapturer } from 'electron';
 
 /**
  * Captures a screenshot of the primary screen and returns it as a Buffer.
