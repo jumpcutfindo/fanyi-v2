@@ -94,16 +94,16 @@ export function TranslationList({ translations }: TranslationListProps) {
       className="flex h-0 w-full grow flex-row"
     >
       <Panel
-        className="flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
+        className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
         minSize={8}
       >
-        <div className="text-muted-foreground flex h-6 flex-row justify-between text-sm">
+        <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
           <span className="">{uniqueEntries.length} words</span>
-          {hoveredEntry ? (
-            <span>
-              {hoveredEntry.simplified} ({hoveredEntry.pinyin})
-            </span>
-          ) : null}
+          <span className={!hoveredEntry ? 'italic' : ''}>
+            {hoveredEntry
+              ? `${hoveredEntry.simplified} (${hoveredEntry.pinyin})`
+              : 'No word hovered'}
+          </span>
         </div>
         <div className="grow overflow-x-clip overflow-y-auto">
           <div className="flex h-fit flex-row flex-wrap">
