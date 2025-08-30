@@ -1,10 +1,11 @@
+import { contextBridge, ipcRenderer } from 'electron';
+
 import { OcrResponse } from '@shared/types/ocr';
 import {
   AddScreenshotPresetPayload,
   ScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
-import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {

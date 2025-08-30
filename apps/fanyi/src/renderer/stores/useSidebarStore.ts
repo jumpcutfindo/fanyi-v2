@@ -1,5 +1,6 @@
-import { ScreenshotPreset } from '@shared/types/screenshot';
 import { create } from 'zustand';
+
+import { ScreenshotPreset } from '@shared/types/screenshot';
 
 interface ManagerOptions {
   selectedPreset: ScreenshotPreset | null;

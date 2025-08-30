@@ -1,12 +1,11 @@
 import { Loader2Icon } from 'lucide-react';
 import { useState } from 'react';
+import { TranslationImage } from './TranslationImage';
 
 import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
 import { cn } from '@renderer/lib/utils';
 import { TranslationTab } from '@renderer/stores/useTabStore';
-
-import { TranslationImage } from './TranslationImage';
 
 interface TranslationTabContentProps {
   tab: TranslationTab;

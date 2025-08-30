@@ -1,8 +1,10 @@
-import { DictionaryEntry } from '@shared/types/dictionary';
-import { OcrResult } from '@shared/types/ocr';
+import { GripVertical } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { List, RowComponentProps, useListRef } from 'react-window';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
+import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
 import { cn } from '@renderer/lib/utils';
 
@@ -86,17 +88,24 @@ export function TranslationList({ translations }: TranslationListProps) {
   };
 
   return (
-    <div className="flex h-0 w-full grow flex-row">
-      <div className="flex h-full w-60 flex-col gap-2 overflow-auto py-2 ps-2">
-        <div className="text-muted-foreground flex h-6 flex-row justify-between text-sm">
+    <PanelGroup
+      autoSaveId={'translation-list'}
+      direction="horizontal"
+      className="flex h-0 w-full grow flex-row"
+    >
+      <Panel
+        className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
+        minSize={8}
+      >
+        <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
           <span className="">{uniqueEntries.length} words</span>
-          {hoveredEntry ? (
-            <span>
-              {hoveredEntry.simplified} ({hoveredEntry.pinyin})
-            </span>
-          ) : null}
+          <span className={!hoveredEntry ? 'italic' : ''}>
+            {hoveredEntry
+              ? `${hoveredEntry.simplified} (${hoveredEntry.pinyin})`
+              : 'No word hovered'}
+          </span>
         </div>
-        <div className="grow overflow-auto">
+        <div className="grow overflow-x-clip overflow-y-auto">
           <div className="flex h-fit flex-row flex-wrap">
             {uniqueEntries.map((t, index) => (
               <Button
@@ -117,8 +126,14 @@ export function TranslationList({ translations }: TranslationListProps) {
             ))}
           </div>
         </div>
-      </div>
-      <div className="flex grow flex-col items-center gap-2 overflow-auto p-2">
+      </Panel>
+      <PanelResizeHandle className="flex h-full items-center hover:bg-black/10">
+        <GripVertical className="text-muted-foreground size-4" />
+      </PanelResizeHandle>
+      <Panel
+        className="flex grow flex-col items-center gap-2 overflow-auto py-2 pe-2"
+        minSize={50}
+      >
         <List
           listRef={virtualListRef}
           className="w-full"
@@ -139,8 +154,8 @@ export function TranslationList({ translations }: TranslationListProps) {
             };
           }}
         />
-      </div>
-    </div>
+      </Panel>
+    </PanelGroup>
   );
 }
 

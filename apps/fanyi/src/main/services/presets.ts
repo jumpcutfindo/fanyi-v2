@@ -1,9 +1,10 @@
+import Store from 'electron-store';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   AddScreenshotPresetPayload,
   ScreenshotPreset,
 } from '@shared/types/screenshot';
-import Store from 'electron-store';
-import { v4 as uuidv4 } from 'uuid';
 
 type StoreType = {
   presets: ScreenshotPreset[];

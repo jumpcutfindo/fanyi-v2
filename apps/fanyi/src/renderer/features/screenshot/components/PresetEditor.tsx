@@ -1,9 +1,9 @@
-import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 
+import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
 import {
   SidebarContainer,
   SidebarContent,

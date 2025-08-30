@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { Dictionary, DictionaryEntry } from '@shared/types/dictionary';
 import * as pinyin from 'pinyin-pro';
+
+import { Dictionary, DictionaryEntry } from '@shared/types/dictionary';
 
 let dictionary: Dictionary | null = null;
 
