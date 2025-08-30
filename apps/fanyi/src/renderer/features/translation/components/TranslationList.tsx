@@ -105,7 +105,7 @@ export function TranslationList({ translations }: TranslationListProps) {
             </span>
           ) : null}
         </div>
-        <div className="grow overflow-auto">
+        <div className="grow overflow-x-clip overflow-y-auto">
           <div className="flex h-fit flex-row flex-wrap">
             {uniqueEntries.map((t, index) => (
               <Button
