@@ -1,7 +1,7 @@
 import { GripVertical } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { List, RowComponentProps, useListRef } from 'react-window';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
@@ -17,8 +17,8 @@ interface TranslationListProps {
 }
 
 export function TranslationList({ translations }: TranslationListProps) {
-  const virtualListRef = useListRef(null);
   const itemsRef = useRef<Record<string, HTMLButtonElement>>({});
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const uniqueEntries = useMemo(
     () => [...new Set(translations)],
@@ -40,8 +40,8 @@ export function TranslationList({ translations }: TranslationListProps) {
   );
 
   const scrollToEntry = (index: number) => {
-    if (virtualListRef.current) {
-      virtualListRef.current.scrollToRow({
+    if (virtuosoRef.current) {
+      virtuosoRef.current.scrollToIndex({
         index,
         align: 'center',
         behavior: 'smooth',
@@ -140,26 +140,21 @@ export function TranslationList({ translations }: TranslationListProps) {
         minSize={25}
         defaultSize={40}
       >
-        <List
-          listRef={virtualListRef}
-          className="w-full"
-          rowComponent={TranslationItem}
-          rowCount={uniqueEntries.length}
-          rowHeight={116}
-          rowProps={{
-            setRef: (key, ref) => {
-              if (!ref) return;
-              itemsRef.current[key] = ref;
-            },
-            entries: uniqueEntries,
-            handleSelect: setSelectedEntry,
-            isSelected: (entry) => entry === selectedEntry,
-          }}
-          onRowsRendered={({ startIndex, stopIndex }) => {
-            visibleIndices.current = {
-              start: startIndex,
-              end: stopIndex,
-            };
+        <Virtuoso
+          ref={virtuosoRef}
+          className="h-full w-full"
+          totalCount={uniqueEntries.length}
+          itemContent={(index) => {
+            const entry = uniqueEntries[index];
+
+            return (
+              <TranslationItem
+                ref={(ref) => (itemsRef.current[entry.simplified] = ref)}
+                entry={entry}
+                isSelected={selectedEntry === entry}
+                handleSelect={setSelectedEntry}
+              />
+            );
           }}
         />
       </Panel>
@@ -173,34 +168,27 @@ export function TranslationList({ translations }: TranslationListProps) {
   );
 }
 
-type TranslationItemProps = RowComponentProps<{
-  setRef: (key: string, ref: HTMLButtonElement) => void;
-  entries: DictionaryEntry[];
+interface TranslationItemProps {
+  ref: (ref: HTMLButtonElement) => void;
+  entry: DictionaryEntry;
+  isSelected: boolean;
   handleSelect: (entry: DictionaryEntry) => void;
-  isSelected: (entry: DictionaryEntry) => boolean;
-}>;
+}
 
 function TranslationItem({
-  setRef,
-  entries,
-  index,
-  style,
-  handleSelect,
+  ref,
+  entry,
   isSelected,
+  handleSelect,
 }: TranslationItemProps) {
-  const entry = entries[index];
-
   return (
-    <div className="mb-2" style={style}>
+    <div className="pb-1">
       <button
         type="button"
-        ref={(ref) => {
-          if (!ref) return;
-          setRef(entry.simplified, ref);
-        }}
+        ref={ref}
         className={cn(
           'bg-card hover:bg-muted flex h-fit w-full cursor-pointer flex-col rounded-md border p-4 text-start transition-all',
-          isSelected(entry) ? 'border-primary' : ''
+          isSelected ? 'border-primary' : ''
         )}
         onClick={() => handleSelect(entry)}
       >
