@@ -125,6 +125,8 @@ export function TranslationList({ translations }: TranslationListProps) {
                 }}
                 onMouseOver={() => setHoveredWord(t)}
                 onMouseOut={() => setHoveredWord(null)}
+                onFocus={() => setHoveredWord(t)}
+                onBlur={() => setHoveredWord(null)}
               >
                 {t.simplified}
               </Button>
