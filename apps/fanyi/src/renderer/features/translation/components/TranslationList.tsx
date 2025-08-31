@@ -1,11 +1,12 @@
 import { GripVertical } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { List, RowComponentProps, useListRef } from 'react-window';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
+import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
 import { cn } from '@renderer/lib/utils';
 
 const highlightClass = ['border-primary', 'bg-primary/10'];
@@ -16,18 +17,14 @@ interface TranslationListProps {
 }
 
 export function TranslationList({ translations }: TranslationListProps) {
-  const virtualListRef = useListRef(null);
-  const itemsRef = useRef<Record<string, HTMLDivElement>>({});
+  const itemsRef = useRef<Record<string, HTMLButtonElement>>({});
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const uniqueEntries = useMemo(
     () => [...new Set(translations)],
     [translations]
   );
 
-  const [activeWord, setActiveWord] = useState<string | null>(null);
-  const [hoveredEntry, setHoveredEntry] = useState<DictionaryEntry | null>(
-    null
-  );
   const visibleIndices = useRef<{
     start: number;
     end: number;
@@ -36,9 +33,15 @@ export function TranslationList({ translations }: TranslationListProps) {
     end: 0,
   });
 
+  const [activeWord, setActiveWord] = useState<string | null>(null);
+  const [hoveredWord, setHoveredWord] = useState<DictionaryEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<DictionaryEntry | null>(
+    null
+  );
+
   const scrollToEntry = (index: number) => {
-    if (virtualListRef.current) {
-      virtualListRef.current.scrollToRow({
+    if (virtuosoRef.current) {
+      virtuosoRef.current.scrollToIndex({
         index,
         align: 'center',
         behavior: 'smooth',
@@ -95,13 +98,14 @@ export function TranslationList({ translations }: TranslationListProps) {
     >
       <Panel
         className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
-        minSize={8}
+        minSize={16}
+        defaultSize={16}
       >
         <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
           <span className="">{uniqueEntries.length} words</span>
-          <span className={!hoveredEntry ? 'italic' : ''}>
-            {hoveredEntry
-              ? `${hoveredEntry.simplified} (${hoveredEntry.pinyin})`
+          <span className={!hoveredWord ? 'italic' : ''}>
+            {hoveredWord
+              ? `${hoveredWord.simplified} (${hoveredWord.pinyin})`
               : 'No word hovered'}
           </span>
         </div>
@@ -119,8 +123,10 @@ export function TranslationList({ translations }: TranslationListProps) {
                   setActiveWord(t.simplified);
                   scrollToEntry(index);
                 }}
-                onMouseOver={() => setHoveredEntry(t)}
-                onMouseOut={() => setHoveredEntry(null)}
+                onMouseOver={() => setHoveredWord(t)}
+                onMouseOut={() => setHoveredWord(null)}
+                onFocus={() => setHoveredWord(t)}
+                onBlur={() => setHoveredWord(null)}
               >
                 {t.simplified}
               </Button>
@@ -132,60 +138,66 @@ export function TranslationList({ translations }: TranslationListProps) {
         <GripVertical className="text-muted-foreground size-4" />
       </PanelResizeHandle>
       <Panel
-        className="flex grow flex-col items-center gap-2 overflow-auto py-2 pe-2"
-        minSize={50}
+        className="flex grow flex-col items-center gap-2 overflow-auto py-2"
+        minSize={25}
+        defaultSize={40}
       >
-        <List
-          listRef={virtualListRef}
-          className="w-full"
-          rowComponent={TranslationItem}
-          rowCount={uniqueEntries.length}
-          rowHeight={112}
-          rowProps={{
-            setRef: (key: string, ref: HTMLDivElement) => {
-              if (!ref) return;
-              itemsRef.current[key] = ref;
-            },
-            entries: uniqueEntries,
-          }}
-          onRowsRendered={({ startIndex, stopIndex }) => {
-            visibleIndices.current = {
-              start: startIndex,
-              end: stopIndex,
-            };
+        <Virtuoso
+          ref={virtuosoRef}
+          className="h-full w-full"
+          totalCount={uniqueEntries.length}
+          itemContent={(index) => {
+            const entry = uniqueEntries[index];
+
+            return (
+              <TranslationItem
+                ref={(ref) => (itemsRef.current[entry.simplified] = ref)}
+                entry={entry}
+                isSelected={selectedEntry === entry}
+                handleSelect={setSelectedEntry}
+              />
+            );
           }}
         />
+      </Panel>
+      <PanelResizeHandle className="flex h-full items-center hover:bg-black/10">
+        <GripVertical className="text-muted-foreground size-4" />
+      </PanelResizeHandle>
+      <Panel minSize={25} defaultSize={44} collapsible>
+        <ExternalTranslation entry={selectedEntry} />
       </Panel>
     </PanelGroup>
   );
 }
 
-type TranslationItemProps = RowComponentProps<{
-  setRef: (key: string, ref: HTMLDivElement) => void;
-  entries: DictionaryEntry[];
-}>;
+interface TranslationItemProps {
+  ref: (ref: HTMLButtonElement) => void;
+  entry: DictionaryEntry;
+  isSelected: boolean;
+  handleSelect: (entry: DictionaryEntry) => void;
+}
 
 function TranslationItem({
-  setRef,
-  entries,
-  index,
-  style,
+  ref,
+  entry,
+  isSelected,
+  handleSelect,
 }: TranslationItemProps) {
-  const entry = entries[index];
-
   return (
-    <div className="mb-1" style={style}>
-      <div
-        ref={(ref) => {
-          if (!ref) return;
-          setRef(entry.simplified, ref);
-        }}
-        className="bg-card flex h-fit w-full flex-col rounded-md border p-4 transition-all"
+    <div className="pb-1">
+      <button
+        type="button"
+        ref={ref}
+        className={cn(
+          'bg-card hover:bg-muted flex h-fit w-full cursor-pointer flex-col rounded-md border p-4 text-start transition-all',
+          isSelected ? 'border-primary' : ''
+        )}
+        onClick={() => handleSelect(entry)}
       >
         <span className="text-2xl">{entry.simplified}</span>
         <span className="text-sm">{entry.pinyin}</span>
         <div>{entry.definition}</div>
-      </div>
+      </button>
     </div>
   );
 }
