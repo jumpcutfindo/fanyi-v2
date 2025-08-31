@@ -98,7 +98,7 @@ export function TranslationList({ translations }: TranslationListProps) {
     >
       <Panel
         className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
-        minSize={8}
+        minSize={16}
         defaultSize={16}
       >
         <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
