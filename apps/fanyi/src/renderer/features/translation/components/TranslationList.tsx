@@ -99,6 +99,7 @@ export function TranslationList({ translations }: TranslationListProps) {
       <Panel
         className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
         minSize={8}
+        defaultSize={16}
       >
         <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
           <span className="">{uniqueEntries.length} words</span>
@@ -135,8 +136,9 @@ export function TranslationList({ translations }: TranslationListProps) {
         <GripVertical className="text-muted-foreground size-4" />
       </PanelResizeHandle>
       <Panel
-        className="flex grow flex-col items-center gap-2 overflow-auto py-2 pe-2"
-        minSize={50}
+        className="flex grow flex-col items-center gap-2 overflow-auto py-2"
+        minSize={25}
+        defaultSize={40}
       >
         <List
           listRef={virtualListRef}
@@ -160,6 +162,12 @@ export function TranslationList({ translations }: TranslationListProps) {
             };
           }}
         />
+      </Panel>
+      <PanelResizeHandle className="flex h-full items-center hover:bg-black/10">
+        <GripVertical className="text-muted-foreground size-4" />
+      </PanelResizeHandle>
+      <Panel minSize={25} defaultSize={44} collapsible>
+        <ExternalTranslation entry={selectedEntry} />
       </Panel>
     </PanelGroup>
   );
