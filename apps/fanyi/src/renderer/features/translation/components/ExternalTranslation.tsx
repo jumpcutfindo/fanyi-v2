@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { cn } from '@renderer/lib/utils';
