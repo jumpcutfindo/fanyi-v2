@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
@@ -259,7 +259,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         }}
       />
       <form onSubmit={handleSubmit(onSubmit)} className="flex grow flex-col">
-        <SidebarContent className="gap-3">
+        <SidebarContent className="grow gap-3">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -300,6 +300,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
               }}
             />
           </div>
+
           <div className="flex flex-col gap-1">
             <Label htmlFor="source">Source</Label>
             <Controller
@@ -329,6 +330,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
               }}
             />
           </div>
+          <Separator className="my-2" />
           <div className="flex flex-col gap-4">
             <Label>Crop</Label>
             {renderSliderWithInput({
@@ -356,6 +358,20 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
               max: selectedSource?.size.height || 0,
             })}
           </div>
+          <Separator className="my-2" />
+          <div className="flex flex-col gap-1">
+            <Label>Keybind</Label>
+            <Controller
+              name="keybind"
+              control={control}
+              render={({ field }) => (
+                <KeybindInput
+                  keybind={field.value}
+                  setKeybind={field.onChange}
+                />
+              )}
+            />
+          </div>
         </SidebarContent>
         <SidebarFooter className="w-full justify-end gap-2">
           <Button type="submit">{mode === 'create' ? 'Create' : 'Save'}</Button>
@@ -367,5 +383,61 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
         </SidebarFooter>
       </form>
     </SidebarContainer>
+  );
+}
+
+interface KeybindInputProps {
+  keybind: string | undefined;
+  setKeybind: React.Dispatch<React.SetStateAction<string>>;
+}
+
+function KeybindInput({ keybind, setKeybind }: KeybindInputProps) {
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // Prevent default browser behavior for common keybinds
+      // to ensure our component captures the event.
+      e.preventDefault();
+
+      // Use a Set to store unique key parts and maintain order.
+      // The Set automatically handles duplicates.
+      const keys = new Set<string>();
+
+      // Add modifier keys if they are pressed.
+      if (e.ctrlKey) keys.add('Ctrl');
+      if (e.shiftKey) keys.add('Shift');
+      if (e.altKey) keys.add('Alt');
+      if (e.metaKey) keys.add('Meta');
+
+      // Get the key name. We check for a few special cases.
+      let keyName = e.key;
+      if (keyName === ' ') keyName = 'Space';
+      if (keyName === 'Enter') keyName = 'Enter';
+
+      // Ensure the key is not a modifier itself and is not a special key like Tab.
+      const isModifier = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key);
+      if (!isModifier) {
+        // Capitalize the key name before adding it to the set.
+        keys.add(keyName.toUpperCase());
+      }
+
+      // Format the keybind string with a " + " separator.
+      const newKeybind = Array.from(keys).join(' + ');
+      setKeybind(newKeybind);
+    },
+    [setKeybind]
+  );
+
+  // Handler to clear the input value.
+  const handleClear = useCallback(() => {
+    setKeybind('');
+  }, [setKeybind]);
+
+  return (
+    <div className="flex flex-row gap-2">
+      <Input type="text" readOnly value={keybind} onKeyDown={handleKeyDown} />
+      <Button type="button" onClick={handleClear}>
+        Clear
+      </Button>
+    </div>
   );
 }

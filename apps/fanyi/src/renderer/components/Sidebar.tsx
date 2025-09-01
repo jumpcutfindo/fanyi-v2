@@ -25,7 +25,10 @@ export function SidebarContent({
   ...props
 }: SidebarContentProps) {
   return (
-    <div className={cn('flex w-full flex-col gap-2', className)} {...props}>
+    <div
+      className={cn('flex w-full flex-col gap-2 overflow-y-auto', className)}
+      {...props}
+    >
       {children}
     </div>
   );
