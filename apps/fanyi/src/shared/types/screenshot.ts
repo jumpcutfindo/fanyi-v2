@@ -26,6 +26,7 @@ export interface ScreenshotPreset {
   name: string;
   description: string;
   options: ScreenshotOptions;
+  keybind?: string;
 }
 
 export type AddScreenshotPresetPayload = Omit<ScreenshotPreset, 'id'>;
