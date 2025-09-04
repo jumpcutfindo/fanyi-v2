@@ -21,3 +21,15 @@ export function imageBase64ToBlob(
   const blob = new Blob(byteArrays, { type: contentType });
   return blob;
 }
+
+export function bufferToPng(buffer: Buffer) {
+  const imageString = buffer
+    ? btoa(
+        new Uint8Array(buffer).reduce(function (data, byte) {
+          return data + String.fromCharCode(byte);
+        }, '')
+      )
+    : null;
+
+  return `data:image/png;base64,${imageString}`;
+}
