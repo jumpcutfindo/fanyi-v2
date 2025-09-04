@@ -5,6 +5,7 @@ import { app, BrowserWindow } from 'electron';
 import { registerIpcHandlers } from '@main/ipc';
 import { initDictionary } from '@main/services/dictionary';
 import { cleanUpPythonOcr, initPythonOcr } from '@main/services/ocr';
+import { registerKeybindings } from '@main/services/presets';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -78,6 +79,7 @@ app.on('before-quit', () => {
 
 app.whenReady().then(() => {
   registerIpcHandlers();
+  registerKeybindings();
 
   // Setup underlying processes
   initPythonOcr();
