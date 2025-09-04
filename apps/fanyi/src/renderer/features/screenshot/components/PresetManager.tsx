@@ -111,6 +111,18 @@ function PresetItem({ preset, handleSelect, isActive }: PresetItemProps) {
           )}{' '}
           <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
         </span>
+        {preset.keybind ? (
+          <span className="flex flex-row gap-1">
+            {preset.keybind.split(' + ').map((k) => (
+              <span
+                key={`${preset.id}-${k}`}
+                className="border-muted-foreground text-muted-foreground rounded-sm border px-1 text-xs"
+              >
+                {k}
+              </span>
+            ))}
+          </span>
+        ) : null}
       </button>
     </div>
   );
