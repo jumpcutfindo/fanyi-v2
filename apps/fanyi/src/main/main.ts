@@ -5,6 +5,7 @@ import { app, BrowserWindow } from 'electron';
 import { registerIpcHandlers } from '@main/ipc';
 import { initDictionary } from '@main/services/dictionary';
 import { cleanUpPythonOcr, initPythonOcr } from '@main/services/ocr';
+import { registerKeybindings } from '@main/services/presets';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -28,7 +29,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, 'public')
   : RENDERER_DIST;
 
-let win: BrowserWindow | null;
+export let win: BrowserWindow | null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -78,6 +79,7 @@ app.on('before-quit', () => {
 
 app.whenReady().then(() => {
   registerIpcHandlers();
+  registerKeybindings();
 
   // Setup underlying processes
   initPythonOcr();

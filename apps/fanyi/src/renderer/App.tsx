@@ -4,6 +4,7 @@ import { PresetEditor } from '@renderer/features/screenshot/components/PresetEdi
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
 import { TabList } from '@renderer/features/tabs/components/TabList';
+import { TranslationReceiver } from '@renderer/features/translation/components/TranslationReceiver';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 function App() {
@@ -28,17 +29,20 @@ function App() {
   };
 
   return (
-    <div className="flex h-full flex-row">
-      <div className="relative h-full min-w-70 gap-4">
-        <div ref={sidebarRef} className="absolute h-full w-full">
-          {renderSidebar()}
+    <>
+      <TranslationReceiver />
+      <div className="flex h-full flex-row">
+        <div className="relative h-full min-w-70 gap-4">
+          <div ref={sidebarRef} className="absolute h-full w-full">
+            {renderSidebar()}
+          </div>
+        </div>
+        <div className="flex h-full grow flex-col">
+          <TabList />
+          <TabDisplay />
         </div>
       </div>
-      <div className="flex h-full grow flex-col">
-        <TabList />
-        <TabDisplay />
-      </div>
-    </div>
+    </>
   );
 }
 

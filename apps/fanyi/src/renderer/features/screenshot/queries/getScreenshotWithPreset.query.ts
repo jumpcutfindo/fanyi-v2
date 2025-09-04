@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { ScreenshotPreset } from '@shared/types/screenshot';
+import { bufferToPng } from '@renderer/utils/image.util';
 
 export function useGetScreenshotWithPreset(preset: ScreenshotPreset | null) {
   return useQuery({
@@ -8,16 +9,7 @@ export function useGetScreenshotWithPreset(preset: ScreenshotPreset | null) {
     refetchInterval: 1000,
     queryFn: async () => {
       const buffer = await window.api.getScreenshotWithPreset(preset);
-
-      const imageString = buffer
-        ? btoa(
-            new Uint8Array(buffer).reduce(function (data, byte) {
-              return data + String.fromCharCode(byte);
-            }, '')
-          )
-        : null;
-
-      return `data:image/png;base64,${imageString}`;
+      return bufferToPng(buffer);
     },
     enabled: !!preset,
   });
