@@ -6,6 +6,8 @@ import {
   AddScreenshotPresetPayload,
   ScreenshotPreset,
 } from '@shared/types/screenshot';
+import { win } from '@main/main';
+import { takeScreenshotWithPreset } from '@main/services/screenshot';
 
 type StoreType = {
   presets: ScreenshotPreset[];
@@ -65,7 +67,14 @@ export async function deleteScreenshotPreset(id: string) {
 async function registerKeybind(preset: ScreenshotPreset) {
   if (!preset.keybind) return;
 
-  globalShortcut.register(preset.keybind, () => {
+  globalShortcut.register(preset.keybind, async () => {
+    const screenshot = await takeScreenshotWithPreset(preset);
+
+    win?.webContents.send(
+      'trigger-screenshot-with-preset',
+      preset.id,
+      screenshot
+    );
     console.log(`${preset.name} keybind triggered`, preset.keybind);
   });
 }
