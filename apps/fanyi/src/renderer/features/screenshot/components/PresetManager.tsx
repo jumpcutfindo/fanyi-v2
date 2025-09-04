@@ -1,5 +1,4 @@
 import { AppWindow, Monitor, Plus } from 'lucide-react';
-import { useEffect } from 'react';
 
 import { ScreenshotPreset } from '@shared/types/screenshot';
 import {
