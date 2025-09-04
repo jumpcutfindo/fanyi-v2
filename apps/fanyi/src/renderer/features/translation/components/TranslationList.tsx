@@ -189,14 +189,16 @@ function TranslationItem({
         type="button"
         ref={ref}
         className={cn(
-          'bg-card hover:bg-muted flex h-fit w-full cursor-pointer flex-col rounded-md border p-4 text-start transition-all',
+          'bg-card hover:bg-muted grid h-fit w-full cursor-pointer grid-cols-8 items-center gap-4 rounded-md border px-4 py-2 text-start transition-all',
           isSelected ? 'border-primary' : ''
         )}
         onClick={() => handleSelect(entry)}
       >
-        <span className="text-2xl">{entry.simplified}</span>
-        <span className="text-sm">{entry.pinyin}</span>
-        <div>{entry.definition}</div>
+        <span className="col-span-2 text-2xl">{entry.simplified}</span>
+        <span className="text-muted-foreground col-span-2 text-sm">
+          {entry.pinyin}
+        </span>
+        <div className="col-span-4 text-sm">{entry.definition}</div>
       </button>
     </div>
   );
