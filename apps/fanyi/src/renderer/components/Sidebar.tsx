@@ -11,7 +11,13 @@ export function SidebarContainer({
   ...props
 }: SidebarContainerProps) {
   return (
-    <div className={cn('flex h-full flex-col gap-4 p-4', className)} {...props}>
+    <div
+      className={cn(
+        'flex h-full flex-col gap-4 overflow-y-auto border-r',
+        className
+      )}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -26,7 +32,10 @@ export function SidebarContent({
 }: SidebarContentProps) {
   return (
     <div
-      className={cn('flex w-full flex-col gap-2 overflow-y-auto', className)}
+      className={cn(
+        'flex w-full grow flex-col gap-2 overflow-y-auto px-4 pb-4',
+        className
+      )}
       {...props}
     >
       {children}
@@ -42,7 +51,7 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({ title, children, onBack }: SidebarHeaderProps) {
   return (
-    <div className="flex h-6 flex-row items-center justify-between">
+    <div className="flex flex-row items-center justify-between px-4 pt-4">
       <span className="flex h-full flex-row items-center gap-2">
         {onBack ? (
           <Button
@@ -65,5 +74,9 @@ export function SidebarFooter({
   children,
   className,
 }: React.ComponentProps<'div'>) {
-  return <div className={cn('mt-auto flex', className)}>{children}</div>;
+  return (
+    <div className={cn('bg-card sticky bottom-0 flex border-t p-4', className)}>
+      {children}
+    </div>
+  );
 }
