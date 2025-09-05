@@ -17,7 +17,7 @@ export function TabList() {
   const previewTab = useTabStore((state) => state.previewTab);
 
   return (
-    <div className="grid grid-cols-5">
+    <div className="divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid">
       {tabs.map((tab) => (
         <TabItem
           key={tab.id}
@@ -66,7 +66,7 @@ export function TabItem({
       <button
         type="button"
         className={cn(
-          'bg-card not-last:border-e-muted hover:bg-muted flex h-8 w-full items-center truncate border-e border-e-transparent p-2 text-sm',
+          'bg-card hover:bg-muted flex h-8 w-full items-center truncate p-2 text-sm',
           disabled ? 'cursor-not-allowed' : 'cursor-pointer',
           disabled && !isPreview ? 'opacity-20' : '',
           isActive ? 'border-b-primary border-b' : 'opacity-50'
