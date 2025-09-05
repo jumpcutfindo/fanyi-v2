@@ -94,10 +94,10 @@ export function TranslationList({ translations }: TranslationListProps) {
     <PanelGroup
       autoSaveId={'translation-list'}
       direction="horizontal"
-      className="flex h-0 w-full grow flex-row"
+      className="flex h-0 w-full grow flex-row border-t"
     >
       <Panel
-        className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto py-2 ps-2"
+        className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto p-2"
         minSize={16}
         defaultSize={16}
       >
@@ -134,11 +134,9 @@ export function TranslationList({ translations }: TranslationListProps) {
           </div>
         </div>
       </Panel>
-      <PanelResizeHandle className="flex h-full items-center hover:bg-black/10">
-        <GripVertical className="text-muted-foreground size-4" />
-      </PanelResizeHandle>
+      <PanelResizeHandle className="flex h-full items-center border-e hover:border-e-black/20" />
       <Panel
-        className="flex grow flex-col items-center gap-2 overflow-auto py-2"
+        className="flex grow flex-col items-center gap-2 overflow-auto p-2"
         minSize={25}
         defaultSize={40}
       >
@@ -160,9 +158,7 @@ export function TranslationList({ translations }: TranslationListProps) {
           }}
         />
       </Panel>
-      <PanelResizeHandle className="flex h-full items-center hover:bg-black/10">
-        <GripVertical className="text-muted-foreground size-4" />
-      </PanelResizeHandle>
+      <PanelResizeHandle className="flex h-full items-center border-e hover:border-e-black/20" />
       <Panel minSize={25} defaultSize={44} collapsible>
         <ExternalTranslation entry={selectedEntry} />
       </Panel>
