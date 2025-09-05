@@ -1,6 +1,11 @@
 import { Loader2Icon } from 'lucide-react';
-import { useState } from 'react';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { useRef, useState } from 'react';
+import {
+  ImperativePanelHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
 import { TranslationImage } from './TranslationImage';
 
 import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
@@ -15,10 +20,12 @@ interface TranslationTabContentProps {
 export function TranslationTabContent({ tab }: TranslationTabContentProps) {
   const { id, preset, screenshot } = tab;
 
+  const translationListRef = useRef<ImperativePanelHandle>(null);
+
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
+
   const { data: ocrResponse, isPending: isOcrTextPending } =
     useGetOcrWithPresetQuery(id, preset);
-
-  const [isTranslationsHidden, setIsTranslationsHidden] = useState(false);
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">
@@ -43,16 +50,33 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
             <TranslationImage
               ocrResult={ocrResponse.ocrResult}
               screenshot={screenshot}
+              isExpanded={isImageExpanded}
+              toggleExpanded={() => {
+                if (!translationListRef.current) {
+                  return;
+                }
+
+                if (translationListRef.current.isExpanded()) {
+                  setIsImageExpanded(true);
+                  translationListRef.current.collapse();
+                } else {
+                  translationListRef.current.expand();
+                  setIsImageExpanded(false);
+                }
+              }}
             />
           </Panel>
-          <Panel defaultValue={75} minSize={50}>
-            <PanelResizeHandle className="flex w-full items-center border-t hover:border-t-black/20" />
-            {!isTranslationsHidden ? (
-              <TranslationList
-                ocrResult={ocrResponse.ocrResult}
-                translations={ocrResponse.translations}
-              />
-            ) : null}
+          <PanelResizeHandle className="flex w-full items-center border-t hover:border-t-black/20" />
+          <Panel
+            ref={translationListRef}
+            defaultValue={75}
+            minSize={50}
+            collapsible
+          >
+            <TranslationList
+              ocrResult={ocrResponse.ocrResult}
+              translations={ocrResponse.translations}
+            />
           </Panel>
         </PanelGroup>
       )}

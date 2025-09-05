@@ -1,4 +1,3 @@
-import { GripVertical } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';

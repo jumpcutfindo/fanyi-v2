@@ -1,4 +1,4 @@
-import { Files, Images } from 'lucide-react';
+import { Files, ImageDown, Images, ImageUpscale } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { OcrResult } from '@shared/types/ocr';
@@ -13,12 +13,17 @@ import { imageBase64ToBlob } from '@renderer/utils/image.util';
 interface TranslationImageProps {
   ocrResult: OcrResult;
   screenshot: string;
+  isExpanded: boolean;
+  toggleExpanded: () => void;
 }
 
 export function TranslationImage({
   ocrResult,
   screenshot,
+  isExpanded,
+  toggleExpanded,
 }: TranslationImageProps) {
+  // Directly call the function in the JSX
   const handleCopyText = () => {
     navigator.clipboard
       .writeText(ocrResult.results.map((r) => r.text).join(''))
@@ -61,6 +66,16 @@ export function TranslationImage({
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">Copy read text</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="secondary" onClick={toggleExpanded} type="button">
+              {isExpanded ? <ImageDown /> : <ImageUpscale />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isExpanded ? 'Shrink image' : 'Expand image'}
+          </TooltipContent>
         </Tooltip>
       </div>
     </div>
