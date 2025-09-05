@@ -94,7 +94,7 @@ export function TranslationList({ translations }: TranslationListProps) {
     <PanelGroup
       autoSaveId={'translation-list'}
       direction="horizontal"
-      className="flex h-0 w-full grow flex-row border-t"
+      className="flex h-0 w-full grow flex-row"
     >
       <Panel
         className="@container flex h-full w-60 flex-col gap-2 overflow-y-auto p-2"

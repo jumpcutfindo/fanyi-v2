@@ -1,5 +1,6 @@
 import { Loader2Icon } from 'lucide-react';
 import { useState } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { TranslationImage } from './TranslationImage';
 
 import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
@@ -33,19 +34,27 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
           <span>Reading and translating image...</span>
         </div>
       ) : (
-        <div className="flex h-full w-full flex-col">
-          <TranslationImage
-            ocrResult={ocrResponse.ocrResult}
-            screenshot={screenshot}
-            setTranslationsHidden={setIsTranslationsHidden}
-          />
-          {!isTranslationsHidden ? (
-            <TranslationList
+        <PanelGroup
+          autoSaveId="translation-tab"
+          direction="vertical"
+          className="flex h-full w-full flex-col"
+        >
+          <Panel defaultValue={25}>
+            <TranslationImage
               ocrResult={ocrResponse.ocrResult}
-              translations={ocrResponse.translations}
+              screenshot={screenshot}
             />
-          ) : null}
-        </div>
+          </Panel>
+          <Panel defaultValue={75} minSize={50}>
+            <PanelResizeHandle className="flex w-full items-center border-t hover:border-t-black/20" />
+            {!isTranslationsHidden ? (
+              <TranslationList
+                ocrResult={ocrResponse.ocrResult}
+                translations={ocrResponse.translations}
+              />
+            ) : null}
+          </Panel>
+        </PanelGroup>
       )}
     </div>
   );
