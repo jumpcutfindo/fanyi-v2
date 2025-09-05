@@ -1,3 +1,4 @@
+import { MessageSquareMore, MessageSquareWarning } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -100,62 +101,82 @@ export function TranslationList({ translations }: TranslationListProps) {
         minSize={16}
         defaultSize={16}
       >
-        <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
-          <span className="">{uniqueEntries.length} words</span>
-          <span className={!hoveredWord ? 'italic' : ''}>
-            {hoveredWord
-              ? `${hoveredWord.simplified} (${hoveredWord.pinyin})`
-              : 'No word hovered'}
-          </span>
-        </div>
-        <div className="grow overflow-x-clip overflow-y-auto">
-          <div className="flex h-fit flex-row flex-wrap">
-            {uniqueEntries.map((t, index) => (
-              <Button
-                key={`${t.simplified}-${index}`}
-                variant="outline"
-                className={cn(
-                  'flex-1 px-2 py-1 text-lg font-normal',
-                  activeWord === t.simplified ? 'border-primary' : ''
-                )}
-                onClick={() => {
-                  setActiveWord(t.simplified);
-                  scrollToEntry(index);
-                }}
-                onMouseOver={() => setHoveredWord(t)}
-                onMouseOut={() => setHoveredWord(null)}
-                onFocus={() => setHoveredWord(t)}
-                onBlur={() => setHoveredWord(null)}
-              >
-                {t.simplified}
-              </Button>
-            ))}
+        {uniqueEntries.length > 0 ? (
+          <>
+            <div className="text-muted-foreground flex h-10 flex-col gap-1 text-sm @min-[192px]:h-5 @min-[192px]:flex-row @min-[192px]:justify-between">
+              <span className="">{uniqueEntries.length} words</span>
+              <span className={!hoveredWord ? 'italic' : ''}>
+                {hoveredWord
+                  ? `${hoveredWord.simplified} (${hoveredWord.pinyin})`
+                  : 'No word hovered'}
+              </span>
+            </div>
+            <div className="grow overflow-x-clip overflow-y-auto">
+              <div className="flex h-fit flex-row flex-wrap">
+                {uniqueEntries.map((t, index) => (
+                  <Button
+                    key={`${t.simplified}-${index}`}
+                    variant="outline"
+                    className={cn(
+                      'flex-1 px-2 py-1 text-lg font-normal',
+                      activeWord === t.simplified ? 'border-primary' : ''
+                    )}
+                    onClick={() => {
+                      setActiveWord(t.simplified);
+                      scrollToEntry(index);
+                    }}
+                    onMouseOver={() => setHoveredWord(t)}
+                    onMouseOut={() => setHoveredWord(null)}
+                    onFocus={() => setHoveredWord(t)}
+                    onBlur={() => setHoveredWord(null)}
+                  >
+                    {t.simplified}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-2">
+            <MessageSquareWarning className="text-muted-foreground size-8" />
+            <span className="text-muted-foreground w-[50%] text-center">
+              No words found.
+            </span>
           </div>
-        </div>
+        )}
       </Panel>
       <PanelResizeHandle className="flex h-full items-center border-e hover:border-e-black/20" />
       <Panel
-        className="flex grow flex-col items-center gap-2 overflow-auto p-2"
+        className="flex h-full grow flex-col items-center justify-center gap-2 overflow-auto p-2"
         minSize={25}
         defaultSize={40}
       >
-        <Virtuoso
-          ref={virtuosoRef}
-          className="h-full w-full"
-          totalCount={uniqueEntries.length}
-          itemContent={(index) => {
-            const entry = uniqueEntries[index];
+        {uniqueEntries.length > 0 ? (
+          <Virtuoso
+            ref={virtuosoRef}
+            className="h-full w-full"
+            totalCount={uniqueEntries.length}
+            itemContent={(index) => {
+              const entry = uniqueEntries[index];
 
-            return (
-              <TranslationItem
-                ref={(ref) => (itemsRef.current[entry.simplified] = ref)}
-                entry={entry}
-                isSelected={selectedEntry === entry}
-                handleSelect={setSelectedEntry}
-              />
-            );
-          }}
-        />
+              return (
+                <TranslationItem
+                  ref={(ref) => (itemsRef.current[entry.simplified] = ref)}
+                  entry={entry}
+                  isSelected={selectedEntry === entry}
+                  handleSelect={setSelectedEntry}
+                />
+              );
+            }}
+          />
+        ) : (
+          <>
+            <MessageSquareMore className="text-muted-foreground size-8" />
+            <span className="text-muted-foreground w-[50%] text-center">
+              No dictionary entries to display.
+            </span>
+          </>
+        )}
       </Panel>
       <PanelResizeHandle className="flex h-full items-center border-e hover:border-e-black/20" />
       <Panel minSize={25} defaultSize={44} collapsible>
