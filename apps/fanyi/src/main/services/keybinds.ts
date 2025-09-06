@@ -1,10 +1,14 @@
-import { globalShortcut } from 'electron';
+import { clipboard, globalShortcut } from 'electron';
 
 /**
  * Contains reserved keybinds that may perform actions defined by the system
  */
 const defaultKeybindToFnMap: Record<string, () => void> = {
-  'Ctrl + V': () => {},
+  'Ctrl + V': () => {
+    const image = clipboard.readImage();
+
+    console.log('Paste image keybind triggered');
+  },
 };
 
 /**
@@ -23,6 +27,12 @@ export function getUsedKeybinds(): string[] {
 
 function isKeybindAvailable(keybind: string) {
   return !getUsedKeybinds().includes(keybind);
+}
+
+export function registerDefaultKeybinds() {
+  for (const keybind in defaultKeybindToFnMap) {
+    globalShortcut.register(keybind, defaultKeybindToFnMap[keybind]);
+  }
 }
 
 export function registerKeybind(keybind: string, fn: () => void) {

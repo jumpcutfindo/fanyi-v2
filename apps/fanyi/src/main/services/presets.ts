@@ -85,7 +85,7 @@ async function unregisterPresetKeybind(preset: ScreenshotPreset) {
   keybinds.unregisterKeybind(preset.keybind);
 }
 
-export async function registerKeybindings() {
+export async function registerPresetKeybinds() {
   const presets = await getScreenshotPresets();
 
   presets.forEach(registerPresetKeybind);
