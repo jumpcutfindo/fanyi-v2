@@ -23,5 +23,13 @@ interface SidebarStore {
 export const useSidebarStore = create<SidebarStore>((set) => ({
   sidebarState: { state: 'manager' },
   setSidebarState: (state: SidebarUnionState) =>
-    set(() => ({ sidebarState: state })),
+    set(() => {
+      if (state.state === 'editor') {
+        window.api.disableKeybinds();
+      } else {
+        window.api.enableKeybinds();
+      }
+
+      return { sidebarState: state };
+    }),
 }));

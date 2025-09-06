@@ -25,6 +25,7 @@ import { Slider } from '@renderer/components/ui/Slider';
 import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/queries/addScreenshotPreset.mutation';
 import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
+import { useGetUsedKeybindsQuery } from '@renderer/features/screenshot/queries/getUsedKeybinds.query';
 import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
@@ -42,6 +43,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const removeTab = useTabStore((state) => state.removeTab);
 
   const { data: screenshotSources } = useGetScreenshotSources();
+  const { data: usedKeybinds } = useGetUsedKeybindsQuery();
 
   const { mutate: addScreenshotPreset } = useAddScreenshotPresetMutation();
   const { mutate: updateScreenshotPreset } =
@@ -370,7 +372,19 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
                   setKeybind={field.onChange}
                 />
               )}
+              rules={{
+                validate: (value) => {
+                  if (value) {
+                    return (
+                      !usedKeybinds?.includes(value) || 'Keybind already in use'
+                    );
+                  }
+                },
+              }}
             />
+            {errors.keybind ? (
+              <p className="text-xs text-red-500">{errors.keybind.message}</p>
+            ) : null}
           </div>
         </SidebarContent>
         <SidebarFooter className="w-full justify-end gap-2">
@@ -422,6 +436,7 @@ function KeybindInput({ keybind, setKeybind }: KeybindInputProps) {
 
       // Format the keybind string with a " + " separator.
       const newKeybind = Array.from(keys).join(' + ');
+
       setKeybind(newKeybind);
     },
     [setKeybind]
