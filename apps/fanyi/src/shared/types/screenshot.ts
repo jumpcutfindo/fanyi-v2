@@ -25,7 +25,7 @@ export interface ScreenshotPreset {
   id: string;
   name: string;
   description: string;
-  options: ScreenshotOptions;
+  options?: ScreenshotOptions;
   keybind?: string;
 }
 
