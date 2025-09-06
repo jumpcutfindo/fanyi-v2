@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { ScreenshotPreset } from '@shared/types/screenshot';
+import { CustomScreenshotPreset } from '@shared/types/screenshot';
 
 export function useUpdateScreenshotPresetMutation() {
   return useMutation({
-    mutationFn: (preset: ScreenshotPreset) => {
+    mutationFn: (preset: CustomScreenshotPreset) => {
       return window.api.updateScreenshotPreset(preset);
     },
   });

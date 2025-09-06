@@ -21,7 +21,7 @@ export type ScreenshotOptions = {
   };
 };
 
-export interface ScreenshotPreset {
+export interface CustomScreenshotPreset {
   id: string;
   name: string;
   description: string;
@@ -29,4 +29,4 @@ export interface ScreenshotPreset {
   keybind?: string;
 }
 
-export type AddScreenshotPresetPayload = Omit<ScreenshotPreset, 'id'>;
+export type AddScreenshotPresetPayload = Omit<CustomScreenshotPreset, 'id'>;

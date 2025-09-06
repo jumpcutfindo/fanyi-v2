@@ -3,7 +3,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 
-import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
+import {
+  CustomScreenshotPreset,
+  ScreenshotSource,
+} from '@shared/types/screenshot';
 import {
   SidebarContainer,
   SidebarContent,
@@ -32,7 +35,7 @@ import { useTabStore } from '@renderer/stores/useTabStore';
 
 interface PresetEditorProps {
   mode: 'create' | 'edit';
-  initialValues?: ScreenshotPreset;
+  initialValues?: CustomScreenshotPreset;
 }
 
 export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
@@ -59,7 +62,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-  } = useForm<ScreenshotPreset>({
+  } = useForm<CustomScreenshotPreset>({
     defaultValues: initialValues ?? {
       options: {
         type: 'screen',
@@ -98,7 +101,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     );
   }, 500);
 
-  const onSubmit = (data: ScreenshotPreset) => {
+  const onSubmit = (data: CustomScreenshotPreset) => {
     if (mode === 'create') {
       addScreenshotPreset(data, {
         onSuccess: () => {

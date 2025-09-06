@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { OcrResponse } from '@shared/types/ocr';
 import {
   AddScreenshotPresetPayload,
-  ScreenshotPreset,
+  CustomScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
 import { getUsedKeybinds } from '@main/services/keybinds';
@@ -36,16 +36,16 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 });
 
 contextBridge.exposeInMainWorld('api', {
-  getScreenshotWithPreset: (preset: ScreenshotPreset): Promise<Buffer> =>
+  getScreenshotWithPreset: (preset: CustomScreenshotPreset): Promise<Buffer> =>
     ipcRenderer.invoke('take-screenshot-with-preset', preset),
   getScreenshotSources: (): Promise<ScreenshotSource[]> =>
     ipcRenderer.invoke('get-screenshot-sources'),
 
   addScreenshotPreset: (preset: AddScreenshotPresetPayload): Promise<void> =>
     ipcRenderer.invoke('add-screenshot-preset', preset),
-  getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
+  getScreenshotPresets: (): Promise<CustomScreenshotPreset[]> =>
     ipcRenderer.invoke('get-screenshot-presets'),
-  updateScreenshotPreset: (preset: ScreenshotPreset): Promise<void> =>
+  updateScreenshotPreset: (preset: CustomScreenshotPreset): Promise<void> =>
     ipcRenderer.invoke('update-screenshot-preset', preset),
   deleteScreenshotPreset: (id: string): Promise<void> =>
     ipcRenderer.invoke('delete-screenshot-preset', id),
@@ -54,7 +54,9 @@ contextBridge.exposeInMainWorld('api', {
   enableKeybinds: () => ipcRenderer.invoke('enable-keybinds'),
   disableKeybinds: () => ipcRenderer.invoke('disable-keybinds'),
 
-  performOcrWithPreset: (preset: ScreenshotPreset): Promise<OcrResponse> =>
+  performOcrWithPreset: (
+    preset: CustomScreenshotPreset
+  ): Promise<OcrResponse> =>
     ipcRenderer.invoke('perform-ocr-with-preset', preset),
   getOcrStatus: () => ipcRenderer.invoke('get-ocr-status'),
 });
