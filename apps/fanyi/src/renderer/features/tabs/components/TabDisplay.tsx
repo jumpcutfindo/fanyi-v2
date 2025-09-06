@@ -1,5 +1,6 @@
 import { PreviewTabContent } from '@renderer/features/screenshot/components/PreviewTabContent';
 import { TranslationTabContent } from '@renderer/features/translation/components/TranslationTabContent';
+import { usePresetKeybindReceiver } from '@renderer/hooks/usePresetKeybindReceiver.hook';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 const containerStyle =
@@ -7,6 +8,9 @@ const containerStyle =
 
 export function TabDisplay() {
   const activeTab = useTabStore((state) => state.activeTab);
+
+  // This hook handles the receiving of keybinds for processing screenshots
+  usePresetKeybindReceiver();
 
   if (!activeTab) {
     return (

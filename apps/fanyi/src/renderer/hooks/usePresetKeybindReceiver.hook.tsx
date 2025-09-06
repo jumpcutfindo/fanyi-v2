@@ -8,7 +8,7 @@ import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/g
 import { useTabStore } from '@renderer/stores/useTabStore';
 import { bufferToPng } from '@renderer/utils/image.util';
 
-function TranslationReceiver() {
+export function usePresetKeybindReceiver() {
   const { data: presets } = useGetScreenshotPresets();
   const { data: ocrStatus } = useGetOcrStatusQuery();
 
@@ -60,8 +60,4 @@ function TranslationReceiver() {
       window.ipcRenderer.removeAllListeners('trigger-screenshot-with-preset');
     };
   }, []);
-
-  return <></>;
 }
-
-export { TranslationReceiver };
