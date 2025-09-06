@@ -3,7 +3,11 @@ import { ipcMain } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
 import { getDictionaryEntries } from '@main/services/dictionary';
-import { getUsedKeybinds } from '@main/services/keybinds';
+import {
+  disableKeybinds,
+  enableKeybinds,
+  getUsedKeybinds,
+} from '@main/services/keybinds';
 import {
   addScreenshotPreset,
   deleteScreenshotPreset,
@@ -94,5 +98,11 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-used-keybinds', async (_event) => {
     return getUsedKeybinds();
+  });
+  ipcMain.handle('enable-keybinds', async (_event) => {
+    enableKeybinds();
+  });
+  ipcMain.handle('disable-keybinds', async (_event) => {
+    disableKeybinds();
   });
 }

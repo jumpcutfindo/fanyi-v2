@@ -50,7 +50,9 @@ contextBridge.exposeInMainWorld('api', {
   deleteScreenshotPreset: (id: string): Promise<void> =>
     ipcRenderer.invoke('delete-screenshot-preset', id),
 
-  getUsedKeybinds: () => getUsedKeybinds(),
+  getUsedKeybinds: () => ipcRenderer.invoke('get-used-keybinds'),
+  enableKeybinds: () => ipcRenderer.invoke('enable-keybinds'),
+  disableKeybinds: () => ipcRenderer.invoke('disable-keybinds'),
 
   performOcrWithPreset: (preset: ScreenshotPreset): Promise<OcrResponse> =>
     ipcRenderer.invoke('perform-ocr-with-preset', preset),

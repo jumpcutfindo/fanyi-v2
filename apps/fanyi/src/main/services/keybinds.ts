@@ -3,21 +3,26 @@ import { globalShortcut } from 'electron';
 /**
  * Contains reserved keybinds that may perform actions defined by the system
  */
-const RESERVED_KEYBINDS: string[] = ['Ctrl + V'];
+const defaultKeybindToFnMap: Record<string, () => void> = {
+  'Ctrl + V': () => {},
+};
 
 /**
- * Contains custom keybinds that are currently registered
+ * Contains keybinds registered by the user
  */
-let registeredKeybinds: string[] = [];
+const customKeybindToFnMap: Record<string, () => void> = {};
 
-export function getUsedKeybinds() {
-  return [...RESERVED_KEYBINDS, ...registeredKeybinds];
+let isKeybindsDisabled: boolean = false;
+
+export function getUsedKeybinds(): string[] {
+  return [
+    ...Object.keys(defaultKeybindToFnMap),
+    ...Object.keys(customKeybindToFnMap),
+  ];
 }
 
 function isKeybindAvailable(keybind: string) {
-  return (
-    RESERVED_KEYBINDS.includes(keybind) || !registeredKeybinds.includes(keybind)
-  );
+  return !getUsedKeybinds().includes(keybind);
 }
 
 export function registerKeybind(keybind: string, fn: () => void) {
@@ -26,12 +31,31 @@ export function registerKeybind(keybind: string, fn: () => void) {
   }
 
   globalShortcut.register(keybind, fn);
-
-  registeredKeybinds.push(keybind);
+  customKeybindToFnMap[keybind] = fn;
 }
 
 export function unregisterKeybind(keybind: string) {
   globalShortcut.unregister(keybind);
 
-  registeredKeybinds = registeredKeybinds.filter((k) => k !== keybind);
+  delete customKeybindToFnMap[keybind];
+}
+
+export function enableKeybinds() {
+  if (isKeybindsDisabled) {
+    for (const keybind in customKeybindToFnMap) {
+      globalShortcut.register(keybind, customKeybindToFnMap[keybind]);
+    }
+
+    isKeybindsDisabled = false;
+  }
+}
+
+export function disableKeybinds() {
+  if (!isKeybindsDisabled) {
+    for (const keybind in customKeybindToFnMap) {
+      globalShortcut.unregister(keybind);
+    }
+
+    isKeybindsDisabled = true;
+  }
 }
