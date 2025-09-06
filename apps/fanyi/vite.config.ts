@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import electron from 'vite-plugin-electron/simple';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 /**
  * For electron applications, need to define aliases in all Vite instances
@@ -17,6 +18,7 @@ const alias = {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    nodePolyfills(),
     react(),
     tailwindcss(),
     electron({
