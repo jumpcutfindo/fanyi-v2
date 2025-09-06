@@ -33,6 +33,8 @@ interface Window {
     updateScreenshotPreset: (preset: ScreenshotPreset) => Promise<void>;
     deleteScreenshotPreset: (id: string) => Promise<void>;
 
+    getUsedKeybinds: () => Promise<string[]>;
+
     getScreenshotWithPreset: (preset: ScreenshotPreset) => Promise<Buffer>;
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
   };

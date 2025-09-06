@@ -6,6 +6,7 @@ import {
   ScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
+import { getUsedKeybinds } from '@main/services/keybinds';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
@@ -48,6 +49,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('update-screenshot-preset', preset),
   deleteScreenshotPreset: (id: string): Promise<void> =>
     ipcRenderer.invoke('delete-screenshot-preset', id),
+
+  getUsedKeybinds: () => getUsedKeybinds(),
 
   performOcrWithPreset: (preset: ScreenshotPreset): Promise<OcrResponse> =>
     ipcRenderer.invoke('perform-ocr-with-preset', preset),

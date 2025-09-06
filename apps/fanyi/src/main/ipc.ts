@@ -3,6 +3,7 @@ import { ipcMain } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
 import { getDictionaryEntries } from '@main/services/dictionary';
+import { getUsedKeybinds } from '@main/services/keybinds';
 import {
   addScreenshotPreset,
   deleteScreenshotPreset,
@@ -89,5 +90,9 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-ocr-status', async (_event) => {
     return getOcrStatus();
+  });
+
+  ipcMain.handle('get-used-keybinds', async (_event) => {
+    return getUsedKeybinds();
   });
 }
