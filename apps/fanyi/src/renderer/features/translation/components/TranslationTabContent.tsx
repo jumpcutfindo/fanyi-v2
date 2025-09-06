@@ -8,8 +8,8 @@ import {
 } from 'react-resizable-panels';
 import { TranslationImage } from './TranslationImage';
 
-import { useGetOcrWithPresetQuery } from '@renderer/features/screenshot/queries/getOcrWithPreset.query';
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
+import { useGetOcrWithPresetQuery } from '@renderer/features/translation/queries/getOcrWithPreset.query';
 import { cn } from '@renderer/lib/utils';
 import { TranslationTab } from '@renderer/stores/useTabStore';
 
