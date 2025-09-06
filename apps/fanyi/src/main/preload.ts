@@ -3,10 +3,9 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { OcrResponse } from '@shared/types/ocr';
 import {
   AddScreenshotPresetPayload,
-  CustomScreenshotPreset,
+  ScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
-import { getUsedKeybinds } from '@main/services/keybinds';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
@@ -36,16 +35,16 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 });
 
 contextBridge.exposeInMainWorld('api', {
-  getScreenshotWithPreset: (preset: CustomScreenshotPreset): Promise<Buffer> =>
+  getScreenshotWithPreset: (preset: ScreenshotPreset): Promise<Buffer> =>
     ipcRenderer.invoke('take-screenshot-with-preset', preset),
   getScreenshotSources: (): Promise<ScreenshotSource[]> =>
     ipcRenderer.invoke('get-screenshot-sources'),
 
   addScreenshotPreset: (preset: AddScreenshotPresetPayload): Promise<void> =>
     ipcRenderer.invoke('add-screenshot-preset', preset),
-  getScreenshotPresets: (): Promise<CustomScreenshotPreset[]> =>
+  getScreenshotPresets: (): Promise<ScreenshotPreset[]> =>
     ipcRenderer.invoke('get-screenshot-presets'),
-  updateScreenshotPreset: (preset: CustomScreenshotPreset): Promise<void> =>
+  updateScreenshotPreset: (preset: ScreenshotPreset): Promise<void> =>
     ipcRenderer.invoke('update-screenshot-preset', preset),
   deleteScreenshotPreset: (id: string): Promise<void> =>
     ipcRenderer.invoke('delete-screenshot-preset', id),
@@ -54,9 +53,7 @@ contextBridge.exposeInMainWorld('api', {
   enableKeybinds: () => ipcRenderer.invoke('enable-keybinds'),
   disableKeybinds: () => ipcRenderer.invoke('disable-keybinds'),
 
-  performOcrWithPreset: (
-    preset: CustomScreenshotPreset
-  ): Promise<OcrResponse> =>
-    ipcRenderer.invoke('perform-ocr-with-preset', preset),
+  performOcrWithScreenshot: (buffer: Buffer): Promise<OcrResponse> =>
+    ipcRenderer.invoke('perform-ocr-with-screenshot', buffer),
   getOcrStatus: () => ipcRenderer.invoke('get-ocr-status'),
 });

@@ -9,23 +9,24 @@ import {
 import { TranslationImage } from './TranslationImage';
 
 import { TranslationList } from '@renderer/features/translation/components/TranslationList';
-import { useGetOcrWithPresetQuery } from '@renderer/features/translation/queries/getOcrWithPreset.query';
+import { useGetOcrWithScreenshotQuery } from '@renderer/features/translation/queries/getOcrWithScreenshot.query';
 import { cn } from '@renderer/lib/utils';
 import { TranslationTab } from '@renderer/stores/useTabStore';
+import { pngToBuffer } from '@renderer/utils/image.util';
 
 interface TranslationTabContentProps {
   tab: TranslationTab;
 }
 
 export function TranslationTabContent({ tab }: TranslationTabContentProps) {
-  const { id, preset, screenshot } = tab;
+  const { id, screenshot } = tab;
 
   const translationListRef = useRef<ImperativePanelHandle>(null);
 
   const [isImageExpanded, setIsImageExpanded] = useState(false);
 
   const { data: ocrResponse, isPending: isOcrTextPending } =
-    useGetOcrWithPresetQuery(id, preset);
+    useGetOcrWithScreenshotQuery(id, pngToBuffer(screenshot));
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">

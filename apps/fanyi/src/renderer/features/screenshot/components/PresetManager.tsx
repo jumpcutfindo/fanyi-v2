@@ -1,6 +1,6 @@
 import { AppWindow, Monitor, Plus } from 'lucide-react';
 
-import { CustomScreenshotPreset } from '@shared/types/screenshot';
+import { ScreenshotPreset } from '@shared/types/screenshot';
 import {
   SidebarContainer,
   SidebarContent,
@@ -84,7 +84,7 @@ export function PresetManager() {
 }
 
 interface PresetItemProps {
-  preset: CustomScreenshotPreset | null;
+  preset: ScreenshotPreset | null;
   isActive?: boolean;
   handleSelect: () => void;
 }

@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 
-import { CustomScreenshotPreset } from '@shared/types/screenshot';
+import { ScreenshotPreset } from '@shared/types/screenshot';
 
 interface ManagerOptions {
-  selectedPreset: CustomScreenshotPreset | null;
+  selectedPreset: ScreenshotPreset | null;
 }
 
 interface EditorOptions {
   mode: 'create' | 'edit';
-  initialPreset?: CustomScreenshotPreset;
+  initialPreset?: ScreenshotPreset;
 }
 
 type SidebarUnionState =
