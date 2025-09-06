@@ -1,15 +1,9 @@
-import { clipboard, globalShortcut } from 'electron';
+import { globalShortcut } from 'electron';
 
 /**
  * Contains reserved keybinds that may perform actions defined by the system
  */
-const defaultKeybindToFnMap: Record<string, () => void> = {
-  'Ctrl + V': () => {
-    const image = clipboard.readImage();
-
-    console.log('Paste image keybind triggered');
-  },
-};
+const defaultKeybindToFnMap: Record<string, () => void> = {};
 
 /**
  * Contains keybinds registered by the user
