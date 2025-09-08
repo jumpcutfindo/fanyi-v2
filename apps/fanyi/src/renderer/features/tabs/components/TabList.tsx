@@ -27,7 +27,7 @@ export function TabList() {
   );
 
   return (
-    <div className="divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid">
+    <div className="divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid md:grid-cols-7 lg:grid-cols-12">
       {allTabs.map((tab, index) => (
         <TabItem
           key={tab.id}
