@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { useTabStore } from '@renderer/stores/useTabStore';
-import { bufferToPng } from '@renderer/utils/image.util';
+import { bufferToDataUri } from '@renderer/utils/image.util';
 
 export function usePresetKeybindReceiver() {
   const { data: presets } = useGetScreenshotPresets();
@@ -36,7 +36,7 @@ export function usePresetKeybindReceiver() {
       }
 
       const preset = presetsRef.current?.find((p) => p.id === presetId);
-      const screenshot = bufferToPng(buffer);
+      const screenshot = bufferToDataUri(buffer, 'image/png');
 
       // Create a new tab for translation
       addTab(
