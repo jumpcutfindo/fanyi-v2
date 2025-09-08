@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
-import { blobToImageBase64, pngToBuffer } from '@renderer/utils/image.util';
+import { blobToImageBase64 } from '@renderer/utils/image.util';
 
 export function usePasteImageReceiver() {
   const addTab = useTabStore((state) => state.addTab);
