@@ -1,8 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { ScreenshotPreset } from '@shared/types/screenshot';
-
-export function useGetOcrWithPresetQuery(id: string, preset: ScreenshotPreset) {
+export function useGetOcrWithScreenshotQuery(id: string, screenshot: Buffer) {
   return useQuery({
     queryKey: ['ocr-with-preset', id],
 
@@ -13,7 +11,7 @@ export function useGetOcrWithPresetQuery(id: string, preset: ScreenshotPreset) {
     refetchOnWindowFocus: false,
 
     queryFn: async () => {
-      return await window.api.performOcrWithPreset(preset);
+      return await window.api.performOcrWithScreenshot(screenshot);
     },
   });
 }

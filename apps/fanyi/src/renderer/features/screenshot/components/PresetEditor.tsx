@@ -3,7 +3,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 
-import { ScreenshotPreset, ScreenshotSource } from '@shared/types/screenshot';
+import {
+  CustomScreenshotPreset,
+  ScreenshotSource,
+} from '@shared/types/screenshot';
 import {
   SidebarContainer,
   SidebarContent,
@@ -25,13 +28,14 @@ import { Slider } from '@renderer/components/ui/Slider';
 import { useAddScreenshotPresetMutation } from '@renderer/features/screenshot/queries/addScreenshotPreset.mutation';
 import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot/queries/deleteScreenshotPreset.mutation';
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
+import { useGetUsedKeybindsQuery } from '@renderer/features/screenshot/queries/getUsedKeybinds.query';
 import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 interface PresetEditorProps {
   mode: 'create' | 'edit';
-  initialValues?: ScreenshotPreset;
+  initialValues?: CustomScreenshotPreset;
 }
 
 export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
@@ -42,6 +46,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   const removeTab = useTabStore((state) => state.removeTab);
 
   const { data: screenshotSources } = useGetScreenshotSources();
+  const { data: usedKeybinds } = useGetUsedKeybindsQuery();
 
   const { mutate: addScreenshotPreset } = useAddScreenshotPresetMutation();
   const { mutate: updateScreenshotPreset } =
@@ -57,7 +62,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     handleSubmit,
     formState: { errors, isDirty },
     reset,
-  } = useForm<ScreenshotPreset>({
+  } = useForm<CustomScreenshotPreset>({
     defaultValues: initialValues ?? {
       options: {
         type: 'screen',
@@ -96,7 +101,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
     );
   }, 500);
 
-  const onSubmit = (data: ScreenshotPreset) => {
+  const onSubmit = (data: CustomScreenshotPreset) => {
     if (mode === 'create') {
       addScreenshotPreset(data, {
         onSuccess: () => {
@@ -370,7 +375,19 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
                   setKeybind={field.onChange}
                 />
               )}
+              rules={{
+                validate: (value) => {
+                  if (value) {
+                    return (
+                      !usedKeybinds?.includes(value) || 'Keybind already in use'
+                    );
+                  }
+                },
+              }}
             />
+            {errors.keybind ? (
+              <p className="text-xs text-red-500">{errors.keybind.message}</p>
+            ) : null}
           </div>
         </SidebarContent>
         <SidebarFooter className="w-full justify-end gap-2">
@@ -422,6 +439,7 @@ function KeybindInput({ keybind, setKeybind }: KeybindInputProps) {
 
       // Format the keybind string with a " + " separator.
       const newKeybind = Array.from(keys).join(' + ');
+
       setKeybind(newKeybind);
     },
     [setKeybind]

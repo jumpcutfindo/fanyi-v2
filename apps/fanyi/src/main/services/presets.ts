@@ -1,16 +1,16 @@
-import { globalShortcut } from 'electron';
 import Store from 'electron-store';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
   AddScreenshotPresetPayload,
-  ScreenshotPreset,
+  CustomScreenshotPreset,
 } from '@shared/types/screenshot';
 import { win } from '@main/main';
+import * as keybinds from '@main/services/keybinds';
 import { takeScreenshotWithPreset } from '@main/services/screenshot';
 
 type StoreType = {
-  presets: ScreenshotPreset[];
+  presets: CustomScreenshotPreset[];
 };
 
 const presetStore = new Store<StoreType>({ name: 'presets' });
@@ -25,14 +25,16 @@ export async function addScreenshotPreset(preset: AddScreenshotPresetPayload) {
 
   presetStore.set('presets', [...presets, newPreset]);
 
-  registerKeybind(newPreset);
+  registerPresetKeybind(newPreset);
 }
 
-export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
+export async function getScreenshotPresets(): Promise<
+  CustomScreenshotPreset[]
+> {
   return presetStore.get('presets', []);
 }
 
-export async function updateScreenshotPreset(preset: ScreenshotPreset) {
+export async function updateScreenshotPreset(preset: CustomScreenshotPreset) {
   const presets = await getScreenshotPresets();
 
   const presetToBeUpdated = presets.find((p) => p.id === preset.id);
@@ -44,8 +46,8 @@ export async function updateScreenshotPreset(preset: ScreenshotPreset) {
     );
 
     // Unregister old keybind and register new one
-    unregisterKeybind(presetToBeUpdated);
-    registerKeybind(preset);
+    unregisterPresetKeybind(presetToBeUpdated);
+    registerPresetKeybind(preset);
   }
 }
 
@@ -60,14 +62,14 @@ export async function deleteScreenshotPreset(id: string) {
       presets.filter((p) => p.id !== id)
     );
 
-    unregisterKeybind(deletedPreset);
+    unregisterPresetKeybind(deletedPreset);
   }
 }
 
-async function registerKeybind(preset: ScreenshotPreset) {
+async function registerPresetKeybind(preset: CustomScreenshotPreset) {
   if (!preset.keybind) return;
 
-  globalShortcut.register(preset.keybind, async () => {
+  keybinds.registerKeybind(preset.keybind, async () => {
     const screenshot = await takeScreenshotWithPreset(preset);
 
     win?.webContents.send(
@@ -79,14 +81,14 @@ async function registerKeybind(preset: ScreenshotPreset) {
   });
 }
 
-async function unregisterKeybind(preset: ScreenshotPreset) {
+async function unregisterPresetKeybind(preset: CustomScreenshotPreset) {
   if (!preset.keybind) return;
 
-  globalShortcut.unregister(preset.keybind);
+  keybinds.unregisterKeybind(preset.keybind);
 }
 
-export async function registerKeybindings() {
+export async function registerPresetKeybinds() {
   const presets = await getScreenshotPresets();
 
-  presets.forEach(registerKeybind);
+  presets.forEach(registerPresetKeybind);
 }

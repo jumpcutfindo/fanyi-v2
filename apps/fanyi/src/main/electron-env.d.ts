@@ -26,14 +26,20 @@ interface Window {
   ipcRenderer: import('electron').IpcRenderer;
   api: {
     getOcrStatus: () => Promise<OcrStatus>;
-    performOcrWithPreset: (preset: ScreenshotPreset) => Promise<OcrResponse>;
+    performOcrWithScreenshot: (buffer: Buffer) => Promise<OcrResponse>;
 
     addScreenshotPreset: (preset: AddScreenshotPresetPayload) => Promise<void>;
-    getScreenshotPresets: () => Promise<ScreenshotPreset[]>;
-    updateScreenshotPreset: (preset: ScreenshotPreset) => Promise<void>;
+    getScreenshotPresets: () => Promise<CustomScreenshotPreset[]>;
+    updateScreenshotPreset: (preset: CustomScreenshotPreset) => Promise<void>;
     deleteScreenshotPreset: (id: string) => Promise<void>;
 
-    getScreenshotWithPreset: (preset: ScreenshotPreset) => Promise<Buffer>;
+    enableKeybinds: () => Promise<void>;
+    disableKeybinds: () => Promise<void>;
+    getUsedKeybinds: () => Promise<string[]>;
+
+    getScreenshotWithPreset: (
+      preset: CustomScreenshotPreset
+    ) => Promise<Buffer>;
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
   };
 }

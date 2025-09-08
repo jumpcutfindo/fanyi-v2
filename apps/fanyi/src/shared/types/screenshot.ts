@@ -21,12 +21,24 @@ export type ScreenshotOptions = {
   };
 };
 
-export interface ScreenshotPreset {
+interface BaseScreenshotPreset {
   id: string;
   name: string;
   description: string;
+}
+
+interface TemporaryScreenshotPreset extends BaseScreenshotPreset {
+  type: 'temporary';
+}
+
+export interface CustomScreenshotPreset extends BaseScreenshotPreset {
+  type: 'custom';
   options: ScreenshotOptions;
   keybind?: string;
 }
 
-export type AddScreenshotPresetPayload = Omit<ScreenshotPreset, 'id'>;
+export type ScreenshotPreset =
+  | TemporaryScreenshotPreset
+  | CustomScreenshotPreset;
+
+export type AddScreenshotPresetPayload = Omit<CustomScreenshotPreset, 'id'>;

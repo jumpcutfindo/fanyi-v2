@@ -4,13 +4,16 @@ import { PresetEditor } from '@renderer/features/screenshot/components/PresetEdi
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
 import { TabList } from '@renderer/features/tabs/components/TabList';
-import { TranslationReceiver } from '@renderer/features/translation/components/TranslationReceiver';
+import { usePasteImageReceiver } from '@renderer/hooks/usePasteImageReceiver.hook';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 function App() {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
+
+  // Handle pasting of images globally
+  usePasteImageReceiver();
 
   const renderSidebar = () => {
     switch (sidebarState.state) {
@@ -30,7 +33,6 @@ function App() {
 
   return (
     <>
-      <TranslationReceiver />
       <div className="flex h-full flex-row">
         <div className="relative h-full min-w-70 gap-4">
           <div ref={sidebarRef} className="absolute h-full w-full">

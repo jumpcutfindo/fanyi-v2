@@ -4,6 +4,11 @@ import { getOcrStatus, runOcr } from './services/ocr';
 
 import { getDictionaryEntries } from '@main/services/dictionary';
 import {
+  disableKeybinds,
+  enableKeybinds,
+  getUsedKeybinds,
+} from '@main/services/keybinds';
+import {
   addScreenshotPreset,
   deleteScreenshotPreset,
   getScreenshotPresets,
@@ -73,13 +78,10 @@ export function registerIpcHandlers() {
    * Listen for OCR requests with image data and invoke the OCR service.
    * ipcMain.handle is used to return the OCR result to the renderer.
    */
-  ipcMain.handle('perform-ocr-with-preset', async (_event, preset) => {
+  ipcMain.handle('perform-ocr-with-screenshot', async (_event, screenshot) => {
     try {
-      const imageResult = await takeScreenshotWithPreset(preset);
-      const ocrResult = await runOcr(imageResult);
-
+      const ocrResult = await runOcr(screenshot);
       const translations = getDictionaryEntries(ocrResult.segmented_text);
-
       return { ocrResult, translations };
     } catch (error) {
       console.error('Failed to handle OCR request:', error);
@@ -89,5 +91,15 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-ocr-status', async (_event) => {
     return getOcrStatus();
+  });
+
+  ipcMain.handle('get-used-keybinds', async (_event) => {
+    return getUsedKeybinds();
+  });
+  ipcMain.handle('enable-keybinds', async (_event) => {
+    enableKeybinds();
+  });
+  ipcMain.handle('disable-keybinds', async (_event) => {
+    disableKeybinds();
   });
 }

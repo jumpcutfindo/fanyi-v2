@@ -1,8 +1,8 @@
 import { desktopCapturer } from 'electron';
 
 import {
+  CustomScreenshotPreset,
   ScreenshotOptions,
-  ScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
 
@@ -33,7 +33,7 @@ async function takeScreenshot(options: ScreenshotOptions): Promise<Buffer> {
   }
 }
 
-export async function takeScreenshotWithPreset(preset: ScreenshotPreset) {
+export async function takeScreenshotWithPreset(preset: CustomScreenshotPreset) {
   return takeScreenshot(preset.options);
 }
 

@@ -1,13 +1,14 @@
 import { IpcRendererEvent } from 'electron';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { useTabStore } from '@renderer/stores/useTabStore';
 import { bufferToPng } from '@renderer/utils/image.util';
 
-function TranslationReceiver() {
+export function usePresetKeybindReceiver() {
   const { data: presets } = useGetScreenshotPresets();
   const { data: ocrStatus } = useGetOcrStatusQuery();
 
@@ -40,7 +41,7 @@ function TranslationReceiver() {
       // Create a new tab for translation
       addTab(
         {
-          id: '',
+          id: uuidv4(),
           type: 'translation',
           title: preset.name,
           preset: preset,
@@ -59,8 +60,4 @@ function TranslationReceiver() {
       window.ipcRenderer.removeAllListeners('trigger-screenshot-with-preset');
     };
   }, []);
-
-  return <></>;
 }
-
-export { TranslationReceiver };

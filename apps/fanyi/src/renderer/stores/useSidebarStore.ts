@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 
-import { ScreenshotPreset } from '@shared/types/screenshot';
+import { CustomScreenshotPreset } from '@shared/types/screenshot';
 
 interface ManagerOptions {
-  selectedPreset: ScreenshotPreset | null;
+  selectedPreset: CustomScreenshotPreset | null;
 }
 
 interface EditorOptions {
   mode: 'create' | 'edit';
-  initialPreset?: ScreenshotPreset;
+  initialPreset?: CustomScreenshotPreset;
 }
 
 type SidebarUnionState =
@@ -23,5 +23,13 @@ interface SidebarStore {
 export const useSidebarStore = create<SidebarStore>((set) => ({
   sidebarState: { state: 'manager' },
   setSidebarState: (state: SidebarUnionState) =>
-    set(() => ({ sidebarState: state })),
+    set(() => {
+      if (state.state === 'editor') {
+        window.api.disableKeybinds();
+      } else {
+        window.api.enableKeybinds();
+      }
+
+      return { sidebarState: state };
+    }),
 }));
