@@ -45,14 +45,16 @@ export function blobToImageBase64(blob: Blob): Promise<string> {
   });
 }
 
-export function pngToBuffer(pngString: string) {
-  // 1. Remove the data URI header
-  const base64String = pngString.replace(/^data:image\/png;base64,/, '');
+export function dataUriToBuffer(dataUri: string) {
+  // 1. Split the data URI to get the header and the Base64 string.
+  // The split method creates an array, where the first element is the header
+  // and the second is the Base64 data. We only need the second element.
+  const base64String = dataUri.split(',')[1];
 
-  // 2. Decode from Base64
+  // 2. Decode from Base64.
   const binaryString = atob(base64String);
 
-  // 3. Create a Buffer
+  // 3. Convert the binary string to a Buffer.
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
@@ -62,14 +64,19 @@ export function pngToBuffer(pngString: string) {
   return Buffer.from(bytes);
 }
 
-export function bufferToPng(buffer: Buffer) {
-  const imageString = buffer
-    ? btoa(
-        new Uint8Array(buffer).reduce(function (data, byte) {
-          return data + String.fromCharCode(byte);
-        }, '')
-      )
-    : null;
+export function bufferToDataUri(buffer: Buffer, mimeType: string) {
+  // Handle case where buffer is null or empty.
+  if (!buffer || buffer.length === 0) {
+    return '';
+  }
 
-  return `data:image/png;base64,${imageString}`;
+  // Convert the buffer to a Base64 string.
+  const base64String = btoa(
+    new Uint8Array(buffer).reduce((data, byte) => {
+      return data + String.fromCharCode(byte);
+    }, '')
+  );
+
+  // Construct the data URI with the provided MIME type.
+  return `data:${mimeType};base64,${base64String}`;
 }

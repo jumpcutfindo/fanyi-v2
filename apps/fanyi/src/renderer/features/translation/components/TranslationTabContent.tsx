@@ -12,7 +12,7 @@ import { TranslationList } from '@renderer/features/translation/components/Trans
 import { useGetOcrWithScreenshotQuery } from '@renderer/features/translation/queries/getOcrWithScreenshot.query';
 import { cn } from '@renderer/lib/utils';
 import { TranslationTab } from '@renderer/stores/useTabStore';
-import { pngToBuffer } from '@renderer/utils/image.util';
+import { dataUriToBuffer } from '@renderer/utils/image.util';
 
 interface TranslationTabContentProps {
   tab: TranslationTab;
@@ -26,7 +26,7 @@ export function TranslationTabContent({ tab }: TranslationTabContentProps) {
   const [isImageExpanded, setIsImageExpanded] = useState(false);
 
   const { data: ocrResponse, isPending: isOcrTextPending } =
-    useGetOcrWithScreenshotQuery(id, pngToBuffer(screenshot));
+    useGetOcrWithScreenshotQuery(id, dataUriToBuffer(screenshot));
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center">

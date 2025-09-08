@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { CustomScreenshotPreset } from '@shared/types/screenshot';
-import { bufferToPng } from '@renderer/utils/image.util';
+import { bufferToDataUri } from '@renderer/utils/image.util';
 
 export function useGetScreenshotWithPreset(
   preset: CustomScreenshotPreset | null
@@ -11,7 +11,7 @@ export function useGetScreenshotWithPreset(
     refetchInterval: 1000,
     queryFn: async () => {
       const buffer = await window.api.getScreenshotWithPreset(preset);
-      return bufferToPng(buffer);
+      return bufferToDataUri(buffer, 'image/png');
     },
     enabled: !!preset,
   });
