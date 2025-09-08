@@ -50,9 +50,31 @@ function getDictionaryEntries(queries: string[]) {
     throw new Error('Dictionary not initialized');
   }
 
-  return queries
-    .map((query) => dictionary!.wordMap[query])
-    .filter((entry) => entry !== undefined);
+  const entryMap: Record<string, DictionaryEntry> = {};
+
+  for (const query of queries) {
+    entryMap[query] = dictionary.wordMap[query];
+  }
+
+  const results: DictionaryEntry[] = [];
+
+  // Break up items with no entries into individual words, and process them
+  for (const key of Object.keys(entryMap)) {
+    if (!entryMap[key]) {
+      // Split the key into individual words
+      const individualWords = key.split('');
+
+      entryMap[key] = dictionary.wordMap[key];
+
+      for (const word of individualWords) {
+        results.push(dictionary.wordMap[word]);
+      }
+    } else {
+      results.push(entryMap[key]);
+    }
+  }
+
+  return results.filter((entry) => entry !== undefined);
 }
 
 export { initDictionary, getDictionaryEntries };
