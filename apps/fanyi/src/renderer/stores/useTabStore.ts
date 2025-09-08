@@ -1,7 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 
-import { ScreenshotPreset } from '@shared/types/screenshot';
+import {
+  CustomScreenshotPreset,
+  ScreenshotPreset,
+} from '@shared/types/screenshot';
 
 interface BaseTab {
   id: string;
@@ -10,7 +13,7 @@ interface BaseTab {
 
 export interface PreviewTab extends BaseTab {
   type: 'preview';
-  activePreset: ScreenshotPreset | null;
+  activePreset: CustomScreenshotPreset | null;
 }
 
 export interface TranslationTab extends BaseTab {

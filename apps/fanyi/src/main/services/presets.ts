@@ -3,14 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   AddScreenshotPresetPayload,
-  ScreenshotPreset,
+  CustomScreenshotPreset,
 } from '@shared/types/screenshot';
 import { win } from '@main/main';
 import * as keybinds from '@main/services/keybinds';
 import { takeScreenshotWithPreset } from '@main/services/screenshot';
 
 type StoreType = {
-  presets: ScreenshotPreset[];
+  presets: CustomScreenshotPreset[];
 };
 
 const presetStore = new Store<StoreType>({ name: 'presets' });
@@ -28,11 +28,13 @@ export async function addScreenshotPreset(preset: AddScreenshotPresetPayload) {
   registerPresetKeybind(newPreset);
 }
 
-export async function getScreenshotPresets(): Promise<ScreenshotPreset[]> {
+export async function getScreenshotPresets(): Promise<
+  CustomScreenshotPreset[]
+> {
   return presetStore.get('presets', []);
 }
 
-export async function updateScreenshotPreset(preset: ScreenshotPreset) {
+export async function updateScreenshotPreset(preset: CustomScreenshotPreset) {
   const presets = await getScreenshotPresets();
 
   const presetToBeUpdated = presets.find((p) => p.id === preset.id);
@@ -64,7 +66,7 @@ export async function deleteScreenshotPreset(id: string) {
   }
 }
 
-async function registerPresetKeybind(preset: ScreenshotPreset) {
+async function registerPresetKeybind(preset: CustomScreenshotPreset) {
   if (!preset.keybind) return;
 
   keybinds.registerKeybind(preset.keybind, async () => {
@@ -79,7 +81,7 @@ async function registerPresetKeybind(preset: ScreenshotPreset) {
   });
 }
 
-async function unregisterPresetKeybind(preset: ScreenshotPreset) {
+async function unregisterPresetKeybind(preset: CustomScreenshotPreset) {
   if (!preset.keybind) return;
 
   keybinds.unregisterKeybind(preset.keybind);

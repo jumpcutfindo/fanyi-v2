@@ -36,6 +36,7 @@ export function usePasteImageReceiver() {
                 title: 'Pasted Screenshot',
                 preset: {
                   id: uuidv4(),
+                  type: 'temporary',
                   name: 'Pasted Screenshot',
                   description: new Date().toLocaleString(),
                 },

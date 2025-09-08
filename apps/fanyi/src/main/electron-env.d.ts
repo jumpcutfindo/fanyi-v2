@@ -29,15 +29,17 @@ interface Window {
     performOcrWithScreenshot: (buffer: Buffer) => Promise<OcrResponse>;
 
     addScreenshotPreset: (preset: AddScreenshotPresetPayload) => Promise<void>;
-    getScreenshotPresets: () => Promise<ScreenshotPreset[]>;
-    updateScreenshotPreset: (preset: ScreenshotPreset) => Promise<void>;
+    getScreenshotPresets: () => Promise<CustomScreenshotPreset[]>;
+    updateScreenshotPreset: (preset: CustomScreenshotPreset) => Promise<void>;
     deleteScreenshotPreset: (id: string) => Promise<void>;
 
     enableKeybinds: () => Promise<void>;
     disableKeybinds: () => Promise<void>;
     getUsedKeybinds: () => Promise<string[]>;
 
-    getScreenshotWithPreset: (preset: ScreenshotPreset) => Promise<Buffer>;
+    getScreenshotWithPreset: (
+      preset: CustomScreenshotPreset
+    ) => Promise<Buffer>;
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
   };
 }
