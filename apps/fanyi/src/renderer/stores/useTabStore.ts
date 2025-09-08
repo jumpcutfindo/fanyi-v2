@@ -56,7 +56,7 @@ export const useTabStore = create<TabStore>((set, get) => ({
       const tabs = prev.tabs.filter((tab) => tab.id !== tabId);
       const previewTab = prev.previewTab?.id === tabId ? null : prev.previewTab;
 
-      let newActiveTab = null;
+      let newActiveTab = prev.activeTab;
 
       // Check if current active tab was removed
       if (prev.activeTab?.id === tabId) {
