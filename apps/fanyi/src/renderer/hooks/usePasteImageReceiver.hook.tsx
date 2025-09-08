@@ -9,15 +9,34 @@ export function usePasteImageReceiver() {
   const addTab = useTabStore((state) => state.addTab);
   const sidebarState = useSidebarStore((state) => state.sidebarState);
 
+  const canProcess = () => sidebarState.state !== 'editor';
+
+  const addImageTab = (
+    base64Image: string,
+    title: string = 'Pasted Screenshot'
+  ) => {
+    addTab(
+      {
+        id: uuidv4(),
+        type: 'translation',
+        title,
+        preset: {
+          id: uuidv4(),
+          type: 'temporary',
+          name: title,
+          description: new Date().toLocaleString(),
+        },
+        screenshot: base64Image,
+      },
+      { setActive: true }
+    );
+  };
+
   const handlePaste = async (event: KeyboardEvent) => {
     // Check for Ctrl + V
     const isPaste = event.key === 'v' && (event.ctrlKey || event.metaKey); // metaKey for macOS
 
-    // Check if can continue with action
-    const canProcess = isPaste && sidebarState.state !== 'editor';
-
-    if (canProcess) {
-      // Prevent the default paste behavior
+    if (isPaste && canProcess()) {
       event.preventDefault();
 
       try {
@@ -28,22 +47,7 @@ export function usePasteImageReceiver() {
             const blob = await clipboardItem.getType('image/png');
             const screenshot = await blobToImageBase64(blob);
 
-            // Create a new tab for translation
-            addTab(
-              {
-                id: uuidv4(),
-                type: 'translation',
-                title: 'Pasted Screenshot',
-                preset: {
-                  id: uuidv4(),
-                  type: 'temporary',
-                  name: 'Pasted Screenshot',
-                  description: new Date().toLocaleString(),
-                },
-                screenshot,
-              },
-              { setActive: true }
-            );
+            addImageTab(screenshot, 'Pasted Screenshot');
           }
         }
       } catch (error) {
@@ -52,13 +56,37 @@ export function usePasteImageReceiver() {
     }
   };
 
-  useEffect(() => {
-    // Add the event listener to the document
-    document.addEventListener('keydown', handlePaste);
+  const handleDrop = (event: DragEvent) => {
+    event.preventDefault();
 
-    // Clean up the event listener when the component unmounts
+    if (canProcess() && event.dataTransfer?.files) {
+      for (const file of Array.from(event.dataTransfer.files)) {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            if (e.target?.result) {
+              const base64Image = e.target.result as string;
+              addImageTab(base64Image, file.name);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Add event listeners
+    document.addEventListener('keydown', handlePaste);
+    document.addEventListener('drop', handleDrop);
+    document.addEventListener('dragover', (e) => e.preventDefault()); // This is crucial to allow the drop event
+
+    // Clean up event listeners
     return () => {
       document.removeEventListener('keydown', handlePaste);
+      document.removeEventListener('drop', handleDrop);
+      document.removeEventListener('dragover', (e) => e.preventDefault());
     };
-  }, []); // The empty dependency array ensures this effect runs only once
+  }, []);
 }
