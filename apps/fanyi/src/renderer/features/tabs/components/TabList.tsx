@@ -32,7 +32,7 @@ export function TabList() {
         <TabItem
           key={tab.id}
           tabIndex={index}
-          tabCount={tabs.length}
+          tabCount={allTabs.length}
           tab={tab}
           isActive={activeTab?.id === tab.id}
           handleSelect={() => setActiveTab(tab.id)}
