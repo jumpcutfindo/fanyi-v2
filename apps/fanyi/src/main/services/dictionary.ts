@@ -40,6 +40,18 @@ function initDictionary() {
           return acc;
         }
 
+        // Retrieve links from the definition
+        const externalReferences =
+          entry.defintion.matchAll(/[\u4E00-\u9FFF]+/g);
+        const links = [];
+
+        for (const match of externalReferences) {
+          links.push({
+            word: match[0],
+            start: match.index,
+          });
+        }
+
         // Modify all pinyins within definition
         const pinyins = entry.defintion.matchAll(/\[(.*?)\]/g);
 
@@ -57,14 +69,22 @@ function initDictionary() {
         }
 
         if (acc[entry.simplified]) {
-          acc[entry.simplified].defintions.push(entry.defintion);
-          return acc;
+          acc[entry.simplified].defintions.push({
+            definition: entry.defintion,
+            links,
+          });
+        } else {
+          acc[entry.simplified] = {
+            ...entry,
+            defintions: [
+              {
+                definition: entry.defintion,
+                links,
+              },
+            ],
+          };
         }
 
-        acc[entry.simplified] = {
-          ...entry,
-          defintions: [entry.defintion],
-        };
         return acc;
       },
       {} as Record<string, DictionaryEntry>
