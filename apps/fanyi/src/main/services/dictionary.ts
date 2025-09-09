@@ -19,7 +19,7 @@ function initDictionary() {
   const regex =
     /^(?<traditional>.*?)\s+(?<simplified>.*?)\s+\[(?<pinyin>.*?)\]\s+\/(?<definition>.*?)\/\s*?/gm;
 
-  const entries: DictionaryEntry[] = [];
+  const entries = [];
 
   for (const match of rawDictionary.matchAll(regex)) {
     entries.push({
@@ -28,14 +28,22 @@ function initDictionary() {
       pinyin: pinyin.convert(match.groups!.pinyin.toLowerCase(), {
         format: 'numToSymbol',
       }),
-      definition: match.groups!.definition,
+      defintion: match.groups!.definition,
     });
   }
 
   dictionary = {
     wordMap: entries.reduce(
       (acc, entry) => {
-        acc[entry.simplified] = entry;
+        if (acc[entry.simplified]) {
+          acc[entry.simplified].defintions.push(entry.defintion);
+          return acc;
+        }
+
+        acc[entry.simplified] = {
+          ...entry,
+          defintions: [entry.defintion],
+        };
         return acc;
       },
       {} as Record<string, DictionaryEntry>
@@ -74,7 +82,16 @@ function getDictionaryEntries(queries: string[]) {
     }
   }
 
-  return results.filter((entry) => entry !== undefined);
+  return results
+    .filter((entry) => entry !== undefined)
+    .map((entry) => {
+      return {
+        ...entry,
+        definition: pinyin.convert(entry.defintions, {
+          format: 'numToSymbol',
+        }),
+      };
+    });
 }
 
 export { initDictionary, getDictionaryEntries };

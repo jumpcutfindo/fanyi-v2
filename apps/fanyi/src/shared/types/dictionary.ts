@@ -6,5 +6,5 @@ export interface DictionaryEntry {
   traditional: string;
   simplified: string;
   pinyin: string;
-  definition: string;
+  defintions: string[];
 }

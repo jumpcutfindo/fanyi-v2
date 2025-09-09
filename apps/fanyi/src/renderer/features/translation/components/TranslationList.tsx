@@ -6,6 +6,7 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
+import { Separator } from '@renderer/components/ui/Separator';
 import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
 import { cn } from '@renderer/lib/utils';
 
@@ -214,7 +215,14 @@ function TranslationItem({
         <span className="text-muted-foreground flex-1 text-sm">
           {entry.pinyin}
         </span>
-        <div className="flex-3 text-sm">{entry.definition}</div>
+        <div className="flex flex-3 flex-col gap-2 text-sm">
+          {entry.defintions.map((def, index, arr) => (
+            <>
+              <span key={def}>{def}</span>
+              {index !== arr.length - 1 ? <Separator /> : null}
+            </>
+          ))}
+        </div>
       </button>
     </div>
   );
