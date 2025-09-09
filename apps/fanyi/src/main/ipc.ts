@@ -2,7 +2,10 @@
 import { ipcMain } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
-import { getDictionaryEntries } from '@main/services/dictionary';
+import {
+  getDictionaryEntries,
+  getRawDictionaryEntry,
+} from '@main/services/dictionary';
 import {
   disableKeybinds,
   enableKeybinds,
@@ -101,5 +104,9 @@ export function registerIpcHandlers() {
   });
   ipcMain.handle('disable-keybinds', async (_event) => {
     disableKeybinds();
+  });
+
+  ipcMain.handle('get-dictionary-entry-of-word', async (_event, word) => {
+    return getRawDictionaryEntry(word);
   });
 }

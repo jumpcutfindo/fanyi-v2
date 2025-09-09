@@ -126,4 +126,12 @@ function getDictionaryEntries(queries: string[]) {
   return results.filter((entry) => entry !== undefined);
 }
 
-export { initDictionary, getDictionaryEntries };
+function getRawDictionaryEntry(query: string) {
+  if (!dictionary) {
+    throw new Error('Dictionary not initialized');
+  }
+
+  return dictionary.wordMap[query];
+}
+
+export { initDictionary, getDictionaryEntries, getRawDictionaryEntry };

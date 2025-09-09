@@ -41,5 +41,7 @@ interface Window {
       preset: CustomScreenshotPreset
     ) => Promise<Buffer>;
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
+
+    getDictionaryEntryOfWord(word: string): Promise<DictionaryEntry | null>;
   };
 }

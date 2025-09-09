@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResponse } from '@shared/types/ocr';
 import {
   AddScreenshotPresetPayload,
@@ -56,4 +57,7 @@ contextBridge.exposeInMainWorld('api', {
   performOcrWithScreenshot: (buffer: Buffer): Promise<OcrResponse> =>
     ipcRenderer.invoke('perform-ocr-with-screenshot', buffer),
   getOcrStatus: () => ipcRenderer.invoke('get-ocr-status'),
+
+  getDictionaryEntryOfWord: (word: string): Promise<DictionaryEntry | null> =>
+    ipcRenderer.invoke('get-dictionary-entry-of-word', word),
 });

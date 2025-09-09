@@ -6,8 +6,14 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@renderer/components/ui/HoverCard';
 import { Separator } from '@renderer/components/ui/Separator';
 import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
+import { TranslationHoverCard } from '@renderer/features/translation/components/TranslationHoverCard';
 import { cn } from '@renderer/lib/utils';
 
 const highlightClass = ['border-primary', 'bg-primary/10'];
@@ -211,9 +217,9 @@ function TranslationItem({
     for (const link of d.links) {
       chunks.push(d.definition.slice(lastIndex, link.start));
       chunks.push(
-        <a className="text-red-500">
-          {d.definition.slice(link.start, link.start + link.word.length)}
-        </a>
+        <TranslationHoverCard
+          word={d.definition.slice(link.start, link.start + link.word.length)}
+        />
       );
       lastIndex = link.start + link.word.length;
     }
@@ -242,7 +248,12 @@ function TranslationItem({
           {entry.pinyin}
         </span>
         <div className="flex flex-3 flex-col gap-2 text-sm">
-          {entry.defintions.map((def) => renderDefinition(def))}
+          {entry.defintions.map((def, index, arr) => (
+            <>
+              {renderDefinition(def)}
+              {index !== arr.length - 1 ? <Separator /> : null}
+            </>
+          ))}
         </div>
       </button>
     </div>
