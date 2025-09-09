@@ -6,11 +6,6 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@renderer/components/ui/HoverCard';
 import { Separator } from '@renderer/components/ui/Separator';
 import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
 import { TranslationHoverCard } from '@renderer/features/translation/components/TranslationHoverCard';
