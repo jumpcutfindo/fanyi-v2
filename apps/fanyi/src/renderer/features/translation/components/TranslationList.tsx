@@ -200,6 +200,32 @@ function TranslationItem({
   isSelected,
   handleSelect,
 }: TranslationItemProps) {
+  const renderDefinition = (d: DictionaryEntry['defintions'][number]) => {
+    if (d.links.length === 0) {
+      return <span key={d.definition}>{d.definition}</span>;
+    }
+
+    let lastIndex = 0;
+    const chunks = [];
+
+    for (const link of d.links) {
+      chunks.push(d.definition.slice(lastIndex, link.start));
+      chunks.push(
+        <a className="text-red-500">
+          {d.definition.slice(link.start, link.start + link.word.length)}
+        </a>
+      );
+      lastIndex = link.start + link.word.length;
+    }
+
+    // Append rest
+    if (lastIndex < d.definition.length) {
+      chunks.push(d.definition.slice(lastIndex));
+    }
+
+    return <span key={d.definition}>{chunks}</span>;
+  };
+
   return (
     <div className="pb-1">
       <button
@@ -216,12 +242,7 @@ function TranslationItem({
           {entry.pinyin}
         </span>
         <div className="flex flex-3 flex-col gap-2 text-sm">
-          {entry.defintions.map((def, index, arr) => (
-            <>
-              <span key={def}>{def}</span>
-              {index !== arr.length - 1 ? <Separator /> : null}
-            </>
-          ))}
+          {entry.defintions.map((def) => renderDefinition(def))}
         </div>
       </button>
     </div>

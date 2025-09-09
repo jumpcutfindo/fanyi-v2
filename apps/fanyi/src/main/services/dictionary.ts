@@ -40,18 +40,6 @@ function initDictionary() {
           return acc;
         }
 
-        // Retrieve links from the definition
-        const externalReferences =
-          entry.defintion.matchAll(/[\u4E00-\u9FFF]+/g);
-        const links = [];
-
-        for (const match of externalReferences) {
-          links.push({
-            word: match[0],
-            start: match.index,
-          });
-        }
-
         // Modify all pinyins within definition
         const pinyins = entry.defintion.matchAll(/\[(.*?)\]/g);
 
@@ -66,6 +54,18 @@ function initDictionary() {
               })
             );
           }
+        }
+
+        // Retrieve links from the definition
+        const externalReferences =
+          entry.defintion.matchAll(/[\u4E00-\u9FFF]+/g);
+        const links = [];
+
+        for (const match of externalReferences) {
+          links.push({
+            word: match[0],
+            start: match.index,
+          });
         }
 
         if (acc[entry.simplified]) {
