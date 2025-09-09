@@ -35,6 +35,27 @@ function initDictionary() {
   dictionary = {
     wordMap: entries.reduce(
       (acc, entry) => {
+        // Skip useless entries
+        if (entry.defintion.includes('variant of')) {
+          return acc;
+        }
+
+        // Modify all pinyins within definition
+        const pinyins = entry.defintion.matchAll(/\[(.*?)\]/g);
+
+        for (const match of pinyins) {
+          const individualPinyin = match[0].matchAll(/[a-z]+[1-4]/gi);
+
+          for (const innerMatch of individualPinyin) {
+            entry.defintion = entry.defintion.replace(
+              innerMatch[0],
+              pinyin.convert(innerMatch[0].toLowerCase(), {
+                format: 'numToSymbol',
+              })
+            );
+          }
+        }
+
         if (acc[entry.simplified]) {
           acc[entry.simplified].defintions.push(entry.defintion);
           return acc;
@@ -82,16 +103,7 @@ function getDictionaryEntries(queries: string[]) {
     }
   }
 
-  return results
-    .filter((entry) => entry !== undefined)
-    .map((entry) => {
-      return {
-        ...entry,
-        definition: pinyin.convert(entry.defintions, {
-          format: 'numToSymbol',
-        }),
-      };
-    });
+  return results.filter((entry) => entry !== undefined);
 }
 
 export { initDictionary, getDictionaryEntries };
