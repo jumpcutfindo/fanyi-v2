@@ -6,5 +6,11 @@ export interface DictionaryEntry {
   traditional: string;
   simplified: string;
   pinyin: string;
-  definition: string;
+  defintions: {
+    definition: string;
+    links: {
+      word: string;
+      start: number;
+    }[];
+  }[];
 }
