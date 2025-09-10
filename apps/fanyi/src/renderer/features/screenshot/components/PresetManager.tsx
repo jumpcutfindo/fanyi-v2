@@ -4,6 +4,7 @@ import { CustomScreenshotPreset } from '@shared/types/screenshot';
 import { SidebarContent, SidebarHeader } from '@renderer/components/Sidebar';
 import { Button } from '@renderer/components/ui/Button';
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
+import { PresetKeybindDisplay } from '@renderer/features/screenshot/components/PresetKeybindDisplay';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
@@ -102,18 +103,7 @@ function PresetItem({ preset, handleSelect, isActive }: PresetItemProps) {
           )}{' '}
           <span>{`${preset.options.type === 'screen' ? 'Screen' : 'Window'} (${preset.options.crop?.width}×${preset.options.crop?.height})`}</span>
         </span>
-        {preset.keybind ? (
-          <span className="flex flex-row gap-1">
-            {preset.keybind.split(' + ').map((k) => (
-              <span
-                key={`${preset.id}-${k}`}
-                className="border-muted-foreground text-muted-foreground rounded-sm border px-1 text-xs"
-              >
-                {k}
-              </span>
-            ))}
-          </span>
-        ) : null}
+        <PresetKeybindDisplay keybind={preset.keybind} />
       </button>
     </div>
   );
