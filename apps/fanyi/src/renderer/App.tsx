@@ -99,7 +99,7 @@ function App() {
             {renderSidebarFooter()}
           </SidebarContainer>
         </div>
-        <div className="flex h-full grow flex-col gap-4">
+        <div className="flex h-full grow flex-col">
           <TabList />
           <TabDisplay />
         </div>
