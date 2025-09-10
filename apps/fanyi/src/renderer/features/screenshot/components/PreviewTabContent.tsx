@@ -1,5 +1,11 @@
-import { Loader2Icon, Pencil, Play } from 'lucide-react';
+import { Files, Loader2Icon, Pencil, Play } from 'lucide-react';
 
+import { Button } from '@renderer/components/ui/Button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@renderer/components/ui/Tooltip';
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { cn } from '@renderer/lib/utils';
@@ -49,40 +55,55 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
               {preset.options.crop?.width}x{preset.options.crop?.height}
             </span>
           </div>
-          <div className="flex grow flex-row items-center justify-center gap-8 px-32">
-            <button
-              className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-green-200 hover:bg-green-300 disabled:opacity-20"
-              onClick={() => {
-                if (!canRequestOcr) {
-                  return;
-                }
+          <div className="flex grow flex-row items-center justify-center gap-4 px-32">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  className="group border border-emerald-600 shadow-none hover:bg-emerald-600"
+                  onClick={() => {
+                    if (!canRequestOcr) {
+                      return;
+                    }
 
-                addTab(
-                  {
-                    id: '',
-                    type: 'translation',
-                    title: preset.name,
-                    preset: preset,
-                    screenshot,
-                  },
-                  { setActive: true }
-                );
-              }}
-              disabled={!canRequestOcr}
-            >
-              <Play className="text-green-600 group-hover:fill-green-600" />
-            </button>
-            <button
-              className="group flex size-12 cursor-pointer items-center justify-center rounded-full bg-amber-200 hover:bg-amber-300"
-              onClick={() =>
-                setSidebarState({
-                  state: 'editor',
-                  options: { mode: 'edit', initialPreset: preset },
-                })
-              }
-            >
-              <Pencil className="text-amber-600 group-hover:fill-amber-600" />
-            </button>
+                    addTab(
+                      {
+                        id: '',
+                        type: 'translation',
+                        title: preset.name,
+                        preset: preset,
+                        screenshot,
+                      },
+                      { setActive: true }
+                    );
+                  }}
+                  disabled={!canRequestOcr}
+                  type="button"
+                >
+                  <Play className="group-hover:text-primary-foreground group-hover:fill-primary-foreground fill-emerald-600 text-emerald-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Execute OCR</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  className="group border border-amber-600 shadow-none hover:bg-amber-600"
+                  onClick={() =>
+                    setSidebarState({
+                      state: 'editor',
+                      options: { mode: 'edit', initialPreset: preset },
+                    })
+                  }
+                  disabled={!canRequestOcr}
+                  type="button"
+                >
+                  <Pencil className="group-hover:text-primary-foreground text-amber-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Edit preset</TooltipContent>
+            </Tooltip>
           </div>
         </>
       ) : null}
