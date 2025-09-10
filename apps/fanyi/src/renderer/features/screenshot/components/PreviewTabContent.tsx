@@ -1,4 +1,4 @@
-import { Files, Loader2Icon, Pencil, Play } from 'lucide-react';
+import { Loader2Icon, Pencil, Play } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/Button';
 import {
