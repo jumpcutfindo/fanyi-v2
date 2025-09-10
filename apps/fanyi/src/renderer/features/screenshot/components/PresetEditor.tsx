@@ -8,7 +8,6 @@ import {
   ScreenshotSource,
 } from '@shared/types/screenshot';
 import {
-  SidebarContainer,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
