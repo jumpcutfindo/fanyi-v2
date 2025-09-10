@@ -1,6 +1,9 @@
+import { Moon, Sun } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
+import { Label } from '@renderer/components/ui/Label';
+import { Switch } from '@renderer/components/ui/Switch';
 import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
@@ -40,16 +43,12 @@ function App() {
   // Handle pasting of images globally
   usePasteImageReceiver();
 
-  const renderSidebar = () => {
+  const renderSidebarContent = () => {
     switch (sidebarState.state) {
       case 'manager':
         return (
           <>
             <PresetManager />
-
-            <SidebarFooter className="flex flex-row justify-between">
-              <OcrStatus />
-            </SidebarFooter>
           </>
         );
       case 'editor':
@@ -64,12 +63,40 @@ function App() {
     }
   };
 
+  const renderSidebarFooter = () => {
+    switch (sidebarState.state) {
+      case 'editor':
+        return null;
+      default:
+        return (
+          <SidebarFooter className="flex flex-row justify-between">
+            <OcrStatus />
+            <div className="flex flex-row justify-center gap-2">
+              <Label htmlFor="darkMode">
+                {isDarkMode ? (
+                  <Moon className="fill-foreground size-3.5" />
+                ) : (
+                  <Sun className="text-muted-foreground fill-muted-foreground size-3.5" />
+                )}
+              </Label>
+              <Switch
+                id="darkMode"
+                checked={isDarkMode}
+                onCheckedChange={setIsDarkMode}
+              />
+            </div>
+          </SidebarFooter>
+        );
+    }
+  };
+
   return (
     <>
       <div className="flex h-full flex-row">
         <div className="relative h-full min-w-70 gap-4">
           <SidebarContainer ref={sidebarRef} className="absolute h-full w-full">
-            {renderSidebar()}
+            {renderSidebarContent()}
+            {renderSidebarFooter()}
           </SidebarContainer>
         </div>
         <div className="flex h-full grow flex-col gap-4">
