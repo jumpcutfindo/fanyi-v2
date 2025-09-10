@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
+import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
@@ -13,7 +15,7 @@ function App() {
   const sidebarState = useSidebarStore((state) => state.sidebarState);
 
   // Use a state hook to manage the dark mode, defaulting to a system preference or light mode
-  const [isDarkMode] = useState<boolean>(() => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     // Check if a preference is already saved in local storage
     const savedMode = localStorage.getItem('theme');
     if (savedMode) {
@@ -41,7 +43,15 @@ function App() {
   const renderSidebar = () => {
     switch (sidebarState.state) {
       case 'manager':
-        return <PresetManager />;
+        return (
+          <>
+            <PresetManager />
+
+            <SidebarFooter className="flex flex-row justify-between">
+              <OcrStatus />
+            </SidebarFooter>
+          </>
+        );
       case 'editor':
         return (
           <PresetEditor
@@ -58,11 +68,11 @@ function App() {
     <>
       <div className="flex h-full flex-row">
         <div className="relative h-full min-w-70 gap-4">
-          <div ref={sidebarRef} className="absolute h-full w-full">
+          <SidebarContainer ref={sidebarRef} className="absolute h-full w-full">
             {renderSidebar()}
-          </div>
+          </SidebarContainer>
         </div>
-        <div className="flex h-full grow flex-col">
+        <div className="flex h-full grow flex-col gap-4">
           <TabList />
           <TabDisplay />
         </div>

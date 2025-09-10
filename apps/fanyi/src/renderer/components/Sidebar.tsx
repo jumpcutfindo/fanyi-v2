@@ -12,10 +12,7 @@ export function SidebarContainer({
 }: SidebarContainerProps) {
   return (
     <div
-      className={cn(
-        'flex h-full flex-col gap-4 overflow-y-auto border-r',
-        className
-      )}
+      className={cn('flex h-full flex-col gap-4 border-r', className)}
       {...props}
     >
       {children}

@@ -249,7 +249,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
   }, [mode, selectedSource, initialValues, setValue]);
 
   return (
-    <SidebarContainer>
+    <>
       <SidebarHeader
         title={mode === 'create' ? 'Create a preset' : 'Edit preset'}
         onBack={() => {
@@ -263,7 +263,10 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           }
         }}
       />
-      <form onSubmit={handleSubmit(onSubmit)} className="flex grow flex-col">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex grow flex-col overflow-y-auto"
+      >
         <SidebarContent className="grow gap-3">
           <div className="flex flex-col gap-1">
             <Label htmlFor="name">Name</Label>
@@ -399,7 +402,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
           ) : null}
         </SidebarFooter>
       </form>
-    </SidebarContainer>
+    </>
   );
 }
 
