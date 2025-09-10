@@ -1,14 +1,8 @@
 import { AppWindow, Monitor, Plus } from 'lucide-react';
 
 import { CustomScreenshotPreset } from '@shared/types/screenshot';
-import {
-  SidebarContainer,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-} from '@renderer/components/Sidebar';
+import { SidebarContent, SidebarHeader } from '@renderer/components/Sidebar';
 import { Button } from '@renderer/components/ui/Button';
-import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
@@ -25,7 +19,7 @@ export function PresetManager() {
   const setSidebarState = useSidebarStore((state) => state.setSidebarState);
 
   return (
-    <SidebarContainer>
+    <>
       <SidebarHeader title="Presets">
         <Button
           variant="ghost"
@@ -76,10 +70,7 @@ export function PresetManager() {
           />
         ))}
       </SidebarContent>
-      <SidebarFooter>
-        <OcrStatus />
-      </SidebarFooter>
-    </SidebarContainer>
+    </>
   );
 }
 
