@@ -381,7 +381,9 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
                 validate: (value) => {
                   if (value) {
                     return (
-                      !usedKeybinds?.includes(value) || 'Keybind already in use'
+                      !usedKeybinds?.includes(value) ||
+                      watch('keybind') === value ||
+                      'Keybind already in use'
                     );
                   }
                 },
