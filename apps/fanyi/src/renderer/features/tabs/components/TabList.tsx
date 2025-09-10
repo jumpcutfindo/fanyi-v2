@@ -41,6 +41,7 @@ export function TabList() {
           contextMenu={{
             enabled: true,
             handleCloseOthers: () => {
+              allTabs.slice(0, index).forEach((tab) => removeTab(tab.id));
               allTabs.slice(index + 1).forEach((tab) => removeTab(tab.id));
             },
             handleCloseLeft: () => {
