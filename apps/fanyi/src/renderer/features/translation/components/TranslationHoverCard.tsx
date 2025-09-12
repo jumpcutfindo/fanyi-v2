@@ -22,7 +22,7 @@ function TranslationHoverCard({ word }: TranslationHoverCard) {
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>
-      <HoverCardTrigger className="text-blue-700 underline-offset-2 hover:underline">
+      <HoverCardTrigger className="text-accent dark:text-primary underline underline-offset-4">
         {word}
       </HoverCardTrigger>
       <HoverCardContent className="flex w-80 flex-col items-center justify-center">

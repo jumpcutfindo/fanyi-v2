@@ -11,7 +11,12 @@ import { ExternalTranslation } from '@renderer/features/translation/components/E
 import { TranslationHoverCard } from '@renderer/features/translation/components/TranslationHoverCard';
 import { cn } from '@renderer/lib/utils';
 
-const highlightClass = ['border-primary', 'bg-primary/10'];
+const highlightClass = [
+  'border-accent',
+  'bg-card',
+  'dark:border-primary',
+  'dark:bg-accent',
+];
 
 interface TranslationListProps {
   ocrResult: OcrResult;
@@ -81,10 +86,12 @@ export function TranslationList({ translations }: TranslationListProps) {
 
         requestAnimationFrame(() => {
           // Add highlight to element
+          element.classList.remove('bg-card');
           element.classList.add(...highlightClass);
 
           // Remove after some delay
           setTimeout(() => {
+            element.classList.add('bg-card');
             element.classList.remove(...highlightClass);
           }, 1500);
         });
@@ -121,7 +128,9 @@ export function TranslationList({ translations }: TranslationListProps) {
                     variant="outline"
                     className={cn(
                       'flex-1 px-2 py-1 text-lg font-normal',
-                      activeWord === t.simplified ? 'border-primary' : ''
+                      activeWord === t.simplified
+                        ? 'border-primary dark:border-primary'
+                        : ''
                     )}
                     onClick={() => {
                       setActiveWord(t.simplified);
