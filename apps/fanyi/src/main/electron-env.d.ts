@@ -43,5 +43,11 @@ interface Window {
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
 
     getDictionaryEntryOfWord(word: string): Promise<DictionaryEntry | null>;
+
+    getPreferences: () => Promise<UserPreferences>;
+    setPreference: (
+      key: keyof UserPreferences,
+      value: UserPreferences[keyof UserPreferences]
+    ) => Promise<void>;
   };
 }
