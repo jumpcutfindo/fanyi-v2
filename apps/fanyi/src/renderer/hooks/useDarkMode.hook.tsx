@@ -1,26 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
+
+import { useGetUserPreferences } from '@renderer/features/preferences/queries/getUserPreferences.query';
+import { useSetUserPreferenceMutation } from '@renderer/features/preferences/queries/setUserPreference.mutation';
 
 export function useDarkMode() {
-  // Use a state hook to manage the dark mode, defaulting to a system preference or light mode
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    // Check if a preference is already saved in local storage
-    const savedMode = localStorage.getItem('theme');
-    if (savedMode) {
-      return savedMode === 'dark';
+  const { data: userPreferences } = useGetUserPreferences();
+  const { mutate: setUserPreference } = useSetUserPreferenceMutation();
+
+  console.log(userPreferences);
+
+  const isDarkMode = useMemo(() => {
+    if (!userPreferences) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
-    // If not, check the user's system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+
+    console.log('memo', userPreferences);
+
+    return userPreferences.isDarkMode;
+  }, [userPreferences]);
+
+  const setIsDarkMode = () => {
+    console.log('update preference');
+    setUserPreference({ key: 'isDarkMode', value: !isDarkMode });
+  };
 
   // useEffect hook to handle the dark mode class on the html element
   useEffect(() => {
     const html = document.documentElement;
     if (isDarkMode) {
       html.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       html.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
 

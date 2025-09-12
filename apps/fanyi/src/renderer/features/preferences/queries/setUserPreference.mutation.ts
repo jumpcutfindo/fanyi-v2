@@ -7,12 +7,12 @@ export function useSetUserPreferenceMutation() {
 
   return useMutation({
     mutationKey: ['set-user-preference'],
-    mutationFn: (payload: {
+    mutationFn: async (payload: {
       key: keyof UserPreferences;
       value: UserPreferences[keyof UserPreferences];
     }) => {
+      window.api.setPreference(payload.key, payload.value);
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
-      return window.api.setPreference(payload.key, payload.value);
     },
   });
 }
