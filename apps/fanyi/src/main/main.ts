@@ -6,7 +6,12 @@ import { registerIpcHandlers } from '@main/ipc';
 import { initDictionary } from '@main/services/dictionary';
 import { registerDefaultKeybinds } from '@main/services/keybinds';
 import { cleanUpPythonOcr, initPythonOcr } from '@main/services/ocr';
+import {
+  addPreferenceChangeListener,
+  getPreferences,
+} from '@main/services/preferences';
 import { registerPresetKeybinds } from '@main/services/presets';
+import { getBackgroundColor, getTitlebarStyle } from '@main/utils/styles';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,7 +37,9 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 export let win: BrowserWindow | null;
 
-function createWindow() {
+async function createWindow() {
+  const { isDarkMode } = await getPreferences();
+
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
@@ -40,11 +47,10 @@ function createWindow() {
     },
     width: 1024,
     height: 768,
-  });
 
-  // Test active push message to Renderer-process.
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString());
+    backgroundColor: getBackgroundColor(isDarkMode),
+    titleBarStyle: 'hidden',
+    titleBarOverlay: getTitlebarStyle(isDarkMode),
   });
 
   if (VITE_DEV_SERVER_URL) {
@@ -88,6 +94,15 @@ app.whenReady().then(() => {
   // Setup underlying processes
   initPythonOcr();
   initDictionary();
+
+  // Register change listener for dark mode
+  addPreferenceChangeListener((preferences) => {
+    if (!win || !preferences) {
+      return;
+    }
+
+    win.setTitleBarOverlay(getTitlebarStyle(preferences.isDarkMode));
+  });
 
   createWindow();
 });
