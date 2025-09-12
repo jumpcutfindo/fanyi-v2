@@ -13,7 +13,6 @@ import { cn } from '@renderer/lib/utils';
 
 const highlightClass = [
   'border-accent',
-  'bg-card',
   'dark:border-primary',
   'dark:bg-accent',
 ];
@@ -86,12 +85,10 @@ export function TranslationList({ translations }: TranslationListProps) {
 
         requestAnimationFrame(() => {
           // Add highlight to element
-          element.classList.remove('bg-card');
           element.classList.add(...highlightClass);
 
           // Remove after some delay
           setTimeout(() => {
-            element.classList.add('bg-card');
             element.classList.remove(...highlightClass);
           }, 1500);
         });
