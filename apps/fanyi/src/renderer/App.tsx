@@ -1,11 +1,13 @@
-import { Moon, Sun } from 'lucide-react';
+import { Loader2Icon, Moon, Sun } from 'lucide-react';
 import { useRef } from 'react';
+import logo from '/images/logo.svg';
 
 import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
 import { Titlebar } from '@renderer/components/Titlebar';
 import { Label } from '@renderer/components/ui/Label';
 import { Switch } from '@renderer/components/ui/Switch';
 import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
+import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
@@ -15,6 +17,7 @@ import { usePasteImageReceiver } from '@renderer/hooks/usePasteImageReceiver.hoo
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 function App() {
+  const { data: ocrStatus } = useGetOcrStatusQuery();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
@@ -72,9 +75,18 @@ function App() {
     }
   };
 
-  return (
-    <div className="flex h-full flex-col">
-      <Titlebar />
+  const renderApp = () => {
+    if (ocrStatus === 'startup') {
+      return (
+        <div className="flex h-0 w-full grow flex-col items-center justify-center gap-8 text-center">
+          <img src={logo} className="size-36" />
+          <Loader2Icon className="animate-spin" />
+          <span>Loading resources...</span>
+        </div>
+      );
+    }
+
+    return (
       <div className="flex h-0 grow flex-row">
         <div className="relative h-full min-w-70 gap-4">
           <SidebarContainer ref={sidebarRef} className="absolute h-full w-full">
@@ -87,6 +99,13 @@ function App() {
           <TabDisplay />
         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="flex h-full flex-col">
+      <Titlebar />
+      {renderApp()}
     </div>
   );
 }
