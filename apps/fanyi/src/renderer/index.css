@@ -45,7 +45,7 @@
 
   --muted-foreground: oklch(0.556 0 0);
 
-  --accent: oklch(49.059% 0.27068 265.529);
+  --accent: rgb(24, 61, 246);
 
   --accent-foreground: oklch(0.205 0 0);
 
