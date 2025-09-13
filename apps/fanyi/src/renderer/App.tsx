@@ -1,5 +1,5 @@
 import { Moon, Sun } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
 import { Titlebar } from '@renderer/components/Titlebar';
