@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow } from 'electron';
-
 import { registerIpcHandlers } from '@main/ipc';
 import { initDictionary } from '@main/services/dictionary';
 import { registerDefaultKeybinds } from '@main/services/keybinds';
@@ -101,7 +100,9 @@ app.whenReady().then(() => {
       return;
     }
 
-    win.setTitleBarOverlay(getTitlebarStyle(preferences.isDarkMode));
+    if (process.platform !== 'darwin') {
+      win.setTitleBarOverlay(getTitlebarStyle(preferences.isDarkMode));
+    }
   });
 
   createWindow();
