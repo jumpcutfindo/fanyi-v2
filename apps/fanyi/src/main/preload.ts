@@ -1,5 +1,3 @@
-import { contextBridge, ipcRenderer } from 'electron';
-
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResponse } from '@shared/types/ocr';
 import { UserPreferences } from '@shared/types/preferences';
@@ -8,6 +6,7 @@ import {
   CustomScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
+import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
@@ -67,4 +66,6 @@ contextBridge.exposeInMainWorld('api', {
     key: keyof UserPreferences,
     value: UserPreferences[keyof UserPreferences]
   ) => ipcRenderer.invoke('set-preference', key, value),
+
+  getSystemOs: () => ipcRenderer.invoke('get-system-os'),
 });
