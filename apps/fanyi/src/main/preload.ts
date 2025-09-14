@@ -1,3 +1,5 @@
+import { contextBridge, ipcRenderer } from 'electron';
+
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResponse } from '@shared/types/ocr';
 import { UserPreferences } from '@shared/types/preferences';
@@ -6,7 +8,6 @@ import {
   CustomScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
-import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {

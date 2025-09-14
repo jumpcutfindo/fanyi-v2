@@ -1,10 +1,10 @@
-import { DictionaryEntry } from '@shared/types/dictionary';
-import { OcrResult } from '@shared/types/ocr';
 import { MessageSquareMore, MessageSquareWarning } from 'lucide-react';
 import React, { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
+import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
 import { Separator } from '@renderer/components/ui/Separator';
 import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';

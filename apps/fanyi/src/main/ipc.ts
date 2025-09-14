@@ -1,5 +1,7 @@
 import os from 'os';
 import { ipcMain } from 'electron';
+import { getOcrStatus, runOcr } from './services/ocr';
+
 import {
   getDictionaryEntries,
   getRawDictionaryEntry,
@@ -20,8 +22,6 @@ import {
   getScreenshotSources,
   takeScreenshotWithPreset,
 } from '@main/services/screenshot';
-
-import { getOcrStatus, runOcr } from './services/ocr';
 
 export function registerIpcHandlers() {
   ipcMain.handle('take-screenshot-with-preset', async (_event, preset) => {

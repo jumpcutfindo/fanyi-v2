@@ -1,5 +1,6 @@
-import { DictionaryEntry } from '@shared/types/dictionary';
 import { useQuery } from '@tanstack/react-query';
+
+import { DictionaryEntry } from '@shared/types/dictionary';
 
 export function useGetDictionaryEntryForWordQuery(word: string) {
   return useQuery<{ result: DictionaryEntry }>({

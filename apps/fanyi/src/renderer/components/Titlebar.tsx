@@ -1,13 +1,13 @@
-import { getSystemOsQuery } from '@renderer/features/system/queries/getSystemOs.query';
+import icon from '/images/icon.svg';
+
+import { useGetSystemOsQuery } from '@renderer/features/system/queries/getSystemOs.query';
 import { cn } from '@renderer/lib/utils';
 import { useTabStore } from '@renderer/stores/useTabStore';
-
-import icon from '/images/icon.svg';
 
 function Titlebar() {
   const currentTab = useTabStore((state) => state.activeTab);
 
-  const { data: systemOs } = getSystemOsQuery();
+  const { data: systemOs } = useGetSystemOsQuery();
 
   const getHelperText = () => {
     if (!currentTab) {
