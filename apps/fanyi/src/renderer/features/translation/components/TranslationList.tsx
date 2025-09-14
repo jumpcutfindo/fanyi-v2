@@ -219,6 +219,7 @@ function TranslationItem({
       chunks.push(d.definition.slice(lastIndex, link.start));
       chunks.push(
         <TranslationHoverCard
+          key={`${entry.simplified} + ${link.word}`}
           word={d.definition.slice(link.start, link.start + link.word.length)}
         />
       );
@@ -250,10 +251,13 @@ function TranslationItem({
         </span>
         <div className="flex flex-3 flex-col gap-2 text-sm">
           {entry.defintions.map((def, index, arr) => (
-            <>
+            <span
+              className="flex flex-col gap-2"
+              key={`${entry.simplified}-subdef-${index}`}
+            >
               {renderDefinition(def)}
               {index !== arr.length - 1 ? <Separator /> : null}
-            </>
+            </span>
           ))}
         </div>
       </button>

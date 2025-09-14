@@ -1,4 +1,4 @@
-// src/main/ipc.ts
+import os from 'os';
 import { ipcMain } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
@@ -117,5 +117,9 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('set-preference', async (_event, key, value) => {
     await setPreference(key, value);
+  });
+
+  ipcMain.handle('get-system-os', async (_event) => {
+    return os.platform();
   });
 }

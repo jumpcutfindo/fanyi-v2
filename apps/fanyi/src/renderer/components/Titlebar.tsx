@@ -1,9 +1,13 @@
 import icon from '/images/icon.svg';
 
+import { useGetSystemOsQuery } from '@renderer/features/system/queries/getSystemOs.query';
+import { cn } from '@renderer/lib/utils';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 function Titlebar() {
   const currentTab = useTabStore((state) => state.activeTab);
+
+  const { data: systemOs } = useGetSystemOsQuery();
 
   const getHelperText = () => {
     if (!currentTab) {
@@ -19,9 +23,14 @@ function Titlebar() {
     }
   };
 
+  const isMacintosh = systemOs === 'darwin';
+
   return (
     <div
-      className="bg-card relative flex h-9 flex-row items-center border-b px-2 text-xs"
+      className={cn(
+        'bg-card relative flex h-9 flex-row items-center border-b px-2 text-xs',
+        isMacintosh ? 'flex-row-reverse' : 'flex-row'
+      )}
       // @ts-expect-error Valid css property in electron
       style={{ appRegion: 'drag' }}
     >

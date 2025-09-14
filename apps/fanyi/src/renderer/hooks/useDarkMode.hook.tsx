@@ -7,14 +7,10 @@ export function useDarkMode() {
   const { data: userPreferences } = useGetUserPreferences();
   const { mutate: setUserPreference } = useSetUserPreferenceMutation();
 
-  console.log(userPreferences);
-
   const isDarkMode = useMemo(() => {
     if (!userPreferences) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
-
-    console.log('memo', userPreferences);
 
     return userPreferences.isDarkMode;
   }, [userPreferences]);

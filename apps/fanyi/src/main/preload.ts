@@ -67,4 +67,6 @@ contextBridge.exposeInMainWorld('api', {
     key: keyof UserPreferences,
     value: UserPreferences[keyof UserPreferences]
   ) => ipcRenderer.invoke('set-preference', key, value),
+
+  getSystemOs: () => ipcRenderer.invoke('get-system-os'),
 });

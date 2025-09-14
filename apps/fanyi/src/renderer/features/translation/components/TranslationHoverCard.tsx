@@ -13,12 +13,14 @@ interface TranslationHoverCard {
 }
 
 function TranslationHoverCard({ word }: TranslationHoverCard) {
-  const { data: entry, isLoading: isEntryLoading } =
+  const { data: queryResult, isLoading: isEntryLoading } =
     useGetDictionaryEntryForWordQuery(word);
 
-  if (!entry) {
+  if (!queryResult || !queryResult.result) {
     return <span>{word}</span>;
   }
+
+  const { result: entry } = queryResult;
 
   return (
     <HoverCard openDelay={100} closeDelay={100}>

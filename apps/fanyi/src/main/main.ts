@@ -101,7 +101,9 @@ app.whenReady().then(() => {
       return;
     }
 
-    win.setTitleBarOverlay(getTitlebarStyle(preferences.isDarkMode));
+    if (process.platform !== 'darwin') {
+      win.setTitleBarOverlay(getTitlebarStyle(preferences.isDarkMode));
+    }
   });
 
   createWindow();

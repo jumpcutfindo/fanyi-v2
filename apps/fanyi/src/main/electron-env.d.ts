@@ -49,5 +49,7 @@ interface Window {
       key: keyof UserPreferences,
       value: UserPreferences[keyof UserPreferences]
     ) => Promise<void>;
+
+    getSystemOs: () => Promise<string>;
   };
 }
