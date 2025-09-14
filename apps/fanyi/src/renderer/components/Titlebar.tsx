@@ -7,7 +7,7 @@ function Titlebar() {
 
   const getHelperText = () => {
     if (!currentTab) {
-      return '';
+      return 'Fanyi';
     }
 
     if (currentTab.type === 'preview') {
