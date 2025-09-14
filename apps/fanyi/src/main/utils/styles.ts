@@ -9,13 +9,13 @@ export function getBackgroundColor(isDarkMode: boolean) {
 export function getTitlebarStyle(isDarkMode: boolean) {
   if (isDarkMode) {
     return {
-      color: '#0a101f',
+      color: '#FFFFFF00',
       symbolColor: '#FFFFFF',
       height: 35,
     };
   } else {
     return {
-      color: '#FFFFFF',
+      color: '#FFFFFF00',
       symbolColor: '#000000',
       height: 35,
     };
