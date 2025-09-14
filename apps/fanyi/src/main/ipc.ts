@@ -11,6 +11,7 @@ import {
   enableKeybinds,
   getUsedKeybinds,
 } from '@main/services/keybinds';
+import { getPreferences, setPreference } from '@main/services/preferences';
 import {
   addScreenshotPreset,
   deleteScreenshotPreset,
@@ -108,5 +109,13 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-dictionary-entry-of-word', async (_event, word) => {
     return getRawDictionaryEntry(word);
+  });
+
+  ipcMain.handle('get-preferences', async (_event) => {
+    return await getPreferences();
+  });
+
+  ipcMain.handle('set-preference', async (_event, key, value) => {
+    await setPreference(key, value);
   });
 }

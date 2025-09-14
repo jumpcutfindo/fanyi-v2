@@ -1,44 +1,29 @@
-import { Moon, Sun } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Loader2Icon, Moon, Sun } from 'lucide-react';
+import { useRef } from 'react';
+import logo from '/images/logo.svg';
 
 import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
+import { Titlebar } from '@renderer/components/Titlebar';
 import { Label } from '@renderer/components/ui/Label';
 import { Switch } from '@renderer/components/ui/Switch';
 import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
+import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
 import { TabList } from '@renderer/features/tabs/components/TabList';
+import { useDarkMode } from '@renderer/hooks/useDarkMode.hook';
 import { usePasteImageReceiver } from '@renderer/hooks/usePasteImageReceiver.hook';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 
 function App() {
+  const { data: ocrStatus } = useGetOcrStatusQuery();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
 
-  // Use a state hook to manage the dark mode, defaulting to a system preference or light mode
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    // Check if a preference is already saved in local storage
-    const savedMode = localStorage.getItem('theme');
-    if (savedMode) {
-      return savedMode === 'dark';
-    }
-    // If not, check the user's system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  // useEffect hook to handle the dark mode class on the html element
-  useEffect(() => {
-    const html = document.documentElement;
-    if (isDarkMode) {
-      html.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      html.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+  // Handle dark mode
+  const { isDarkMode, setIsDarkMode } = useDarkMode();
 
   // Handle pasting of images globally
   usePasteImageReceiver();
@@ -90,9 +75,19 @@ function App() {
     }
   };
 
-  return (
-    <>
-      <div className="flex h-full flex-row">
+  const renderApp = () => {
+    if (ocrStatus === 'startup') {
+      return (
+        <div className="flex h-0 w-full grow flex-col items-center justify-center gap-8 text-center">
+          <img src={logo} className="size-36" />
+          <Loader2Icon className="animate-spin" />
+          <span>Loading resources...</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex h-0 grow flex-row">
         <div className="relative h-full min-w-70 gap-4">
           <SidebarContainer ref={sidebarRef} className="absolute h-full w-full">
             {renderSidebarContent()}
@@ -104,7 +99,14 @@ function App() {
           <TabDisplay />
         </div>
       </div>
-    </>
+    );
+  };
+
+  return (
+    <div className="flex h-full flex-col">
+      <Titlebar />
+      {renderApp()}
+    </div>
   );
 }
 
