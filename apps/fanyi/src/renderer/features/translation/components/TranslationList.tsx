@@ -1,10 +1,10 @@
+import { DictionaryEntry } from '@shared/types/dictionary';
+import { OcrResult } from '@shared/types/ocr';
 import { MessageSquareMore, MessageSquareWarning } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
-import { DictionaryEntry } from '@shared/types/dictionary';
-import { OcrResult } from '@shared/types/ocr';
 import { Button } from '@renderer/components/ui/Button';
 import { Separator } from '@renderer/components/ui/Separator';
 import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
@@ -219,6 +219,7 @@ function TranslationItem({
       chunks.push(d.definition.slice(lastIndex, link.start));
       chunks.push(
         <TranslationHoverCard
+          key={`${entry.simplified} + ${link.word}`}
           word={d.definition.slice(link.start, link.start + link.word.length)}
         />
       );
@@ -250,10 +251,13 @@ function TranslationItem({
         </span>
         <div className="flex flex-3 flex-col gap-2 text-sm">
           {entry.defintions.map((def, index, arr) => (
-            <>
+            <span
+              className="flex flex-col gap-2"
+              key={`${entry.simplified}-subdef-${index}`}
+            >
               {renderDefinition(def)}
               {index !== arr.length - 1 ? <Separator /> : null}
-            </>
+            </span>
           ))}
         </div>
       </button>
