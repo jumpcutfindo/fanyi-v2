@@ -16,7 +16,6 @@ export function useDarkMode() {
   }, [userPreferences]);
 
   const setIsDarkMode = () => {
-    console.log('update preference');
     setUserPreference({ key: 'isDarkMode', value: !isDarkMode });
   };
 
