@@ -11,7 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@renderer/components/ui/Dialog';
+import { Separator } from '@renderer/components/ui/Separator';
 import { Switch } from '@renderer/components/ui/Switch';
+import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
 
 function SettingsDialog() {
   const { data: preferences } = useGetUserPreferences();
@@ -73,6 +75,8 @@ function SettingsDialog() {
             />
           </div>
         </div>
+        <Separator className="my-1" />
+        <OcrStatus />
       </DialogContent>
     </Dialog>
   );
