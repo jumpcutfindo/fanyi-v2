@@ -1,6 +1,8 @@
+import { SiGithub } from '@icons-pack/react-simple-icons';
 import { Settings } from 'lucide-react';
 
 import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
+import { useOpenExternalLinkMutation } from '@shared/queries/openExternalLink.mutation';
 import { useSetUserPreferenceMutation } from '@shared/queries/setUserPreference.mutation';
 import { OcrStatus } from '@renderer/components/OcrStatus';
 import { Button } from '@renderer/components/ui/Button';
@@ -19,6 +21,7 @@ function SettingsDialog() {
   const { data: preferences } = useGetUserPreferences();
 
   const { mutate: setPreference } = useSetUserPreferenceMutation();
+  const { mutate: openExternalLink } = useOpenExternalLinkMutation();
 
   return (
     <Dialog>
@@ -76,7 +79,21 @@ function SettingsDialog() {
           </div>
         </div>
         <Separator />
-        <OcrStatus />
+        <div className="flex flex-row items-center gap-2">
+          <OcrStatus />
+          <span className="text-muted-foreground ms-auto text-xs">
+            Fanyi v1.0.0
+          </span>
+          <Button
+            variant="link"
+            className="group size-4"
+            onClick={() =>
+              openExternalLink('https://github.com/jumpcutfindo/fanyi-v2')
+            }
+          >
+            <SiGithub className="fill-muted-foreground group-hover:fill-accent" />
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

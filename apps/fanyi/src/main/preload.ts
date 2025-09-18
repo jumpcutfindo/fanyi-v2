@@ -69,4 +69,7 @@ contextBridge.exposeInMainWorld('api', {
   ) => ipcRenderer.invoke('set-preference', key, value),
 
   getSystemOs: () => ipcRenderer.invoke('get-system-os'),
+
+  openExternalLink: (url: string) =>
+    ipcRenderer.invoke('open-external-link', url),
 });

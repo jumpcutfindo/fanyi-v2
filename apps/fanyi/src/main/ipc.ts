@@ -1,7 +1,9 @@
 import os from 'os';
-import { ipcMain } from 'electron';
+import { electron } from 'process';
+import { ipcMain, shell } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
+import { win } from '@main/main';
 import {
   getDictionaryEntries,
   getRawDictionaryEntry,
@@ -121,5 +123,9 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-system-os', async (_event) => {
     return os.platform();
+  });
+
+  ipcMain.handle('open-external-link', async (_event, url) => {
+    return shell.openExternal(url);
   });
 }

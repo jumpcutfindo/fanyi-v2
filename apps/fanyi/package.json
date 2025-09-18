@@ -14,6 +14,7 @@
     "postinstall": "node ./node_modules/electron/install.js && electron-builder install-app-deps"
   },
   "dependencies": {
+    "@icons-pack/react-simple-icons": "^13.7.0",
     "@radix-ui/react-context-menu": "^2.2.16",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-hover-card": "^1.1.15",
