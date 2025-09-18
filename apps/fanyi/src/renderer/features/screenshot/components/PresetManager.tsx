@@ -8,7 +8,7 @@ import { PresetKeybindDisplay } from '@renderer/features/screenshot/components/P
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
-import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
+import { useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
   const { data: presets } = useGetScreenshotPresets();
@@ -33,14 +33,14 @@ export function PresetManager() {
             });
 
             if (!previewTab) {
-              const tab: PreviewTab = {
-                id: 'new',
-                title: 'Preview',
-                type: 'preview',
-                activePreset: null,
-              };
-
-              setPreviewTab(tab, { setActive: true });
+              setPreviewTab(
+                {
+                  title: 'Preview',
+                  type: 'preview',
+                  activePreset: null,
+                },
+                { setActive: true }
+              );
             }
           }}
         >
@@ -59,14 +59,14 @@ export function PresetManager() {
             key={p.id}
             preset={p}
             handleSelect={() => {
-              const tab: PreviewTab = {
-                id: p.id,
-                title: 'Preview',
-                type: 'preview',
-                activePreset: p,
-              };
-
-              setPreviewTab(tab, { setActive: true });
+              setPreviewTab(
+                {
+                  title: 'Preview',
+                  type: 'preview',
+                  activePreset: p,
+                },
+                { setActive: true }
+              );
             }}
           />
         ))}

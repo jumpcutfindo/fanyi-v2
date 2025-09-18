@@ -81,7 +81,6 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
 
                     addTab(
                       {
-                        id: '',
                         type: 'translation',
                         title: preset.name,
                         preset: preset,

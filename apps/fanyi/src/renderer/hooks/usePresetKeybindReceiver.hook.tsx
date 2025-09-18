@@ -1,7 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
 
 import { useGetOcrStatusQuery } from '@shared/queries/getOcrStatus.query';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
@@ -41,7 +40,6 @@ export function usePresetKeybindReceiver() {
       // Create a new tab for translation
       addTab(
         {
-          id: uuidv4(),
           type: 'translation',
           title: preset.name,
           preset: preset,
