@@ -6,8 +6,8 @@ import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
 import { Titlebar } from '@renderer/components/Titlebar';
 import { Label } from '@renderer/components/ui/Label';
 import { Switch } from '@renderer/components/ui/Switch';
-import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
 import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
+import { SettingsDialog } from '@renderer/features/preferences/components/SettingsDialog';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
@@ -55,8 +55,7 @@ function App() {
       default:
         return (
           <SidebarFooter className="flex flex-row justify-between">
-            <OcrStatus />
-            <div className="flex flex-row justify-center gap-2">
+            <div className="flex flex-row items-center justify-center gap-2">
               <Label htmlFor="darkMode">
                 {isDarkMode ? (
                   <Moon className="fill-foreground size-3.5" />
@@ -70,6 +69,7 @@ function App() {
                 onCheckedChange={setIsDarkMode}
               />
             </div>
+            <SettingsDialog />
           </SidebarFooter>
         );
     }
