@@ -1,5 +1,7 @@
 import { Settings } from 'lucide-react';
 
+import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
+import { useSetUserPreferenceMutation } from '@shared/queries/setUserPreference.mutation';
 import { Button } from '@renderer/components/ui/Button';
 import {
   Dialog,
@@ -10,8 +12,6 @@ import {
   DialogTrigger,
 } from '@renderer/components/ui/Dialog';
 import { Switch } from '@renderer/components/ui/Switch';
-import { useGetUserPreferences } from '@renderer/features/preferences/queries/getUserPreferences.query';
-import { useSetUserPreferenceMutation } from '@renderer/features/preferences/queries/setUserPreference.mutation';
 
 function SettingsDialog() {
   const { data: preferences } = useGetUserPreferences();

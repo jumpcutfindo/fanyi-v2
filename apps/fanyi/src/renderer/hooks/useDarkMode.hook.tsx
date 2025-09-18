@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
-import { useGetUserPreferences } from '@renderer/features/preferences/queries/getUserPreferences.query';
-import { useSetUserPreferenceMutation } from '@renderer/features/preferences/queries/setUserPreference.mutation';
+import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
+import { useSetUserPreferenceMutation } from '@shared/queries/setUserPreference.mutation';
 
 export function useDarkMode() {
   const { data: userPreferences } = useGetUserPreferences();

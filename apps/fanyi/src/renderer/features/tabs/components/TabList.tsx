@@ -1,13 +1,13 @@
 import { X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@renderer/components/ui/ContextMenu';
-import { useGetUserPreferences } from '@renderer/features/preferences/queries/getUserPreferences.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { Tab, useTabStore } from '@renderer/stores/useTabStore';
