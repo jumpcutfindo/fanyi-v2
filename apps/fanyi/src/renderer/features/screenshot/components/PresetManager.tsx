@@ -1,9 +1,9 @@
 import { AppWindow, Monitor, Plus } from 'lucide-react';
 
+import { useGetOcrStatusQuery } from '@shared/queries/getOcrStatus.query';
 import { CustomScreenshotPreset } from '@shared/types/screenshot';
 import { SidebarContent, SidebarHeader } from '@renderer/components/Sidebar';
 import { Button } from '@renderer/components/ui/Button';
-import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { PresetKeybindDisplay } from '@renderer/features/screenshot/components/PresetKeybindDisplay';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';

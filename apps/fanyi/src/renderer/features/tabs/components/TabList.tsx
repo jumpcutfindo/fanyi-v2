@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -32,11 +33,22 @@ export function TabList() {
     [tabs, previewTab]
   );
 
+  const { data: preferences } = useGetUserPreferences();
+
+  const tabListClass = preferences?.isWrapTabs
+    ? 'divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid md:grid-cols-7 lg:grid-cols-12'
+    : 'flex flex-row overflow-x-scroll no-scrollbar';
+
+  const tabClass = preferences?.isWrapTabs
+    ? 'w-full'
+    : 'lg:min-w-48 sm:min-w-32';
+
   return (
-    <div className="divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid md:grid-cols-7 lg:grid-cols-12">
+    <div className={tabListClass}>
       {allTabs.map((tab, index) => (
         <TabItem
           key={tab.id}
+          className={tabClass}
           tabIndex={index}
           tabCount={allTabs.length}
           tab={tab}
@@ -86,6 +98,7 @@ export interface TabItemProps {
   handleSelect: () => void;
   handleClose: () => void;
   disabled?: boolean;
+  className?: string;
 }
 
 export function TabItem({
@@ -98,6 +111,7 @@ export function TabItem({
   handleSelect,
   handleClose,
   disabled,
+  className,
 }: TabItemProps) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -106,14 +120,16 @@ export function TabItem({
       <Tooltip>
         <TooltipTrigger asChild>
           <ContextMenuTrigger asChild disabled={!contextMenu.enabled}>
-            <div className="group relative h-8 w-full">
+            <div className={cn('group relative h-8', className)}>
               <button
                 type="button"
                 className={cn(
-                  'bg-card hover:bg-muted flex h-8 w-full items-center truncate p-2 text-sm',
+                  'bg-card hover:bg-accent/5 flex h-8 w-full items-center truncate p-2 text-sm',
                   disabled ? 'cursor-not-allowed' : 'cursor-pointer',
                   disabled && !isPreview ? 'opacity-20' : '',
-                  isActive ? 'border-b-primary border-b' : 'opacity-50'
+                  isActive
+                    ? 'border-b-accent bg-accent/10 border-b'
+                    : 'opacity-40'
                 )}
                 onClick={handleSelect}
                 disabled={disabled}

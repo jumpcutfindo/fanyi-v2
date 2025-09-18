@@ -1,4 +1,4 @@
-import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
+import { useGetOcrStatusQuery } from '@shared/queries/getOcrStatus.query';
 import { cn } from '@renderer/lib/utils';
 
 export function OcrStatus() {

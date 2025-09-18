@@ -1,5 +1,5 @@
 import os from 'os';
-import { ipcMain } from 'electron';
+import { app, ipcMain, shell } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
 import {
@@ -121,5 +121,13 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-system-os', async (_event) => {
     return os.platform();
+  });
+
+  ipcMain.handle('open-external-link', async (_event, url) => {
+    return shell.openExternal(url);
+  });
+
+  ipcMain.handle('get-app-version', async (_event) => {
+    return app.getVersion();
   });
 }

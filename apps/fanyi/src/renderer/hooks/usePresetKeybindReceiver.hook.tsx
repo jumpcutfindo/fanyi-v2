@@ -2,7 +2,7 @@ import { IpcRendererEvent } from 'electron';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
+import { useGetOcrStatusQuery } from '@shared/queries/getOcrStatus.query';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { useTabStore } from '@renderer/stores/useTabStore';
 import { bufferToDataUri } from '@renderer/utils/image.util';
