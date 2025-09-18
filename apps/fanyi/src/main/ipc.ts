@@ -1,9 +1,7 @@
 import os from 'os';
-import { electron } from 'process';
 import { app, ipcMain, shell } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
-import { win } from '@main/main';
 import {
   getDictionaryEntries,
   getRawDictionaryEntry,
