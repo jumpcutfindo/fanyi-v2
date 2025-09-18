@@ -7,6 +7,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@renderer/components/ui/ContextMenu';
+import { useGetUserPreferences } from '@renderer/features/preferences/queries/getUserPreferences.query';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { Tab, useTabStore } from '@renderer/stores/useTabStore';
@@ -26,11 +27,22 @@ export function TabList() {
     [tabs, previewTab]
   );
 
+  const { data: preferences } = useGetUserPreferences();
+
+  const tabListClass = preferences?.isWrapTabs
+    ? 'divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid md:grid-cols-7 lg:grid-cols-12'
+    : 'flex flex-row overflow-x-scroll no-scrollbar';
+
+  const tabClass = preferences?.isWrapTabs
+    ? 'w-full'
+    : 'lg:min-w-48 sm:min-w-32';
+
   return (
-    <div className="divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid md:grid-cols-7 lg:grid-cols-12">
+    <div className={tabListClass}>
       {allTabs.map((tab, index) => (
         <TabItem
           key={tab.id}
+          className={tabClass}
           tabIndex={index}
           tabCount={allTabs.length}
           tab={tab}
@@ -80,6 +92,7 @@ export interface TabItemProps {
   handleSelect: () => void;
   handleClose: () => void;
   disabled?: boolean;
+  className?: string;
 }
 
 export function TabItem({
@@ -92,13 +105,14 @@ export function TabItem({
   handleSelect,
   handleClose,
   disabled,
+  className,
 }: TabItemProps) {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
     <ContextMenu modal={false}>
       <ContextMenuTrigger asChild disabled={!contextMenu.enabled}>
-        <div className="group relative h-8 w-full">
+        <div className={cn('group relative h-8', className)}>
           <button
             type="button"
             className={cn(

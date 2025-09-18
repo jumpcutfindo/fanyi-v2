@@ -3,10 +3,8 @@ import { Settings } from 'lucide-react';
 import { Button } from '@renderer/components/ui/Button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -36,8 +34,8 @@ function SettingsDialog() {
           <DialogTitle>Settings</DialogTitle>
           <DialogDescription className="sr-only">Settings</DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col">
-          <div className="flex flex-row items-center">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-row items-center gap-2">
             <div className="flex grow flex-col">
               <p className="text-sm">Dark mode</p>
               <span className="text-muted-foreground text-sm">
@@ -50,6 +48,25 @@ function SettingsDialog() {
               onCheckedChange={(checked) =>
                 setPreference({
                   key: 'isDarkMode',
+                  value: checked,
+                })
+              }
+            />
+          </div>
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex grow flex-col">
+              <p className="text-sm">Wrap tabs</p>
+              <span className="text-muted-foreground text-sm">
+                Wraps the tabs if the tabs exceeds the screen width. Otherwise,
+                the tabs are scrollable.
+              </span>
+            </div>
+            <Switch
+              id="darkMode"
+              checked={preferences?.isWrapTabs}
+              onCheckedChange={(checked) =>
+                setPreference({
+                  key: 'isWrapTabs',
                   value: checked,
                 })
               }
