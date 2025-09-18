@@ -1,6 +1,7 @@
 import { SiGithub } from '@icons-pack/react-simple-icons';
 import { Settings } from 'lucide-react';
 
+import { useGetAppVersionQuery } from '@shared/queries/getAppVersion.query';
 import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
 import { useOpenExternalLinkMutation } from '@shared/queries/openExternalLink.mutation';
 import { useSetUserPreferenceMutation } from '@shared/queries/setUserPreference.mutation';
@@ -19,6 +20,7 @@ import { Switch } from '@renderer/components/ui/Switch';
 
 function SettingsDialog() {
   const { data: preferences } = useGetUserPreferences();
+  const { data: appVersion } = useGetAppVersionQuery();
 
   const { mutate: setPreference } = useSetUserPreferenceMutation();
   const { mutate: openExternalLink } = useOpenExternalLinkMutation();
@@ -82,7 +84,7 @@ function SettingsDialog() {
         <div className="flex flex-row items-center gap-2">
           <OcrStatus />
           <span className="text-muted-foreground ms-auto text-xs">
-            Fanyi v1.0.0
+            {appVersion ? `Fanyi ${appVersion}` : 'Fanyi'}
           </span>
           <Button
             variant="link"

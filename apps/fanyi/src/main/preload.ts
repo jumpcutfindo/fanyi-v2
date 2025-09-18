@@ -72,4 +72,5 @@ contextBridge.exposeInMainWorld('api', {
 
   openExternalLink: (url: string) =>
     ipcRenderer.invoke('open-external-link', url),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 });

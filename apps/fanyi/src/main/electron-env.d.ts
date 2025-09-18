@@ -52,5 +52,6 @@ interface Window {
 
     getSystemOs: () => Promise<string>;
     openExternalLink: (url: string) => Promise<void>;
+    getAppVersion: () => Promise<string>;
   };
 }
