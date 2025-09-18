@@ -8,7 +8,10 @@ export const preferencesStore = new Store<UserPreferences>({
 });
 
 export async function getPreferences(): Promise<UserPreferences> {
-  return preferencesStore.get('preferences', { isDarkMode: false });
+  return preferencesStore.get('preferences', {
+    isDarkMode: false,
+    isWrapTabs: false,
+  });
 }
 
 export async function setPreference(
