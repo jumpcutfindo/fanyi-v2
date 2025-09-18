@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -7,6 +8,11 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@renderer/components/ui/ContextMenu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@renderer/components/ui/Tooltip';
 import { cn } from '@renderer/lib/utils';
 import { useSidebarStore } from '@renderer/stores/useSidebarStore';
 import { Tab, useTabStore } from '@renderer/stores/useTabStore';
@@ -97,41 +103,54 @@ export function TabItem({
 
   return (
     <ContextMenu modal={false}>
-      <ContextMenuTrigger asChild disabled={!contextMenu.enabled}>
-        <div className="group relative h-8 w-full">
-          <button
-            type="button"
-            className={cn(
-              'bg-card hover:bg-muted flex h-8 w-full items-center truncate p-2 text-sm',
-              disabled ? 'cursor-not-allowed' : 'cursor-pointer',
-              disabled && !isPreview ? 'opacity-20' : '',
-              isActive ? 'border-b-primary border-b' : 'opacity-50'
-            )}
-            onClick={handleSelect}
-            disabled={disabled}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-          >
-            <span
-              className={cn('max-w-[90%] truncate', isPreview ? 'italic' : '')}
-            >
-              {tab.title}
-            </span>
-          </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <ContextMenuTrigger asChild disabled={!contextMenu.enabled}>
+            <div className="group relative h-8 w-full">
+              <button
+                type="button"
+                className={cn(
+                  'bg-card hover:bg-muted flex h-8 w-full items-center truncate p-2 text-sm',
+                  disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+                  disabled && !isPreview ? 'opacity-20' : '',
+                  isActive ? 'border-b-primary border-b' : 'opacity-50'
+                )}
+                onClick={handleSelect}
+                disabled={disabled}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+              >
+                <span
+                  className={cn(
+                    'max-w-[90%] truncate',
+                    isPreview ? 'italic' : ''
+                  )}
+                >
+                  {tab.title}
+                </span>
+              </button>
 
-          {!disabled ? (
-            <button
-              className={cn(
-                'hover:bg-muted absolute top-[50%] right-2 translate-y-[-50%] cursor-pointer rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100',
-                isFocused ? 'opacity-100' : ''
-              )}
-              onClick={handleClose}
-            >
-              <X className="size-4" />
-            </button>
-          ) : null}
-        </div>
-      </ContextMenuTrigger>
+              {!disabled ? (
+                <button
+                  className={cn(
+                    'hover:bg-muted absolute top-[50%] right-2 translate-y-[-50%] cursor-pointer rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100',
+                    isFocused ? 'opacity-100' : ''
+                  )}
+                  onClick={handleClose}
+                >
+                  <X className="size-4" />
+                </button>
+              ) : null}
+            </div>
+          </ContextMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent className="flex flex-col">
+          <span className="font-bold">{tab.title}</span>
+          <span>
+            Generated at {dayjs(tab.createdOn).format('YYYY-MM-DD HH:mm')}
+          </span>
+        </TooltipContent>
+      </Tooltip>
       {contextMenu.enabled ? (
         <ContextMenuContent className="w-52">
           <ContextMenuItem onSelect={handleClose}>Close</ContextMenuItem>
