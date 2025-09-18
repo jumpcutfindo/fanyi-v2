@@ -2,11 +2,11 @@ import { Loader2Icon, Moon, Sun } from 'lucide-react';
 import { useRef } from 'react';
 import logo from '/images/logo.svg';
 
+import { useGetOcrStatusQuery } from '@shared/queries/getOcrStatus.query';
 import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
 import { Titlebar } from '@renderer/components/Titlebar';
 import { Label } from '@renderer/components/ui/Label';
 import { Switch } from '@renderer/components/ui/Switch';
-import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { SettingsDialog } from '@renderer/features/preferences/components/SettingsDialog';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';

@@ -1,12 +1,12 @@
 import { Loader2Icon, Pencil, Play } from 'lucide-react';
 
+import { useGetOcrStatusQuery } from '@shared/queries/getOcrStatus.query';
 import { Button } from '@renderer/components/ui/Button';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@renderer/components/ui/Tooltip';
-import { useGetOcrStatusQuery } from '@renderer/features/ocr/queries/getOcrStatus.query';
 import { PresetKeybindDisplay } from '@renderer/features/screenshot/components/PresetKeybindDisplay';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { cn } from '@renderer/lib/utils';

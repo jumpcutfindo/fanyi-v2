@@ -116,10 +116,10 @@ export function TabItem({
           <button
             type="button"
             className={cn(
-              'bg-card hover:bg-muted flex h-8 w-full items-center truncate p-2 text-sm',
+              'bg-card hover:bg-accent/5 flex h-8 w-full items-center truncate p-2 text-sm',
               disabled ? 'cursor-not-allowed' : 'cursor-pointer',
               disabled && !isPreview ? 'opacity-20' : '',
-              isActive ? 'border-b-primary border-b' : 'opacity-50'
+              isActive ? 'border-b-accent bg-accent/10 border-b' : 'opacity-40'
             )}
             onClick={handleSelect}
             disabled={disabled}
