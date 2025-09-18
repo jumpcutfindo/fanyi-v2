@@ -2,6 +2,7 @@ import { Settings } from 'lucide-react';
 
 import { useGetUserPreferences } from '@shared/queries/getUserPreferences.query';
 import { useSetUserPreferenceMutation } from '@shared/queries/setUserPreference.mutation';
+import { OcrStatus } from '@renderer/components/OcrStatus';
 import { Button } from '@renderer/components/ui/Button';
 import {
   Dialog,
@@ -13,7 +14,6 @@ import {
 } from '@renderer/components/ui/Dialog';
 import { Separator } from '@renderer/components/ui/Separator';
 import { Switch } from '@renderer/components/ui/Switch';
-import { OcrStatus } from '@renderer/features/ocr/components/OcrStatus';
 
 function SettingsDialog() {
   const { data: preferences } = useGetUserPreferences();
@@ -75,7 +75,7 @@ function SettingsDialog() {
             />
           </div>
         </div>
-        <Separator className="my-1" />
+        <Separator />
         <OcrStatus />
       </DialogContent>
     </Dialog>
