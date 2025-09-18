@@ -9,6 +9,7 @@ import {
 interface BaseTab {
   id: string;
   title: string;
+  createdOn: Date;
 }
 
 export interface PreviewTab extends BaseTab {
@@ -27,14 +28,19 @@ export type Tab = PreviewTab | TranslationTab;
 type TabStore = {
   tabs: Tab[];
   activeTab: Tab | null;
-  addTab: (tab: Tab, options?: { setActive?: boolean }) => void;
+  addTab: (
+    tab:
+      | Omit<TranslationTab, 'id' | 'createdOn'>
+      | Omit<PreviewTab, 'id' | 'createdOn'>,
+    options?: { setActive?: boolean }
+  ) => void;
   removeTab: (tabId: string) => void;
   updateTab: (tab: Tab) => void;
   setActiveTab: (tabId: string) => void;
   isTabActive: (tabId: string) => boolean;
   previewTab: PreviewTab | null;
   setPreviewTab: (
-    tab: Omit<PreviewTab, 'id'>,
+    tab: Omit<PreviewTab, 'id' | 'createdOn'>,
     options?: { setActive?: boolean }
   ) => void;
 };
@@ -44,7 +50,7 @@ export const useTabStore = create<TabStore>((set, get) => ({
   activeTab: null,
   addTab: (tab, opts) =>
     set((prev) => {
-      const newTab = { ...tab, id: uuidv4() };
+      const newTab = { ...tab, id: uuidv4(), createdOn: new Date() };
 
       const newTabs = [...prev.tabs, newTab];
       const newActiveTab = opts?.setActive ? newTab : prev.activeTab;
@@ -111,7 +117,7 @@ export const useTabStore = create<TabStore>((set, get) => ({
   isTabActive: (tabId) => get().activeTab?.id === tabId,
   previewTab: null,
   setPreviewTab: (tab, opts) => {
-    const newPreviewTab = { ...tab, id: uuidv4() };
+    const newPreviewTab = { ...tab, id: uuidv4(), createdOn: new Date() };
 
     if (opts?.setActive) {
       set({ previewTab: newPreviewTab, activeTab: newPreviewTab });

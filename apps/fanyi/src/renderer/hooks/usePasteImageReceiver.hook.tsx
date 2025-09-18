@@ -17,7 +17,6 @@ export function usePasteImageReceiver() {
   ) => {
     addTab(
       {
-        id: uuidv4(),
         type: 'translation',
         title,
         preset: {
