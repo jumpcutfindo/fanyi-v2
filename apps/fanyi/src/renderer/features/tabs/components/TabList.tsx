@@ -116,7 +116,7 @@ export function TabItem({
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <ContextMenu modal={false}>
+    <ContextMenu>
       <Tooltip>
         <TooltipTrigger asChild>
           <ContextMenuTrigger asChild disabled={!contextMenu.enabled}>
