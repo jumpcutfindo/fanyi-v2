@@ -36,7 +36,7 @@ export function TabList() {
   const { data: preferences } = useGetUserPreferences();
 
   const tabListClass = preferences?.isWrapTabs
-    ? 'divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid md:grid-cols-7 lg:grid-cols-12'
+    ? 'divide-border grid grid-cols-5 divide-x-1 divide-y-1 divide-solid lg:grid-cols-7 xl:grid-cols-10'
     : 'flex flex-row overflow-x-scroll no-scrollbar';
 
   const tabClass = preferences?.isWrapTabs
@@ -116,7 +116,7 @@ export function TabItem({
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <ContextMenu modal={false}>
+    <ContextMenu>
       <Tooltip>
         <TooltipTrigger asChild>
           <ContextMenuTrigger asChild disabled={!contextMenu.enabled}>
