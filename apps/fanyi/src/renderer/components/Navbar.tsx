@@ -6,8 +6,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@renderer/components/ui/Tooltip';
+import { SettingsDialog } from '@renderer/features/preferences/components/SettingsDialog';
 import { useDarkMode } from '@renderer/hooks/useDarkMode.hook';
 import { useNavbarStore } from '@renderer/stores/useNavbarStore';
+
+const buttonClassName = 'size-8 rounded-full p-2';
 
 export function Navbar() {
   const { setNavbarState } = useNavbarStore();
@@ -20,7 +23,7 @@ export function Navbar() {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            className="size-8 rounded-full p-2"
+            className={buttonClassName}
             onClick={() => setNavbarState('screenshot')}
           >
             <Camera />
@@ -32,7 +35,7 @@ export function Navbar() {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            className="size-8 rounded-full p-2"
+            className={buttonClassName}
             onClick={() => setNavbarState('dictionaries')}
           >
             <BookOpen />
@@ -41,22 +44,28 @@ export function Navbar() {
         <TooltipContent side="right">Dictionaries</TooltipContent>
       </Tooltip>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col justify-center gap-2">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
-              className="size-8 rounded-full p-2"
+              className={buttonClassName}
               onClick={() => toggleDarkMode()}
             >
               {isDarkMode ? (
-                <Moon className="fill-foreground size-3.5" />
+                <Moon className="size-3.5" />
               ) : (
-                <Sun className="text-muted-foreground fill-muted-foreground size-3.5" />
+                <Sun className="size-3.5" />
               )}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">Toggle theme</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <SettingsDialog />
+          </TooltipTrigger>
+          <TooltipContent side="right">Settings</TooltipContent>
         </Tooltip>
       </div>
     </div>

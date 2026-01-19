@@ -39,25 +39,11 @@ export function ScreenshotPage() {
     }
   };
 
-  const renderSidebarFooter = () => {
-    switch (sidebarState.state) {
-      case 'editor':
-        return null;
-      default:
-        return (
-          <SidebarFooter className="flex flex-row justify-between">
-            <SettingsDialog />
-          </SidebarFooter>
-        );
-    }
-  };
-
   return (
     <>
       <div className="relative h-full min-w-70 gap-4">
         <SidebarContainer ref={sidebarRef} className="absolute h-full w-full">
           {renderSidebarContent()}
-          {renderSidebarFooter()}
         </SidebarContainer>
       </div>
       <div className="flex h-full w-0 grow flex-col">

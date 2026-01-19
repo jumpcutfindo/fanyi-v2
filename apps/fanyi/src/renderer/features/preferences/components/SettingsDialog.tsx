@@ -28,11 +28,7 @@ function SettingsDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className="text-muted-foreground size-6 rounded-full"
-          variant="ghost"
-          type="button"
-        >
+        <Button className="size-8 rounded-full" variant="ghost" type="button">
           <Settings />
         </Button>
       </DialogTrigger>
