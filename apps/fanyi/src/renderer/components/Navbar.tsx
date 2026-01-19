@@ -53,9 +53,9 @@ export function Navbar() {
               onClick={() => toggleDarkMode()}
             >
               {isDarkMode ? (
-                <Moon className="size-3.5" />
+                <Moon className="fill-foreground size-3.5" />
               ) : (
-                <Sun className="size-3.5" />
+                <Sun className="fill-foreground size-3.5" />
               )}
             </Button>
           </TooltipTrigger>
