@@ -16,7 +16,7 @@ function App() {
   const renderApp = () => {
     if (ocrStatus === 'startup') {
       return (
-        <div className="flex h-0 w-full grow flex-col items-center justify-center gap-8 text-center">
+        <div className="flex h-full grow flex-col items-center justify-center gap-8 text-center">
           <img src={logo} className="size-36" />
           <Loader2Icon className="animate-spin" />
           <span>Loading resources...</span>
