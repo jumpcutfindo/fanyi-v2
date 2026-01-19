@@ -193,7 +193,7 @@ export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
                 min={min}
                 max={max}
                 step={1}
-                value={[value]}
+                value={[value ?? min ?? 0]}
                 onValueChange={([num]) => onChange(num)}
               />
             );
