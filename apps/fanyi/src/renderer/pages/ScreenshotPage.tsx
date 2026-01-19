@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 
-import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
-import { SettingsDialog } from '@renderer/features/preferences/components/SettingsDialog';
+import { SidebarContainer } from '@renderer/components/Sidebar';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
 import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';

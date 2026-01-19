@@ -1,4 +1,4 @@
-import { Book, BookOpen, Camera, Moon, Sun } from 'lucide-react';
+import { BookOpen, Camera, Moon, Sun } from 'lucide-react';
 
 import { Button } from '@renderer/components/ui/Button';
 import {
