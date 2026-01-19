@@ -15,7 +15,7 @@ export function useDarkMode() {
     return userPreferences.isDarkMode;
   }, [userPreferences]);
 
-  const setIsDarkMode = () => {
+  const toggleDarkMode = () => {
     setUserPreference({ key: 'isDarkMode', value: !isDarkMode });
   };
 
@@ -29,5 +29,5 @@ export function useDarkMode() {
     }
   }, [isDarkMode]);
 
-  return { isDarkMode, setIsDarkMode };
+  return { isDarkMode, toggleDarkMode };
 }

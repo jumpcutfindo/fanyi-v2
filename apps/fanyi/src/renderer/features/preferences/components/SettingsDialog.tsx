@@ -1,4 +1,5 @@
 import { SiGithub } from '@icons-pack/react-simple-icons';
+import { TooltipTrigger } from '@radix-ui/react-tooltip';
 import { Settings } from 'lucide-react';
 
 import { useGetAppVersionQuery } from '@shared/queries/getAppVersion.query';
@@ -17,6 +18,7 @@ import {
 } from '@renderer/components/ui/Dialog';
 import { Separator } from '@renderer/components/ui/Separator';
 import { Switch } from '@renderer/components/ui/Switch';
+import { Tooltip, TooltipContent } from '@renderer/components/ui/Tooltip';
 
 function SettingsDialog() {
   const { data: preferences } = useGetUserPreferences();
@@ -26,78 +28,83 @@ function SettingsDialog() {
   const { mutate: openExternalLink } = useOpenExternalLinkMutation();
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          className="text-muted-foreground size-6 rounded-full"
-          variant="ghost"
-          type="button"
-        >
-          <Settings />
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
-          <DialogDescription className="sr-only">Settings</DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex grow flex-col">
-              <p className="text-sm">Dark mode</p>
-              <span className="text-muted-foreground text-sm">
-                Toggles whether dark mode is enabled
-              </span>
+    <Tooltip>
+      <Dialog>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button
+              className="size-8 rounded-full"
+              variant="ghost"
+              type="button"
+            >
+              <Settings />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+            <DialogDescription className="sr-only">Settings</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex grow flex-col">
+                <p className="text-sm">Dark mode</p>
+                <span className="text-muted-foreground text-sm">
+                  Toggles whether dark mode is enabled
+                </span>
+              </div>
+              <Switch
+                id="darkMode"
+                checked={preferences?.isDarkMode}
+                onCheckedChange={(checked) =>
+                  setPreference({
+                    key: 'isDarkMode',
+                    value: checked,
+                  })
+                }
+              />
             </div>
-            <Switch
-              id="darkMode"
-              checked={preferences?.isDarkMode}
-              onCheckedChange={(checked) =>
-                setPreference({
-                  key: 'isDarkMode',
-                  value: checked,
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex grow flex-col">
-              <p className="text-sm">Wrap tabs</p>
-              <span className="text-muted-foreground text-sm">
-                Wraps the tabs if the tabs exceeds the screen width. Otherwise,
-                the tabs are scrollable.
-              </span>
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex grow flex-col">
+                <p className="text-sm">Wrap tabs</p>
+                <span className="text-muted-foreground text-sm">
+                  Wraps the tabs if the tabs exceeds the screen width.
+                  Otherwise, the tabs are scrollable.
+                </span>
+              </div>
+              <Switch
+                id="darkMode"
+                checked={preferences?.isWrapTabs}
+                onCheckedChange={(checked) =>
+                  setPreference({
+                    key: 'isWrapTabs',
+                    value: checked,
+                  })
+                }
+              />
             </div>
-            <Switch
-              id="darkMode"
-              checked={preferences?.isWrapTabs}
-              onCheckedChange={(checked) =>
-                setPreference({
-                  key: 'isWrapTabs',
-                  value: checked,
-                })
-              }
-            />
           </div>
-        </div>
-        <Separator />
-        <div className="flex flex-row items-center gap-2">
-          <OcrStatus />
-          <span className="text-muted-foreground ms-auto text-xs">
-            {appVersion ? `Fanyi ${appVersion}` : 'Fanyi'}
-          </span>
-          <Button
-            variant="link"
-            className="group size-4"
-            onClick={() =>
-              openExternalLink('https://github.com/jumpcutfindo/fanyi-v2')
-            }
-          >
-            <SiGithub className="fill-muted-foreground group-hover:fill-accent" />
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          <Separator />
+          <div className="flex flex-row items-center gap-2">
+            <OcrStatus />
+            <span className="text-muted-foreground ms-auto text-xs">
+              {appVersion ? `Fanyi ${appVersion}` : 'Fanyi'}
+            </span>
+            <Button
+              variant="link"
+              className="group size-4"
+              onClick={() =>
+                openExternalLink('https://github.com/jumpcutfindo/fanyi-v2')
+              }
+            >
+              <SiGithub className="fill-muted-foreground group-hover:fill-accent" />
+            </Button>
+          </div>
+        </DialogContent>
+        <TooltipContent side="right">Settings</TooltipContent>
+      </Dialog>
+    </Tooltip>
   );
 }
 
