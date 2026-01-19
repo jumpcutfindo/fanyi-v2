@@ -1,10 +1,6 @@
-import { Moon, Sun } from 'lucide-react';
 import { useRef } from 'react';
 
-import { Navbar } from '@renderer/components/Navbar';
 import { SidebarContainer, SidebarFooter } from '@renderer/components/Sidebar';
-import { Label } from '@renderer/components/ui/Label';
-import { Switch } from '@renderer/components/ui/Switch';
 import { SettingsDialog } from '@renderer/features/preferences/components/SettingsDialog';
 import { PresetEditor } from '@renderer/features/screenshot/components/PresetEditor';
 import { PresetManager } from '@renderer/features/screenshot/components/PresetManager';
@@ -18,7 +14,7 @@ export function ScreenshotPage() {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const sidebarState = useSidebarStore((state) => state.sidebarState);
-  const { isDarkMode, setIsDarkMode } = useDarkMode();
+  useDarkMode();
 
   // Handle pasting of images
   usePasteImageReceiver();
@@ -50,20 +46,6 @@ export function ScreenshotPage() {
       default:
         return (
           <SidebarFooter className="flex flex-row justify-between">
-            <div className="flex flex-row items-center justify-center gap-2">
-              <Label htmlFor="darkMode">
-                {isDarkMode ? (
-                  <Moon className="fill-foreground size-3.5" />
-                ) : (
-                  <Sun className="text-muted-foreground fill-muted-foreground size-3.5" />
-                )}
-              </Label>
-              <Switch
-                id="darkMode"
-                checked={isDarkMode}
-                onCheckedChange={setIsDarkMode}
-              />
-            </div>
             <SettingsDialog />
           </SidebarFooter>
         );
