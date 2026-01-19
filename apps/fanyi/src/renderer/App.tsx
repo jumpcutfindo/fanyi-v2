@@ -13,17 +13,15 @@ function App() {
 
   const { navbarState } = useNavbarStore();
 
-  const renderApp = () => {
-    if (ocrStatus === 'startup') {
-      return (
-        <div className="flex h-full grow flex-col items-center justify-center gap-8 text-center">
-          <img src={logo} className="size-36" />
-          <Loader2Icon className="animate-spin" />
-          <span>Loading resources...</span>
-        </div>
-      );
-    }
+  const renderLoader = () => (
+    <div className="flex h-full grow flex-col items-center justify-center gap-8 text-center">
+      <img src={logo} className="size-36" />
+      <Loader2Icon className="animate-spin" />
+      <span>Loading resources...</span>
+    </div>
+  );
 
+  const renderApp = () => {
     switch (navbarState) {
       case 'screenshot':
         return <ScreenshotPage />;
@@ -36,8 +34,14 @@ function App() {
     <div className="flex h-full flex-col">
       <Titlebar />
       <div className="flex h-0 grow flex-row">
-        <Navbar />
-        {renderApp()}
+        {ocrStatus === 'startup' ? (
+          renderLoader()
+        ) : (
+          <>
+            <Navbar />
+            {renderApp()}
+          </>
+        )}
       </div>
     </div>
   );
