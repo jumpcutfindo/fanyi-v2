@@ -2,24 +2,33 @@ import icon from '/images/icon.svg';
 
 import { useGetSystemOsQuery } from '@renderer/features/system/queries/getSystemOs.query';
 import { cn } from '@renderer/lib/utils';
+import { useNavbarStore } from '@renderer/stores/useNavbarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 function Titlebar() {
+  const currentPage = useNavbarStore((state) => state.navbarState);
   const currentTab = useTabStore((state) => state.activeTab);
 
   const { data: systemOs } = useGetSystemOsQuery();
 
   const getHelperText = () => {
-    if (!currentTab) {
-      return 'Fanyi';
-    }
+    switch (currentPage) {
+      case 'screenshot': {
+        if (!currentTab) {
+          return 'Screenshot';
+        }
 
-    if (currentTab.type === 'preview') {
-      return `Preview (${currentTab.activePreset?.name})`;
-    }
+        switch (currentTab.type) {
+          case 'translation':
+            return `Translation (${currentTab.preset.name})`;
+          case 'preview':
+            return `Preview (${currentTab.activePreset?.name})`;
+        }
 
-    if (currentTab.type === 'translation') {
-      return `Translation (${currentTab.preset.name})`;
+        break;
+      }
+      case 'dictionaries':
+        return 'Dictionaries';
     }
   };
 
