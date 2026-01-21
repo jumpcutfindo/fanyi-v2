@@ -6,6 +6,10 @@ export interface Dictionary {
   modifiedOn: Date;
 }
 
+export type DictionaryMinimal = Omit<Dictionary, 'wordMap'> & {
+  wordCount: number;
+};
+
 export interface DictionaryEntry {
   traditional: string;
   simplified: string;

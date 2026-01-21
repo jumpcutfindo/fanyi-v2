@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import * as pinyin from 'pinyin-pro';
 
-import { Dictionary, DictionaryEntry } from '@shared/types/dictionary';
+import {
+  Dictionary,
+  DictionaryEntry,
+  DictionaryMinimal,
+} from '@shared/types/dictionary';
 
 let defaultDictionary: Dictionary | null = null;
 
@@ -137,19 +141,25 @@ export function getRawDictionaryEntry(query: string) {
   return defaultDictionary.wordMap[query];
 }
 
-export function listDictionaries(): Dictionary[] {
+export function listDictionaries(): DictionaryMinimal[] {
   if (!defaultDictionary) {
     return [];
   }
 
   return [
-    defaultDictionary,
+    {
+      name: defaultDictionary.name,
+      url: defaultDictionary.url,
+      createdOn: defaultDictionary.createdOn,
+      modifiedOn: defaultDictionary.modifiedOn,
+      wordCount: Object.keys(defaultDictionary.wordMap).length,
+    },
     {
       name: 'Example dictionary',
       url: 'https://example.com',
       createdOn: new Date(),
       modifiedOn: new Date(),
-      wordMap: {},
+      wordCount: 1234567890,
     },
   ];
 }
