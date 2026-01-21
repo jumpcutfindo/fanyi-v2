@@ -15,21 +15,23 @@ type SidebarUnionState =
   | { state: 'manager'; options?: ManagerOptions }
   | { state: 'editor'; options: EditorOptions };
 
-interface SidebarStore {
+interface ScreenshotSidebarStore {
   sidebarState: SidebarUnionState;
   setSidebarState: (state: SidebarUnionState) => void;
 }
 
-export const useSidebarStore = create<SidebarStore>((set) => ({
-  sidebarState: { state: 'manager' },
-  setSidebarState: (state: SidebarUnionState) =>
-    set(() => {
-      if (state.state === 'editor') {
-        window.api.disableKeybinds();
-      } else {
-        window.api.enableKeybinds();
-      }
+export const useScreenshotSidebarStore = create<ScreenshotSidebarStore>(
+  (set) => ({
+    sidebarState: { state: 'manager' },
+    setSidebarState: (state: SidebarUnionState) =>
+      set(() => {
+        if (state.state === 'editor') {
+          window.api.disableKeybinds();
+        } else {
+          window.api.enableKeybinds();
+        }
 
-      return { sidebarState: state };
-    }),
-}));
+        return { sidebarState: state };
+      }),
+  })
+);

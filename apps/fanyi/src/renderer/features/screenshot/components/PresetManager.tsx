@@ -7,7 +7,7 @@ import { Button } from '@renderer/components/ui/Button';
 import { PresetKeybindDisplay } from '@renderer/features/screenshot/components/PresetKeybindDisplay';
 import { useGetScreenshotPresets } from '@renderer/features/screenshot/queries/getScreenshotPresets.query';
 import { cn } from '@renderer/lib/utils';
-import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { useScreenshotSidebarStore } from '@renderer/stores/useScreenshotSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 export function PresetManager() {
@@ -17,7 +17,9 @@ export function PresetManager() {
   const previewTab = useTabStore((state) => state.previewTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);
 
-  const setSidebarState = useSidebarStore((state) => state.setSidebarState);
+  const setSidebarState = useScreenshotSidebarStore(
+    (state) => state.setSidebarState
+  );
 
   return (
     <>
