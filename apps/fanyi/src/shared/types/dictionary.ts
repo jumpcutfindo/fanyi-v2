@@ -1,5 +1,9 @@
 export interface Dictionary {
+  name: string;
   wordMap: Record<string, DictionaryEntry>;
+  url?: string;
+  createdOn: Date;
+  modifiedOn: Date;
 }
 
 export interface DictionaryEntry {

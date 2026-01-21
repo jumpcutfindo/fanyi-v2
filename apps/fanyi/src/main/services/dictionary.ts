@@ -33,6 +33,9 @@ function initDefaultDictionary() {
   }
 
   defaultDictionary = {
+    name: 'Default (CEDICT)',
+    createdOn: new Date(),
+    modifiedOn: new Date(),
     wordMap: entries.reduce(
       (acc, entry) => {
         // Skip useless entries
