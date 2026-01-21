@@ -11,10 +11,10 @@ import { useGetDictionaryEntryForWordQuery } from '@renderer/features/translatio
 import { cn } from '@renderer/lib/utils';
 
 interface DictionaryEntryCardProps {
-  ref: (ref: HTMLButtonElement) => void;
   entry: DictionaryEntry;
-  isSelected: boolean;
-  handleSelect: (entry: DictionaryEntry) => void;
+  handleSelect?: (entry: DictionaryEntry) => void;
+  isSelected?: boolean;
+  ref?: (ref: HTMLButtonElement) => void;
 }
 
 export function DictionaryEntryCard({
@@ -59,7 +59,7 @@ export function DictionaryEntryCard({
           'bg-card hover:bg-muted flex h-fit w-full cursor-pointer flex-row items-center gap-4 rounded-md border px-4 py-2 text-start transition-all',
           isSelected ? 'border-primary' : ''
         )}
-        onClick={() => handleSelect(entry)}
+        onClick={() => handleSelect?.(entry)}
       >
         <span className="flex-1 text-2xl">{entry.simplified}</span>
         <span className="text-muted-foreground flex-1 text-sm">
@@ -86,7 +86,7 @@ interface DictionaryHoverCard {
 }
 
 function DictionaryHoverCard({ word }: DictionaryHoverCard) {
-  const { data: queryResult, isLoading: isEntryLoading } =
+  const { data: queryResult, isSearching: isEntryLoading } =
     useGetDictionaryEntryForWordQuery(word);
 
   if (!queryResult || !queryResult.result) {

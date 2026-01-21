@@ -1,4 +1,5 @@
 import { SidebarContainer } from '@renderer/components/Sidebar';
+import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
 
 export function DictionaryPage() {
@@ -7,7 +8,7 @@ export function DictionaryPage() {
       <SidebarContainer className="min-w-70">
         <DictionaryManager />
       </SidebarContainer>
-      <div className="bg-secondary"></div>
+      <DictionaryEntryList />
     </>
   );
 }
