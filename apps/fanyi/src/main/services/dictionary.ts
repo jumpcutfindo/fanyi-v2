@@ -34,7 +34,7 @@ export function initDefaultDictionary() {
       pinyin: pinyin.convert(match.groups!.pinyin.toLowerCase(), {
         format: 'numToSymbol',
       }),
-      defintion: match.groups!.definition,
+      definition: match.groups!.definition,
     });
   }
 
@@ -46,18 +46,18 @@ export function initDefaultDictionary() {
     wordMap: entries.reduce(
       (acc, entry) => {
         // Skip useless entries
-        if (entry.defintion.includes('variant of')) {
+        if (entry.definition.includes('variant of')) {
           return acc;
         }
 
         // Modify all pinyins within definition
-        const pinyins = entry.defintion.matchAll(/\[(.*?)\]/g);
+        const pinyins = entry.definition.matchAll(/\[(.*?)\]/g);
 
         for (const match of pinyins) {
           const individualPinyin = match[0].matchAll(/[a-z]+[1-4]/gi);
 
           for (const innerMatch of individualPinyin) {
-            entry.defintion = entry.defintion.replace(
+            entry.definition = entry.definition.replace(
               innerMatch[0],
               pinyin.convert(innerMatch[0].toLowerCase(), {
                 format: 'numToSymbol',
@@ -68,7 +68,7 @@ export function initDefaultDictionary() {
 
         // Retrieve links from the definition
         const externalReferences =
-          entry.defintion.matchAll(/[\u4E00-\u9FFF]+/g);
+          entry.definition.matchAll(/[\u4E00-\u9FFF]+/g);
         const links = [];
 
         for (const match of externalReferences) {
@@ -79,16 +79,16 @@ export function initDefaultDictionary() {
         }
 
         if (acc[entry.simplified]) {
-          acc[entry.simplified].defintions.push({
-            definition: entry.defintion,
+          acc[entry.simplified].definitions.push({
+            definition: entry.definition,
             links,
           });
         } else {
           acc[entry.simplified] = {
             ...entry,
-            defintions: [
+            definitions: [
               {
-                definition: entry.defintion,
+                definition: entry.definition,
                 links,
               },
             ],
@@ -192,7 +192,7 @@ export function searchDictionaries(
       { name: 'traditional', weight: 1.0 },
       { name: 'simplified', weight: 1.0 },
       { name: 'pinyin', weight: 0.7 },
-      { name: 'defintions.definition', weight: 1.0 }, // Nested path support
+      { name: 'definitions.definition', weight: 1.0 }, // Nested path support
     ],
   };
 

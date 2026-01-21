@@ -23,7 +23,7 @@ export function DictionaryEntryCard({
   isSelected,
   handleSelect,
 }: DictionaryEntryCardProps) {
-  const renderDefinition = (d: DictionaryEntry['defintions'][number]) => {
+  const renderDefinition = (d: DictionaryEntry['definitions'][number]) => {
     if (d.links.length === 0) {
       return <span key={d.definition}>{d.definition}</span>;
     }
@@ -66,7 +66,7 @@ export function DictionaryEntryCard({
           {entry.pinyin}
         </span>
         <div className="flex flex-3 flex-col gap-2 text-sm">
-          {entry.defintions.map((def, index, arr) => (
+          {entry.definitions.map((def, index, arr) => (
             <span
               className="flex flex-col gap-2"
               key={`${entry.simplified}-subdef-${index}`}
@@ -109,7 +109,7 @@ function DictionaryHoverCard({ word }: DictionaryHoverCard) {
             </span>
 
             <div className="flex flex-col gap-2 text-sm">
-              {entry?.defintions.map((d, index, arr) => (
+              {entry?.definitions.map((d, index, arr) => (
                 <>
                   <span key={d.definition}>{d.definition}</span>
                   {index !== arr.length - 1 ? <Separator /> : null}

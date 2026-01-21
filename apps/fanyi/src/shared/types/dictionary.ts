@@ -15,7 +15,7 @@ export interface DictionaryEntry {
   traditional: string;
   simplified: string;
   pinyin: string;
-  defintions: {
+  definitions: {
     definition: string;
     links: {
       word: string;
