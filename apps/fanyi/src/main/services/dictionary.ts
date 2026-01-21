@@ -187,12 +187,12 @@ export function searchDictionaries(
 
   const options = {
     includeScore: true,
-    threshold: 0.4, // 0.0 is a perfect match, 1.0 matches anything. 0.4 is a good sweet spot.
+    threshold: 0.0, // 0.0 is a perfect match, 1.0 matches anything. 0.4 is a good sweet spot.
     keys: [
       { name: 'traditional', weight: 1.0 },
       { name: 'simplified', weight: 1.0 },
       { name: 'pinyin', weight: 0.7 },
-      { name: 'defintions.definition', weight: 0.5 }, // Nested path support
+      { name: 'defintions.definition', weight: 1.0 }, // Nested path support
     ],
   };
 

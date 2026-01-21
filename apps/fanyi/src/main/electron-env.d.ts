@@ -46,7 +46,7 @@ interface Window {
     getDictionaries(): Promise<DictionaryMinimal[]>;
     searchDictionaries(
       queryString: string,
-      limit: number
+      limit?: number
     ): Promise<DictionaryEntry[]>;
 
     getPreferences: () => Promise<UserPreferences>;
