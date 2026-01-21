@@ -6,7 +6,7 @@ import { Dictionary, DictionaryEntry } from '@shared/types/dictionary';
 
 let defaultDictionary: Dictionary | null = null;
 
-function initDefaultDictionary() {
+export function initDefaultDictionary() {
   console.log('Loading dictionary...');
 
   // Retrieve the contents of the dictionary file
@@ -97,7 +97,7 @@ function initDefaultDictionary() {
   console.log(`Loaded default dictionary with ${entries.length} entries`);
 }
 
-function getDictionaryEntries(queries: string[]) {
+export function getDictionaryEntries(queries: string[]) {
   if (!defaultDictionary) {
     throw new Error('Dictionary not initialized');
   }
@@ -129,7 +129,7 @@ function getDictionaryEntries(queries: string[]) {
   return results.filter((entry) => entry !== undefined);
 }
 
-function getRawDictionaryEntry(query: string) {
+export function getRawDictionaryEntry(query: string) {
   if (!defaultDictionary) {
     throw new Error('Dictionary not initialized');
   }
@@ -137,4 +137,19 @@ function getRawDictionaryEntry(query: string) {
   return defaultDictionary.wordMap[query];
 }
 
-export { initDefaultDictionary, getDictionaryEntries, getRawDictionaryEntry };
+export function listDictionaries(): Dictionary[] {
+  if (!defaultDictionary) {
+    return [];
+  }
+
+  return [
+    defaultDictionary,
+    {
+      name: 'Example dictionary',
+      url: 'https://example.com',
+      createdOn: new Date(),
+      modifiedOn: new Date(),
+      wordMap: {},
+    },
+  ];
+}

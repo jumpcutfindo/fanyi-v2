@@ -5,6 +5,7 @@ import { getOcrStatus, runOcr } from './services/ocr';
 import {
   getDictionaryEntries,
   getRawDictionaryEntry,
+  listDictionaries,
 } from '@main/services/dictionary';
 import {
   disableKeybinds,
@@ -109,6 +110,9 @@ export function registerIpcHandlers() {
 
   ipcMain.handle('get-dictionary-entry-of-word', async (_event, word) => {
     return getRawDictionaryEntry(word);
+  });
+  ipcMain.handle('get-dictionaries', async (_event) => {
+    return listDictionaries();
   });
 
   ipcMain.handle('get-preferences', async (_event) => {
