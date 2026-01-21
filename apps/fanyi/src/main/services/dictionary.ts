@@ -4,9 +4,9 @@ import * as pinyin from 'pinyin-pro';
 
 import { Dictionary, DictionaryEntry } from '@shared/types/dictionary';
 
-let dictionary: Dictionary | null = null;
+let defaultDictionary: Dictionary | null = null;
 
-function initDictionary() {
+function initDefaultDictionary() {
   console.log('Loading dictionary...');
 
   // Retrieve the contents of the dictionary file
@@ -32,7 +32,7 @@ function initDictionary() {
     });
   }
 
-  dictionary = {
+  defaultDictionary = {
     wordMap: entries.reduce(
       (acc, entry) => {
         // Skip useless entries
@@ -91,18 +91,18 @@ function initDictionary() {
     ),
   };
 
-  console.log(`Loaded dictionary with ${entries.length} entries`);
+  console.log(`Loaded default dictionary with ${entries.length} entries`);
 }
 
 function getDictionaryEntries(queries: string[]) {
-  if (!dictionary) {
+  if (!defaultDictionary) {
     throw new Error('Dictionary not initialized');
   }
 
   const entryMap: Record<string, DictionaryEntry> = {};
 
   for (const query of queries) {
-    entryMap[query] = dictionary.wordMap[query];
+    entryMap[query] = defaultDictionary.wordMap[query];
   }
 
   const results: DictionaryEntry[] = [];
@@ -113,10 +113,10 @@ function getDictionaryEntries(queries: string[]) {
       // Split the key into individual words
       const individualWords = key.split('');
 
-      entryMap[key] = dictionary.wordMap[key];
+      entryMap[key] = defaultDictionary.wordMap[key];
 
       for (const word of individualWords) {
-        results.push(dictionary.wordMap[word]);
+        results.push(defaultDictionary.wordMap[word]);
       }
     } else {
       results.push(entryMap[key]);
@@ -127,11 +127,11 @@ function getDictionaryEntries(queries: string[]) {
 }
 
 function getRawDictionaryEntry(query: string) {
-  if (!dictionary) {
+  if (!defaultDictionary) {
     throw new Error('Dictionary not initialized');
   }
 
-  return dictionary.wordMap[query];
+  return defaultDictionary.wordMap[query];
 }
 
-export { initDictionary, getDictionaryEntries, getRawDictionaryEntry };
+export { initDefaultDictionary, getDictionaryEntries, getRawDictionaryEntry };

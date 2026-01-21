@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow } from 'electron';
 
 import { registerIpcHandlers } from '@main/ipc';
-import { initDictionary } from '@main/services/dictionary';
+import { initDefaultDictionary } from '@main/services/dictionary';
 import { registerDefaultKeybinds } from '@main/services/keybinds';
 import { cleanUpPythonOcr, initPythonOcr } from '@main/services/ocr';
 import {
@@ -93,7 +93,7 @@ app.whenReady().then(() => {
 
   // Setup underlying processes
   initPythonOcr();
-  initDictionary();
+  initDefaultDictionary();
 
   // Register change listener for dark mode
   addPreferenceChangeListener((preferences) => {
