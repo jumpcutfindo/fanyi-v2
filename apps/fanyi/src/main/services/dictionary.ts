@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import * as pinyin from 'pinyin-pro';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Dictionary,
@@ -37,6 +38,7 @@ export function initDefaultDictionary() {
   }
 
   defaultDictionary = {
+    id: 'default',
     name: 'Default (CEDICT)',
     createdOn: new Date(),
     modifiedOn: new Date(),
@@ -148,6 +150,7 @@ export function listDictionaries(): DictionaryMinimal[] {
 
   return [
     {
+      id: defaultDictionary.id,
       name: defaultDictionary.name,
       url: defaultDictionary.url,
       createdOn: defaultDictionary.createdOn,
@@ -155,6 +158,7 @@ export function listDictionaries(): DictionaryMinimal[] {
       wordCount: Object.keys(defaultDictionary.wordMap).length,
     },
     {
+      id: uuidv4(),
       name: 'Example dictionary',
       url: 'https://example.com',
       createdOn: new Date(),

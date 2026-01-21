@@ -1,4 +1,5 @@
 export interface Dictionary {
+  id: string;
   name: string;
   wordMap: Record<string, DictionaryEntry>;
   url?: string;
