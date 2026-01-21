@@ -6,6 +6,7 @@ import {
   getDictionaryEntries,
   getRawDictionaryEntry,
   listDictionaries,
+  searchDictionaries,
 } from '@main/services/dictionary';
 import {
   disableKeybinds,
@@ -113,6 +114,9 @@ export function registerIpcHandlers() {
   });
   ipcMain.handle('get-dictionaries', async (_event) => {
     return listDictionaries();
+  });
+  ipcMain.handle('search-dictionaries', async (_event, queryString, limit) => {
+    return searchDictionaries(queryString, limit);
   });
 
   ipcMain.handle('get-preferences', async (_event) => {

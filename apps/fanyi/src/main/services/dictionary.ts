@@ -167,3 +167,28 @@ export function listDictionaries(): DictionaryMinimal[] {
     },
   ];
 }
+
+export function searchDictionaries(
+  queryString: string,
+  limit: number
+): DictionaryEntry[] {
+  // TODO: Search only active dictionaries
+  // TODO: Combine dictionaries into flattened structure
+
+  if (!defaultDictionary) {
+    return [];
+  }
+
+  const entries = Object.values(defaultDictionary?.wordMap);
+
+  const filteredEntries = entries.filter(
+    (entry) =>
+      entry.traditional.includes(queryString) ||
+      entry.simplified.includes(queryString) ||
+      entry.defintions.some((def) =>
+        def.definition.toLowerCase().includes(queryString)
+      )
+  );
+
+  return filteredEntries.slice(0, limit);
+}
