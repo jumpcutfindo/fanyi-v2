@@ -4,7 +4,7 @@ import { getOcrStatus, runOcr } from './services/ocr';
 
 import {
   getDictionaryEntries,
-  getRawDictionaryEntry,
+  getDictionaryEntry,
   listDictionaries,
   searchDictionaries,
 } from '@main/services/dictionary';
@@ -110,7 +110,7 @@ export function registerIpcHandlers() {
   });
 
   ipcMain.handle('get-dictionary-entry-of-word', async (_event, word) => {
-    return getRawDictionaryEntry(word);
+    return getDictionaryEntry(word);
   });
   ipcMain.handle('get-dictionaries', async (_event) => {
     return listDictionaries();
