@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import Fuse from 'fuse.js';
 import * as pinyin from 'pinyin-pro';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -173,22 +174,30 @@ export function searchDictionaries(
   limit: number
 ): DictionaryEntry[] {
   // TODO: Search only active dictionaries
+  const activeDictionaries = [defaultDictionary];
   // TODO: Combine dictionaries into flattened structure
 
-  if (!defaultDictionary) {
+  const allEntries = activeDictionaries.flatMap((dict) =>
+    dict ? Object.values(dict.wordMap) : []
+  );
+
+  if (allEntries.length === 0 || !queryString) {
     return [];
   }
 
-  const entries = Object.values(defaultDictionary?.wordMap);
+  const options = {
+    includeScore: true,
+    threshold: 0.4, // 0.0 is a perfect match, 1.0 matches anything. 0.4 is a good sweet spot.
+    keys: [
+      { name: 'traditional', weight: 1.0 },
+      { name: 'simplified', weight: 1.0 },
+      { name: 'pinyin', weight: 0.7 },
+      { name: 'defintions.definition', weight: 0.5 }, // Nested path support
+    ],
+  };
 
-  const filteredEntries = entries.filter(
-    (entry) =>
-      entry.traditional.includes(queryString) ||
-      entry.simplified.includes(queryString) ||
-      entry.defintions.some((def) =>
-        def.definition.toLowerCase().includes(queryString)
-      )
-  );
+  const fuse = new Fuse(allEntries, options);
+  const result = fuse.search(queryString);
 
-  return filteredEntries.slice(0, limit);
+  return result.slice(0, limit).map((res) => res.item);
 }

@@ -62,7 +62,8 @@ contextBridge.exposeInMainWorld('api', {
   getDictionaryEntryOfWord: (word: string): Promise<DictionaryEntry | null> =>
     ipcRenderer.invoke('get-dictionary-entry-of-word', word),
   getDictionaries: () => ipcRenderer.invoke('get-dictionaries'),
-  searchDictionaries: () => ipcRenderer.invoke('search-dictionaries'),
+  searchDictionaries: (queryString: string, limit: number) =>
+    ipcRenderer.invoke('search-dictionaries', queryString, limit),
 
   getPreferences: () => ipcRenderer.invoke('get-preferences'),
   setPreference: (
