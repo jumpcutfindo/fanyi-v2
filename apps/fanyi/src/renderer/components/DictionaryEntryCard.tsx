@@ -86,7 +86,7 @@ interface DictionaryHoverCard {
 }
 
 function DictionaryHoverCard({ word }: DictionaryHoverCard) {
-  const { data: queryResult, isSearching: isEntryLoading } =
+  const { data: queryResult, isPending: isEntryLoading } =
     useGetDictionaryEntryForWordQuery(word);
 
   if (!queryResult || !queryResult.result) {
