@@ -168,14 +168,6 @@ export function listDictionaries(): DictionaryMinimal[] {
       modifiedOn: defaultDictionary.modifiedOn,
       wordCount: Object.keys(defaultDictionary.wordMap).length,
     },
-    {
-      id: uuidv4(),
-      name: 'Example dictionary',
-      url: 'https://example.com',
-      createdOn: new Date(),
-      modifiedOn: new Date(),
-      wordCount: 1234567890,
-    },
   ];
 }
 
@@ -183,9 +175,7 @@ export function searchDictionaries(
   queryString: string,
   limit: number
 ): DictionaryEntry[] {
-  // TODO: Search only active dictionaries
   const activeDictionaries = [defaultDictionary];
-  // TODO: Combine dictionaries into flattened structure
 
   const allEntries = activeDictionaries.flatMap((dict) =>
     dict ? Object.values(dict.rawEntries) : []
