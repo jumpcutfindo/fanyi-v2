@@ -1,12 +1,83 @@
 import fs from 'fs';
 import path from 'path';
+import Fuse from 'fuse.js';
 import * as pinyin from 'pinyin-pro';
 
-import { Dictionary, DictionaryEntry } from '@shared/types/dictionary';
+import {
+  Dictionary,
+  DictionaryEntry,
+  DictionaryMinimal,
+  RawDictionaryEntry,
+} from '@shared/types/dictionary';
 
-let dictionary: Dictionary | null = null;
+let defaultDictionary: Dictionary | null = null;
 
-function initDictionary() {
+function rawEntriesToMap(
+  rawEntries: RawDictionaryEntry[]
+): Record<string, DictionaryEntry> {
+  return rawEntries.reduce(
+    (acc, entry) => {
+      // Skip useless entries
+      if (entry.definition.includes('variant of')) {
+        return acc;
+      }
+
+      // Modify all pinyins
+      entry.pinyin = pinyin.convert(entry.pinyin.toLowerCase(), {
+        format: 'numToSymbol',
+      });
+
+      // Modify all pinyins within definition
+      const pinyins = entry.definition.matchAll(/\[(.*?)\]/g);
+
+      for (const match of pinyins) {
+        const individualPinyin = match[0].matchAll(/[a-z]+[1-4]/gi);
+
+        for (const innerMatch of individualPinyin) {
+          entry.definition = entry.definition.replace(
+            innerMatch[0],
+            pinyin.convert(innerMatch[0].toLowerCase(), {
+              format: 'numToSymbol',
+            })
+          );
+        }
+      }
+
+      // Retrieve links from the definition
+      const externalReferences = entry.definition.matchAll(/[\u4E00-\u9FFF]+/g);
+      const links = [];
+
+      for (const match of externalReferences) {
+        links.push({
+          word: match[0],
+          start: match.index,
+        });
+      }
+
+      if (acc[entry.simplified]) {
+        acc[entry.simplified].definitions.push({
+          definition: entry.definition,
+          links,
+        });
+      } else {
+        acc[entry.simplified] = {
+          ...entry,
+          definitions: [
+            {
+              definition: entry.definition,
+              links,
+            },
+          ],
+        };
+      }
+
+      return acc;
+    },
+    {} as Record<string, DictionaryEntry>
+  );
+}
+
+export function initDefaultDictionary() {
   console.log('Loading dictionary...');
 
   // Retrieve the contents of the dictionary file
@@ -19,90 +90,38 @@ function initDictionary() {
   const regex =
     /^(?<traditional>.*?)\s+(?<simplified>.*?)\s+\[(?<pinyin>.*?)\]\s+\/(?<definition>.*?)\/\s*?/gm;
 
-  const entries = [];
+  const rawEntries = [];
 
   for (const match of rawDictionary.matchAll(regex)) {
-    entries.push({
+    rawEntries.push({
       traditional: match.groups!.traditional,
       simplified: match.groups!.simplified,
-      pinyin: pinyin.convert(match.groups!.pinyin.toLowerCase(), {
-        format: 'numToSymbol',
-      }),
-      defintion: match.groups!.definition,
+      pinyin: match.groups!.pinyin.toLowerCase(),
+      definition: match.groups!.definition,
     });
   }
 
-  dictionary = {
-    wordMap: entries.reduce(
-      (acc, entry) => {
-        // Skip useless entries
-        if (entry.defintion.includes('variant of')) {
-          return acc;
-        }
-
-        // Modify all pinyins within definition
-        const pinyins = entry.defintion.matchAll(/\[(.*?)\]/g);
-
-        for (const match of pinyins) {
-          const individualPinyin = match[0].matchAll(/[a-z]+[1-4]/gi);
-
-          for (const innerMatch of individualPinyin) {
-            entry.defintion = entry.defintion.replace(
-              innerMatch[0],
-              pinyin.convert(innerMatch[0].toLowerCase(), {
-                format: 'numToSymbol',
-              })
-            );
-          }
-        }
-
-        // Retrieve links from the definition
-        const externalReferences =
-          entry.defintion.matchAll(/[\u4E00-\u9FFF]+/g);
-        const links = [];
-
-        for (const match of externalReferences) {
-          links.push({
-            word: match[0],
-            start: match.index,
-          });
-        }
-
-        if (acc[entry.simplified]) {
-          acc[entry.simplified].defintions.push({
-            definition: entry.defintion,
-            links,
-          });
-        } else {
-          acc[entry.simplified] = {
-            ...entry,
-            defintions: [
-              {
-                definition: entry.defintion,
-                links,
-              },
-            ],
-          };
-        }
-
-        return acc;
-      },
-      {} as Record<string, DictionaryEntry>
-    ),
+  defaultDictionary = {
+    id: 'default',
+    name: 'Default (CEDICT)',
+    createdOn: new Date(),
+    modifiedOn: new Date(),
+    rawEntries,
+    wordMap: rawEntriesToMap(rawEntries),
   };
 
-  console.log(`Loaded dictionary with ${entries.length} entries`);
+  console.log(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
-function getDictionaryEntries(queries: string[]) {
-  if (!dictionary) {
+export function getDictionaryEntries(queries: string[]) {
+  if (!defaultDictionary) {
     throw new Error('Dictionary not initialized');
   }
 
   const entryMap: Record<string, DictionaryEntry> = {};
 
   for (const query of queries) {
-    entryMap[query] = dictionary.wordMap[query];
+    entryMap[query] = defaultDictionary.wordMap[query];
   }
 
   const results: DictionaryEntry[] = [];
@@ -113,10 +132,10 @@ function getDictionaryEntries(queries: string[]) {
       // Split the key into individual words
       const individualWords = key.split('');
 
-      entryMap[key] = dictionary.wordMap[key];
+      entryMap[key] = defaultDictionary.wordMap[key];
 
       for (const word of individualWords) {
-        results.push(dictionary.wordMap[word]);
+        results.push(defaultDictionary.wordMap[word]);
       }
     } else {
       results.push(entryMap[key]);
@@ -126,12 +145,63 @@ function getDictionaryEntries(queries: string[]) {
   return results.filter((entry) => entry !== undefined);
 }
 
-function getRawDictionaryEntry(query: string) {
-  if (!dictionary) {
+export function getDictionaryEntry(query: string) {
+  if (!defaultDictionary) {
     throw new Error('Dictionary not initialized');
   }
 
-  return dictionary.wordMap[query];
+  return defaultDictionary.wordMap[query];
 }
 
-export { initDictionary, getDictionaryEntries, getRawDictionaryEntry };
+export function listDictionaries(): DictionaryMinimal[] {
+  if (!defaultDictionary) {
+    return [];
+  }
+
+  return [
+    {
+      id: defaultDictionary.id,
+      name: defaultDictionary.name,
+      url: defaultDictionary.url,
+      createdOn: defaultDictionary.createdOn,
+      modifiedOn: defaultDictionary.modifiedOn,
+      wordCount: Object.keys(defaultDictionary.wordMap).length,
+    },
+  ];
+}
+
+export function searchDictionaries(
+  queryString: string,
+  limit: number
+): DictionaryEntry[] {
+  const activeDictionaries = [defaultDictionary];
+
+  const allEntries = activeDictionaries.flatMap((dict) =>
+    dict ? Object.values(dict.rawEntries) : []
+  );
+
+  if (allEntries.length === 0 || !queryString) {
+    return [];
+  }
+
+  const fuse = new Fuse(allEntries, {
+    threshold: 0.0, // 0.0 is a perfect match, 1.0 matches anything
+    keys: [
+      { name: 'traditional', weight: 1.0 },
+      { name: 'simplified', weight: 1.0 },
+      { name: 'pinyin', weight: 1.0 },
+      { name: 'definition', weight: 1.0 },
+    ],
+    ignoreDiacritics: true,
+    includeScore: true,
+
+    location: 0,
+    distance: 600,
+  });
+  const rawResults = fuse.search(queryString);
+
+  return getDictionaryEntries(rawResults.map((rr) => rr.item.simplified)).slice(
+    0,
+    limit
+  );
+}

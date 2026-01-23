@@ -43,6 +43,11 @@ interface Window {
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
 
     getDictionaryEntryOfWord(word: string): Promise<DictionaryEntry | null>;
+    getDictionaries(): Promise<DictionaryMinimal[]>;
+    searchDictionaries(
+      queryString: string,
+      limit?: number
+    ): Promise<DictionaryEntry[]>;
 
     getPreferences: () => Promise<UserPreferences>;
     setPreference: (

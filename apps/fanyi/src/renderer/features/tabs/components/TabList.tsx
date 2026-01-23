@@ -15,11 +15,11 @@ import {
   TooltipTrigger,
 } from '@renderer/components/ui/Tooltip';
 import { cn } from '@renderer/lib/utils';
-import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { useScreenshotSidebarStore } from '@renderer/stores/useScreenshotSidebarStore';
 import { Tab, useTabStore } from '@renderer/stores/useTabStore';
 
 export function TabList() {
-  const sidebarState = useSidebarStore((state) => state.sidebarState);
+  const sidebarState = useScreenshotSidebarStore((state) => state.sidebarState);
 
   const tabs = useTabStore((state) => state.tabs);
   const previewTab = useTabStore((state) => state.previewTab);

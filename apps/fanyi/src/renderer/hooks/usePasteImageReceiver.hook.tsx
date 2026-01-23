@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useSidebarStore } from '@renderer/stores/useSidebarStore';
+import { useScreenshotSidebarStore } from '@renderer/stores/useScreenshotSidebarStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 import { blobToImageBase64 } from '@renderer/utils/image.util';
 
 export function usePasteImageReceiver() {
   const addTab = useTabStore((state) => state.addTab);
-  const sidebarState = useSidebarStore((state) => state.sidebarState);
+  const sidebarState = useScreenshotSidebarStore((state) => state.sidebarState);
 
   const canProcess = () => sidebarState.state !== 'editor';
 

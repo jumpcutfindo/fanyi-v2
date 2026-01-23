@@ -5,10 +5,9 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { OcrResult } from '@shared/types/ocr';
+import { DictionaryEntryCard } from '@renderer/components/DictionaryEntryCard';
 import { Button } from '@renderer/components/ui/Button';
-import { Separator } from '@renderer/components/ui/Separator';
 import { ExternalTranslation } from '@renderer/features/translation/components/ExternalTranslation';
-import { TranslationHoverCard } from '@renderer/features/translation/components/TranslationHoverCard';
 import { cn } from '@renderer/lib/utils';
 
 const highlightClass = [
@@ -168,7 +167,7 @@ export function TranslationList({ translations }: TranslationListProps) {
               const entry = uniqueEntries[index];
 
               return (
-                <TranslationItem
+                <DictionaryEntryCard
                   ref={(ref) => (itemsRef.current[entry.simplified] = ref)}
                   entry={entry}
                   isSelected={selectedEntry === entry}
@@ -191,76 +190,5 @@ export function TranslationList({ translations }: TranslationListProps) {
         <ExternalTranslation entry={selectedEntry} />
       </Panel>
     </PanelGroup>
-  );
-}
-
-interface TranslationItemProps {
-  ref: (ref: HTMLButtonElement) => void;
-  entry: DictionaryEntry;
-  isSelected: boolean;
-  handleSelect: (entry: DictionaryEntry) => void;
-}
-
-function TranslationItem({
-  ref,
-  entry,
-  isSelected,
-  handleSelect,
-}: TranslationItemProps) {
-  const renderDefinition = (d: DictionaryEntry['defintions'][number]) => {
-    if (d.links.length === 0) {
-      return <span key={d.definition}>{d.definition}</span>;
-    }
-
-    let lastIndex = 0;
-    const chunks = [];
-
-    for (const link of d.links) {
-      chunks.push(d.definition.slice(lastIndex, link.start));
-      chunks.push(
-        <TranslationHoverCard
-          key={`${entry.simplified} + ${link.word}`}
-          word={d.definition.slice(link.start, link.start + link.word.length)}
-        />
-      );
-      lastIndex = link.start + link.word.length;
-    }
-
-    // Append rest
-    if (lastIndex < d.definition.length) {
-      chunks.push(d.definition.slice(lastIndex));
-    }
-
-    return <span key={d.definition}>{chunks}</span>;
-  };
-
-  return (
-    <div className="pb-1">
-      <button
-        type="button"
-        ref={ref}
-        className={cn(
-          'bg-card hover:bg-muted flex h-fit w-full cursor-pointer flex-row items-center gap-4 rounded-md border px-4 py-2 text-start transition-all',
-          isSelected ? 'border-primary' : ''
-        )}
-        onClick={() => handleSelect(entry)}
-      >
-        <span className="flex-1 text-2xl">{entry.simplified}</span>
-        <span className="text-muted-foreground flex-1 text-sm">
-          {entry.pinyin}
-        </span>
-        <div className="flex flex-3 flex-col gap-2 text-sm">
-          {entry.defintions.map((def, index, arr) => (
-            <span
-              className="flex flex-col gap-2"
-              key={`${entry.simplified}-subdef-${index}`}
-            >
-              {renderDefinition(def)}
-              {index !== arr.length - 1 ? <Separator /> : null}
-            </span>
-          ))}
-        </div>
-      </button>
-    </div>
   );
 }
