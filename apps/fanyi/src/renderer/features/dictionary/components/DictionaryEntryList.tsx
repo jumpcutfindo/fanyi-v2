@@ -6,11 +6,8 @@ import { useDebounce } from 'use-debounce';
 import { DictionaryEntryCard } from '@renderer/components/DictionaryEntryCard';
 import { Input } from '@renderer/components/ui/Input';
 import { useSearchDictionaries } from '@renderer/features/dictionary/queries/searchDictionaries.query';
-import { useDictionariesSidebarStore } from '@renderer/stores/useDictionariesSidebarStore';
 
 export function DictionaryEntryList() {
-  const { selectedDictionary } = useDictionariesSidebarStore();
-
   const [inputValue, setInputValue] = useState('');
   const [debouncedSearchQuery] = useDebounce(inputValue, 300);
 

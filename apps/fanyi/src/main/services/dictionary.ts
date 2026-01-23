@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import Fuse from 'fuse.js';
 import * as pinyin from 'pinyin-pro';
-import { v4 as uuidv4 } from 'uuid';
 
 import {
   Dictionary,
