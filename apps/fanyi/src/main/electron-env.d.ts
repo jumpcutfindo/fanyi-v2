@@ -46,7 +46,7 @@ interface Window {
     getDictionaries(): Promise<DictionaryMinimal[]>;
     searchDictionaries(
       queryString: string,
-      limit?: number
+      options: DictionarySearchOptions
     ): Promise<DictionaryEntry[]>;
     createDictionary(dictionary: CreateDictionaryPayload): Promise<void>;
     deleteDictionary(id: string): Promise<void>;

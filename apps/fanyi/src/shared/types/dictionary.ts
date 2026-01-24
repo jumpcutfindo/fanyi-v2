@@ -46,6 +46,17 @@ export interface DictionaryEntry {
   }[];
 }
 
+interface AllSearchOptions {
+  space: 'all';
+}
+
+interface SpecificSearchOptions {
+  space: 'specific';
+  dictionaryId: string;
+}
+
+export type DictionarySearchOptions = AllSearchOptions | SpecificSearchOptions;
+
 export type CreateDictionaryPayload = Omit<
   Dictionary,
   'id' | 'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries' | 'type'

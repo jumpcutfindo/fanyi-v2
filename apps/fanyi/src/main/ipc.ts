@@ -117,9 +117,12 @@ export function registerIpcHandlers() {
   ipcMain.handle('get-dictionaries', async (_event) => {
     return listDictionaries();
   });
-  ipcMain.handle('search-dictionaries', async (_event, queryString, limit) => {
-    return searchDictionaries(queryString, limit);
-  });
+  ipcMain.handle(
+    'search-dictionaries',
+    async (_event, queryString, options) => {
+      return searchDictionaries(queryString, options);
+    }
+  );
   ipcMain.handle('create-dictionary', async (_event, dictionary) => {
     return createDictionary(dictionary);
   });

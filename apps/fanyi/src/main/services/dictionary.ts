@@ -12,6 +12,7 @@ import {
   Dictionary,
   DictionaryEntry,
   DictionaryMinimal,
+  DictionarySearchOptions,
   RawDictionaryEntry,
 } from '@shared/types/dictionary';
 
@@ -189,13 +190,29 @@ export function listDictionaries(): DictionaryMinimal[] {
   ];
 }
 
+function getDictionariesFromOptions(options: DictionarySearchOptions) {
+  switch (options.space) {
+    case 'specific':
+      if (options.dictionaryId === 'default') {
+        return [defaultDictionary];
+      }
+
+      return [
+        localDictionaries.find((dict) => dict.id === options.dictionaryId),
+      ];
+    case 'all':
+    default:
+      return [defaultDictionary, ...localDictionaries];
+  }
+}
+
 export function searchDictionaries(
   queryString: string,
-  limit: number
+  options: DictionarySearchOptions
 ): DictionaryEntry[] {
-  const activeDictionaries = [defaultDictionary];
+  const dictionaries = getDictionariesFromOptions(options);
 
-  const allEntries = activeDictionaries.flatMap((dict) =>
+  const allEntries = dictionaries.flatMap((dict) =>
     dict ? Object.values(dict.rawEntries) : []
   );
 
@@ -219,10 +236,7 @@ export function searchDictionaries(
   });
   const rawResults = fuse.search(queryString);
 
-  return getDictionaryEntries(rawResults.map((rr) => rr.item.simplified)).slice(
-    0,
-    limit
-  );
+  return getDictionaryEntries(rawResults.map((rr) => rr.item.simplified));
 }
 
 export function initLocalDictionaries() {

@@ -6,16 +6,24 @@ import { useDebounce } from 'use-debounce';
 import { DictionaryEntryCard } from '@renderer/components/DictionaryEntryCard';
 import { Input } from '@renderer/components/ui/Input';
 import { useSearchDictionaries } from '@renderer/features/dictionary/queries/searchDictionaries.query';
+import { useDictionariesSidebarStore } from '@renderer/stores/useDictionariesSidebarStore';
 
 export function DictionaryEntryList() {
+  const { selectedDictionary } = useDictionariesSidebarStore();
+
   const [inputValue, setInputValue] = useState('');
   const [debouncedSearchQuery] = useDebounce(inputValue, 300);
 
-  const { data: searchResults, isPending } =
-    useSearchDictionaries(debouncedSearchQuery);
+  const { data: searchResults, isPending } = useSearchDictionaries(
+    debouncedSearchQuery,
+    {
+      space: selectedDictionary ? 'specific' : 'all',
+      dictionaryId: selectedDictionary?.id ?? '',
+    }
+  );
 
   return (
-    <div className="flex w-full flex-col gap-3">
+    <div className="flex h-full w-full flex-col gap-3">
       <div className="flex flex-col gap-2">
         <Input onChange={(e) => setInputValue(e.target.value)} />
         {!isPending ? (
