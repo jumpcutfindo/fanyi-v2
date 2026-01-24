@@ -19,7 +19,6 @@ interface DictionaryFormDialogProps {
 
 interface DictionaryForm {
   name: string;
-  description: string;
   url?: string;
 }
 
@@ -80,20 +79,6 @@ export function DictionaryFormDialog({
             {formState.errors.name ? (
               <span className="text-destructive text-xs">
                 Please provide a name for this dictionary
-              </span>
-            ) : null}
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="description">
-              Description<span className="text-destructive">*</span>
-            </Label>
-            <Input
-              type="text"
-              {...register('description', { required: true })}
-            />
-            {formState.errors.description ? (
-              <span className="text-destructive text-xs">
-                Please provide a description for this dictionary
               </span>
             ) : null}
           </div>
