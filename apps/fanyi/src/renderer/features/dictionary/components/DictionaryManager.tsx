@@ -10,7 +10,8 @@ import { cn } from '@renderer/lib/utils';
 import { useDictionariesSidebarStore } from '@renderer/stores/useDictionariesSidebarStore';
 
 export function DictionaryManager() {
-  const { setSelectedDictionary } = useDictionariesSidebarStore();
+  const { selectedDictionary, setSelectedDictionary } =
+    useDictionariesSidebarStore();
 
   const { data: dictionaries } = useGetDictionaries();
 
@@ -33,7 +34,14 @@ export function DictionaryManager() {
           <DictionaryItem
             key={dictionary.name}
             dictionary={dictionary}
-            handleSelect={() => setSelectedDictionary(dictionary)}
+            handleSelect={() => {
+              if (selectedDictionary?.id === dictionary.id) {
+                setSelectedDictionary(null);
+                return;
+              }
+
+              setSelectedDictionary(dictionary);
+            }}
           />
         ))}
       </SidebarContent>

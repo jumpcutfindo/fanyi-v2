@@ -15,7 +15,7 @@ export function DictionaryEntryList() {
     useSearchDictionaries(debouncedSearchQuery);
 
   return (
-    <div className="flex w-full flex-col gap-3 p-4">
+    <div className="flex w-full flex-col gap-3">
       <div className="flex flex-col gap-2">
         <Input onChange={(e) => setInputValue(e.target.value)} />
         {!isPending ? (
