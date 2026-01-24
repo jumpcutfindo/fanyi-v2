@@ -287,3 +287,20 @@ export function createDictionary(dictionary: CreateDictionaryPayload) {
   });
   return newDictionary;
 }
+
+export function deleteDictionary(id: string) {
+  const index = localDictionaries.findIndex((dict) => dict.id === id);
+
+  if (index !== -1) {
+    const dictionary = localDictionaries[index];
+    localDictionaries.splice(index, 1);
+
+    // Remove from local files
+    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${id}.json`;
+    fs.unlinkSync(filePath);
+
+    console.log(`Deleted dictionary "${dictionary.name}" (${id})`);
+  } else {
+    console.warn(`Dictionary with ID ${id} not found`);
+  }
+}

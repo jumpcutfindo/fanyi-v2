@@ -49,6 +49,7 @@ interface Window {
       limit?: number
     ): Promise<DictionaryEntry[]>;
     createDictionary(dictionary: CreateDictionaryPayload): Promise<void>;
+    deleteDictionary(id: string): Promise<void>;
 
     getPreferences: () => Promise<UserPreferences>;
     setPreference: (

@@ -4,6 +4,7 @@ import { getOcrStatus, runOcr } from './services/ocr';
 
 import {
   createDictionary,
+  deleteDictionary,
   getDictionaryEntries,
   getDictionaryEntry,
   listDictionaries,
@@ -121,6 +122,9 @@ export function registerIpcHandlers() {
   });
   ipcMain.handle('create-dictionary', async (_event, dictionary) => {
     return createDictionary(dictionary);
+  });
+  ipcMain.handle('delete-dictionary', async (_event, id) => {
+    return deleteDictionary(id);
   });
 
   ipcMain.handle('get-preferences', async (_event) => {

@@ -69,6 +69,7 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('search-dictionaries', queryString, limit),
   createDictionary: (dictionary: CreateDictionaryPayload) =>
     ipcRenderer.invoke('create-dictionary', dictionary),
+  deleteDictionary: (id: string) => ipcRenderer.invoke('delete-dictionary', id),
 
   getPreferences: () => ipcRenderer.invoke('get-preferences'),
   setPreference: (
