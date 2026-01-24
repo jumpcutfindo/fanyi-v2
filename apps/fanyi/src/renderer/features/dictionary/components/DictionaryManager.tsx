@@ -1,5 +1,9 @@
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+
 import { DictionaryMinimal } from '@shared/types/dictionary';
 import { SidebarContent, SidebarHeader } from '@renderer/components/Sidebar';
+import { Button } from '@renderer/components/ui/Button';
 import { DictionaryFormDialog } from '@renderer/features/dictionary/components/DictionaryFormDialog';
 import { useGetDictionaries } from '@renderer/features/dictionary/queries/getDictionaries.query';
 import { cn } from '@renderer/lib/utils';
@@ -10,9 +14,20 @@ export function DictionaryManager() {
 
   const { data: dictionaries } = useGetDictionaries();
 
+  const [dictionaryDialogOpen, setDictionaryDialogOpen] = useState(false);
+
   return (
     <>
-      <SidebarHeader title="Dictionaries" />
+      <SidebarHeader title="Dictionaries">
+        <Button
+          variant="ghost"
+          type="button"
+          className="size-6 rounded-full"
+          onClick={() => setDictionaryDialogOpen(true)}
+        >
+          <Plus />
+        </Button>
+      </SidebarHeader>
       <SidebarContent>
         {dictionaries?.map((dictionary) => (
           <DictionaryItem
@@ -22,7 +37,11 @@ export function DictionaryManager() {
           />
         ))}
       </SidebarContent>
-      <DictionaryFormDialog open={true} mode="create" />
+      <DictionaryFormDialog
+        open={dictionaryDialogOpen}
+        setOpen={setDictionaryDialogOpen}
+        mode="create"
+      />
     </>
   );
 }

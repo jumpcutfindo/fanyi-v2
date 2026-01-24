@@ -12,6 +12,7 @@ import { useCreateDictionaryMutation } from '@renderer/features/dictionary/queri
 
 interface DictionaryFormDialogProps {
   open: boolean;
+  setOpen: (open: boolean) => void;
   mode: 'create' | 'edit';
 }
 
@@ -23,11 +24,22 @@ interface DictionaryForm {
 
 export function DictionaryFormDialog({
   open,
+  setOpen,
   mode,
 }: DictionaryFormDialogProps) {
   const { mutate: createDictionary } = useCreateDictionaryMutation();
 
-  const { register, handleSubmit, formState } = useForm<DictionaryForm>({});
+  const { register, handleSubmit, reset, formState } = useForm<DictionaryForm>(
+    {}
+  );
+
+  const handleClose = () => {
+    if (mode === 'create') {
+      reset();
+    }
+
+    setOpen(false);
+  };
 
   const onSubmit = (data: DictionaryForm) => {
     switch (mode) {
@@ -39,7 +51,16 @@ export function DictionaryFormDialog({
   };
 
   return (
-    <Dialog open={open}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          handleClose();
+        }
+
+        setOpen(isOpen);
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           {mode === 'create' ? 'Create new dictionary' : 'Edit dictionary'}
@@ -78,7 +99,7 @@ export function DictionaryFormDialog({
             <Button variant="default" type="submit">
               Create
             </Button>
-            <Button variant="outline" type="button">
+            <Button variant="outline" type="button" onClick={handleClose}>
               Cancel
             </Button>
           </div>
