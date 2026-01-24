@@ -52,12 +52,17 @@ interface DictionaryItemProps {
 }
 
 function DictionaryItem({ dictionary, handleSelect }: DictionaryItemProps) {
+  const { selectedDictionary } = useDictionariesSidebarStore();
+
   return (
     <div className="relative text-sm">
       <button
         type="button"
         className={cn(
-          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 text-start hover:cursor-pointer'
+          'hover:bg-muted flex w-full flex-col gap-2 rounded-sm border p-2 text-start hover:cursor-pointer',
+          selectedDictionary?.id === dictionary.id
+            ? 'border-primary bg-secondary'
+            : ''
         )}
         onClick={handleSelect}
       >
