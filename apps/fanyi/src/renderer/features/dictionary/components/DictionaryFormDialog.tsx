@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '@renderer/components/ui/Button';
 import {
@@ -44,7 +45,12 @@ export function DictionaryFormDialog({
   const onSubmit = (data: DictionaryForm) => {
     switch (mode) {
       case 'create':
-        return createDictionary(data);
+        return createDictionary(data, {
+          onSuccess: () => {
+            handleClose();
+            toast.success('Dictionary created!');
+          },
+        });
       case 'edit':
         return;
     }
