@@ -1,14 +1,43 @@
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, Trash, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { SidebarContainer } from '@renderer/components/Sidebar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@renderer/components/ui/AlertDialog';
 import { Button } from '@renderer/components/ui/Button';
 import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
+import { useDeleteDictionaryMutation } from '@renderer/features/dictionary/queries/deleteDictionary.mutation';
 import { useDictionariesSidebarStore } from '@renderer/stores/useDictionariesSidebarStore';
 
 export function DictionaryPage() {
   const { selectedDictionary, setSelectedDictionary } =
     useDictionariesSidebarStore();
+
+  const { mutate: deleteDictionary } = useDeleteDictionaryMutation();
+
+  const canDeleteDictionary =
+    selectedDictionary !== null && selectedDictionary.id !== 'default';
+
+  const handleDelete = () => {
+    if (selectedDictionary) {
+      deleteDictionary(selectedDictionary.id, {
+        onSuccess: () => {
+          toast.success('Dictionary deleted!');
+          setSelectedDictionary(null);
+        },
+      });
+    }
+  };
 
   return (
     <>
@@ -20,8 +49,8 @@ export function DictionaryPage() {
           {selectedDictionary ? (
             <Button
               variant="ghost"
+              size="icon"
               type="button"
-              className="size-6 rounded-full"
               onClick={() => setSelectedDictionary(null)}
             >
               <X />
@@ -35,6 +64,39 @@ export function DictionaryPage() {
                 : 'All dictionaries'}
             </span>
           </span>
+          {canDeleteDictionary ? (
+            <div className="ms-auto flex flex-row justify-end">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="icon">
+                    <Trash />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Delete dictionary &quot;{selectedDictionary.name}&quot;?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this dictionary? This
+                      action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel variant="outline">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      variant="destructive"
+                      onClick={handleDelete}
+                    >
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          ) : null}
         </div>
         <DictionaryEntryList />
       </div>

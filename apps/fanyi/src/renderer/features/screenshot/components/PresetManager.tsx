@@ -27,7 +27,7 @@ export function PresetManager() {
         <Button
           variant="ghost"
           type="button"
-          className="size-6 rounded-full"
+          size="icon"
           onClick={() => {
             setSidebarState({
               state: 'editor',

@@ -51,12 +51,7 @@ export function SidebarHeader({ title, children, onBack }: SidebarHeaderProps) {
     <div className="flex flex-row items-center justify-between px-4 pt-4">
       <span className="flex h-full flex-row items-center gap-2">
         {onBack ? (
-          <Button
-            className="size-6 rounded-full"
-            onClick={onBack}
-            variant="ghost"
-            type="button"
-          >
+          <Button size="icon" onClick={onBack} variant="ghost" type="button">
             <ArrowLeft />
           </Button>
         ) : null}
