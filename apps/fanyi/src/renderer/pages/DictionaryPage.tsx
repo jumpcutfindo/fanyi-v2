@@ -26,7 +26,7 @@ export function DictionaryPage() {
   const { mutate: deleteDictionary } = useDeleteDictionaryMutation();
 
   const canDeleteDictionary =
-    selectedDictionary !== null && selectedDictionary.id !== 'default';
+    selectedDictionary !== null && selectedDictionary.type !== 'system';
 
   const handleDelete = () => {
     if (selectedDictionary) {

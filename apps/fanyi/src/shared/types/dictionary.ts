@@ -7,7 +7,7 @@ const rawDictionaryEntrySchema = z.object({
   definition: z.string(),
 });
 
-export const storedDictionarySchema = z.object({
+export const customDictionarySchema = z.object({
   id: z.string(),
   name: z.string(),
   rawEntries: z.array(rawDictionaryEntrySchema),
@@ -16,10 +16,11 @@ export const storedDictionarySchema = z.object({
   modifiedOn: z.coerce.date(),
 });
 
-export type StoredDictionary = z.infer<typeof storedDictionarySchema>;
+export type CustomDictionary = z.infer<typeof customDictionarySchema>;
 
-export type Dictionary = z.infer<typeof storedDictionarySchema> & {
+export type Dictionary = z.infer<typeof customDictionarySchema> & {
   // Keep the post-processed version out of the base schema
+  type: 'system' | 'custom';
   wordMap: Record<string, DictionaryEntry>;
 };
 
@@ -47,5 +48,5 @@ export interface DictionaryEntry {
 
 export type CreateDictionaryPayload = Omit<
   Dictionary,
-  'id' | 'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries'
+  'id' | 'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries' | 'type'
 >;

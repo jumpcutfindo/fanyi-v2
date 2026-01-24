@@ -7,12 +7,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   CreateDictionaryPayload,
+  CustomDictionary,
+  customDictionarySchema,
   Dictionary,
   DictionaryEntry,
   DictionaryMinimal,
   RawDictionaryEntry,
-  StoredDictionary,
-  storedDictionarySchema,
 } from '@shared/types/dictionary';
 
 const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
@@ -111,6 +111,7 @@ export function initDefaultDictionary() {
 
   defaultDictionary = {
     id: 'default',
+    type: 'custom',
     name: 'Default (CEDICT)',
     createdOn: new Date(),
     modifiedOn: new Date(),
@@ -169,6 +170,7 @@ export function listDictionaries(): DictionaryMinimal[] {
   return [
     {
       id: defaultDictionary.id,
+      type: 'system',
       name: defaultDictionary.name,
       url: defaultDictionary.url,
       createdOn: defaultDictionary.createdOn,
@@ -177,6 +179,7 @@ export function listDictionaries(): DictionaryMinimal[] {
     },
     ...localDictionaries.map((dict) => ({
       id: dict.id,
+      type: 'custom' as const,
       name: dict.name,
       url: dict.url,
       createdOn: dict.createdOn,
@@ -238,7 +241,7 @@ export function initLocalDictionaries() {
       const fileData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
       // Check whether data follows schema
-      const parsedDictionary = storedDictionarySchema.safeParse(fileData);
+      const parsedDictionary = customDictionarySchema.safeParse(fileData);
 
       // If unable to parse, skip
       if (parsedDictionary.error) {
@@ -248,6 +251,7 @@ export function initLocalDictionaries() {
       } else {
         localDictionaries.push({
           ...parsedDictionary.data,
+          type: 'custom',
           wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
         });
 
@@ -262,7 +266,7 @@ export function initLocalDictionaries() {
 }
 
 export function createDictionary(dictionary: CreateDictionaryPayload) {
-  const newDictionary: StoredDictionary = {
+  const newDictionary: CustomDictionary = {
     ...dictionary,
     id: uuidv4(),
     createdOn: new Date(),
@@ -271,7 +275,7 @@ export function createDictionary(dictionary: CreateDictionaryPayload) {
   };
 
   // Run sanity check on the file's format
-  const parsedDictionary = storedDictionarySchema.safeParse(newDictionary);
+  const parsedDictionary = customDictionarySchema.safeParse(newDictionary);
 
   if (parsedDictionary.error) {
     throw new Error(parsedDictionary.error.message);
@@ -283,6 +287,7 @@ export function createDictionary(dictionary: CreateDictionaryPayload) {
 
   localDictionaries.push({
     ...newDictionary,
+    type: 'custom',
     wordMap: {},
   });
   return newDictionary;
