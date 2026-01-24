@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { app } from 'electron';
 import Fuse from 'fuse.js';
 import * as pinyin from 'pinyin-pro';
 
@@ -8,9 +9,13 @@ import {
   DictionaryEntry,
   DictionaryMinimal,
   RawDictionaryEntry,
+  storedDictionarySchema,
 } from '@shared/types/dictionary';
 
+const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
+
 let defaultDictionary: Dictionary | null = null;
+const localDictionaries: Dictionary[] = [];
 
 function rawEntriesToMap(
   rawEntries: RawDictionaryEntry[]
@@ -78,7 +83,7 @@ function rawEntriesToMap(
 }
 
 export function initDefaultDictionary() {
-  console.log('Loading dictionary...');
+  console.log('Loading default dictionary...');
 
   // Retrieve the contents of the dictionary file
   const rawDictionary = fs.readFileSync(
@@ -204,4 +209,39 @@ export function searchDictionaries(
     0,
     limit
   );
+}
+
+export function initLocalDictionaries() {
+  console.log('Loading local dictionaries...', LOCAL_DICTIONARIES_DIR);
+
+  // If folder doesn't exist, create
+  if (!fs.existsSync(LOCAL_DICTIONARIES_DIR)) {
+    fs.mkdirSync(LOCAL_DICTIONARIES_DIR);
+  }
+
+  // Look for all JSON files inside and load the data
+  const files = fs.readdirSync(LOCAL_DICTIONARIES_DIR);
+  for (const file of files) {
+    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${file}`;
+    const fileData = fs.readFileSync(filePath, 'utf-8');
+
+    // Check whether data follows schema
+    const parsedDictionary = storedDictionarySchema.safeParse(fileData);
+
+    // If unable to parse, skip
+    if (parsedDictionary.error) {
+      console.warn(
+        `Invalid dictionary data in ${filePath}: ${parsedDictionary.error.message}`
+      );
+    } else {
+      localDictionaries.push({
+        ...parsedDictionary.data,
+        wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
+      });
+
+      console.log(
+        `Loaded dictionary ${parsedDictionary.data.name} with ${parsedDictionary.data.rawEntries.length} entries`
+      );
+    }
+  }
 }
