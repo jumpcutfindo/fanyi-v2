@@ -1,0 +1,89 @@
+import { useForm } from 'react-hook-form';
+
+import { Button } from '@renderer/components/ui/Button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+} from '@renderer/components/ui/Dialog';
+import { Input } from '@renderer/components/ui/Input';
+import { Label } from '@renderer/components/ui/Label';
+import { useCreateDictionaryMutation } from '@renderer/features/dictionary/queries/createDictionary.mutation';
+
+interface DictionaryFormDialogProps {
+  open: boolean;
+  mode: 'create' | 'edit';
+}
+
+interface DictionaryForm {
+  name: string;
+  description: string;
+  url?: string;
+}
+
+export function DictionaryFormDialog({
+  open,
+  mode,
+}: DictionaryFormDialogProps) {
+  const { mutate: createDictionary } = useCreateDictionaryMutation();
+
+  const { register, handleSubmit, formState } = useForm<DictionaryForm>({});
+
+  const onSubmit = (data: DictionaryForm) => {
+    switch (mode) {
+      case 'create':
+        return createDictionary(data);
+      case 'edit':
+        return;
+    }
+  };
+
+  return (
+    <Dialog open={open}>
+      <DialogContent>
+        <DialogHeader>
+          {mode === 'create' ? 'Create new dictionary' : 'Edit dictionary'}
+        </DialogHeader>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name">
+              Name<span className="text-destructive">*</span>
+            </Label>
+            <Input type="text" {...register('name', { required: true })} />
+            {formState.errors.name ? (
+              <span className="text-destructive text-xs">
+                Please provide a name for this dictionary
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="description">
+              Description<span className="text-destructive">*</span>
+            </Label>
+            <Input
+              type="text"
+              {...register('description', { required: true })}
+            />
+            {formState.errors.description ? (
+              <span className="text-destructive text-xs">
+                Please provide a description for this dictionary
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="url">URL</Label>
+            <Input type="text" {...register('url')} />
+          </div>
+          <div className="flex flex-row gap-2">
+            <Button variant="default" type="submit">
+              Create
+            </Button>
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

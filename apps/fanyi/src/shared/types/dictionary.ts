@@ -12,9 +12,11 @@ export const storedDictionarySchema = z.object({
   name: z.string(),
   rawEntries: z.array(rawDictionaryEntrySchema),
   url: z.string().optional(),
-  createdOn: z.date(),
-  modifiedOn: z.date(),
+  createdOn: z.coerce.date(),
+  modifiedOn: z.coerce.date(),
 });
+
+export type StoredDictionary = z.infer<typeof storedDictionarySchema>;
 
 export type Dictionary = z.infer<typeof storedDictionarySchema> & {
   // Keep the post-processed version out of the base schema
@@ -45,5 +47,5 @@ export interface DictionaryEntry {
 
 export type CreateDictionaryPayload = Omit<
   Dictionary,
-  'id' | 'createdOn' | 'modifiedOn'
+  'id' | 'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries'
 >;

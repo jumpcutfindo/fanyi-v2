@@ -6,10 +6,12 @@ import * as pinyin from 'pinyin-pro';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
+  CreateDictionaryPayload,
   Dictionary,
   DictionaryEntry,
   DictionaryMinimal,
   RawDictionaryEntry,
+  StoredDictionary,
   storedDictionarySchema,
 } from '@shared/types/dictionary';
 
@@ -173,6 +175,14 @@ export function listDictionaries(): DictionaryMinimal[] {
       modifiedOn: defaultDictionary.modifiedOn,
       wordCount: Object.keys(defaultDictionary.wordMap).length,
     },
+    ...localDictionaries.map((dict) => ({
+      id: dict.id,
+      name: dict.name,
+      url: dict.url,
+      createdOn: dict.createdOn,
+      modifiedOn: dict.modifiedOn,
+      wordCount: Object.keys(dict.wordMap).length,
+    })),
   ];
 }
 
@@ -223,38 +233,41 @@ export function initLocalDictionaries() {
   // Look for all JSON files inside and load the data
   const files = fs.readdirSync(LOCAL_DICTIONARIES_DIR);
   for (const file of files) {
-    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${file}`;
-    const fileData = fs.readFileSync(filePath, 'utf-8');
+    try {
+      const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${file}`;
+      const fileData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
-    // Check whether data follows schema
-    const parsedDictionary = storedDictionarySchema.safeParse(fileData);
+      // Check whether data follows schema
+      const parsedDictionary = storedDictionarySchema.safeParse(fileData);
 
-    // If unable to parse, skip
-    if (parsedDictionary.error) {
-      console.warn(
-        `Invalid dictionary data in ${filePath}: ${parsedDictionary.error.message}`
-      );
-    } else {
-      localDictionaries.push({
-        ...parsedDictionary.data,
-        wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
-      });
+      // If unable to parse, skip
+      if (parsedDictionary.error) {
+        console.warn(
+          `Invalid dictionary data in ${filePath}: ${parsedDictionary.error.message}`
+        );
+      } else {
+        localDictionaries.push({
+          ...parsedDictionary.data,
+          wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
+        });
 
-      console.log(
-        `Loaded dictionary ${parsedDictionary.data.name} with ${parsedDictionary.data.rawEntries.length} entries`
-      );
+        console.log(
+          `Loaded dictionary ${parsedDictionary.data.name} with ${parsedDictionary.data.rawEntries.length} entries`
+        );
+      }
+    } catch (e) {
+      console.warn(`Failed to load dictionary ${file}: ${e}`);
     }
   }
 }
 
-export function createDictionary(
-  dictionary: Omit<Dictionary, 'id' | 'createdOn' | 'modifiedOn'>
-) {
-  const newDictionary = {
+export function createDictionary(dictionary: CreateDictionaryPayload) {
+  const newDictionary: StoredDictionary = {
     ...dictionary,
     id: uuidv4(),
     createdOn: new Date(),
     modifiedOn: new Date(),
+    rawEntries: [],
   };
 
   // Run sanity check on the file's format
@@ -267,4 +280,10 @@ export function createDictionary(
     const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${newDictionary.id}.json`;
     fs.writeFileSync(filePath, JSON.stringify(newDictionary, null, 2));
   }
+
+  localDictionaries.push({
+    ...newDictionary,
+    wordMap: {},
+  });
+  return newDictionary;
 }

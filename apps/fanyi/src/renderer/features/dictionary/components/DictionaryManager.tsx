@@ -1,5 +1,6 @@
 import { DictionaryMinimal } from '@shared/types/dictionary';
 import { SidebarContent, SidebarHeader } from '@renderer/components/Sidebar';
+import { DictionaryFormDialog } from '@renderer/features/dictionary/components/DictionaryFormDialog';
 import { useGetDictionaries } from '@renderer/features/dictionary/queries/getDictionaries.query';
 import { cn } from '@renderer/lib/utils';
 import { useDictionariesSidebarStore } from '@renderer/stores/useDictionariesSidebarStore';
@@ -21,6 +22,7 @@ export function DictionaryManager() {
           />
         ))}
       </SidebarContent>
+      <DictionaryFormDialog open={true} mode="create" />
     </>
   );
 }
