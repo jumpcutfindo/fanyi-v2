@@ -17,11 +17,10 @@ import { Button } from '@renderer/components/ui/Button';
 import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
 import { useDeleteDictionaryMutation } from '@renderer/features/dictionary/queries/deleteDictionary.mutation';
-import { useDictionariesSidebarStore } from '@renderer/stores/useDictionariesSidebarStore';
+import { useDictionariesStore } from '@renderer/stores/useDictionariesStore';
 
 export function DictionaryPage() {
-  const { selectedDictionary, setSelectedDictionary } =
-    useDictionariesSidebarStore();
+  const { selectedDictionary, setSelectedDictionary } = useDictionariesStore();
 
   const { mutate: deleteDictionary } = useDeleteDictionaryMutation();
 
