@@ -42,3 +42,8 @@ export interface DictionaryEntry {
     }[];
   }[];
 }
+
+export type CreateDictionaryPayload = Omit<
+  Dictionary,
+  'id' | 'createdOn' | 'modifiedOn'
+>;

@@ -48,6 +48,7 @@ interface Window {
       queryString: string,
       limit?: number
     ): Promise<DictionaryEntry[]>;
+    createDictionary(dictionary: CreateDictionaryPayload): Promise<void>;
 
     getPreferences: () => Promise<UserPreferences>;
     setPreference: (

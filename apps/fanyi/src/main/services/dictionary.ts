@@ -3,6 +3,7 @@ import path from 'path';
 import { app } from 'electron';
 import Fuse from 'fuse.js';
 import * as pinyin from 'pinyin-pro';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Dictionary,
@@ -243,5 +244,27 @@ export function initLocalDictionaries() {
         `Loaded dictionary ${parsedDictionary.data.name} with ${parsedDictionary.data.rawEntries.length} entries`
       );
     }
+  }
+}
+
+export function createDictionary(
+  dictionary: Omit<Dictionary, 'id' | 'createdOn' | 'modifiedOn'>
+) {
+  const newDictionary = {
+    ...dictionary,
+    id: uuidv4(),
+    createdOn: new Date(),
+    modifiedOn: new Date(),
+  };
+
+  // Run sanity check on the file's format
+  const parsedDictionary = storedDictionarySchema.safeParse(newDictionary);
+
+  if (parsedDictionary.error) {
+    throw new Error(parsedDictionary.error.message);
+  } else {
+    // Write the dictionary to a file
+    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${newDictionary.id}.json`;
+    fs.writeFileSync(filePath, JSON.stringify(newDictionary, null, 2));
   }
 }

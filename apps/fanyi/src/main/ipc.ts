@@ -3,6 +3,7 @@ import { app, ipcMain, shell } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
 import {
+  createDictionary,
   getDictionaryEntries,
   getDictionaryEntry,
   listDictionaries,
@@ -117,6 +118,9 @@ export function registerIpcHandlers() {
   });
   ipcMain.handle('search-dictionaries', async (_event, queryString, limit) => {
     return searchDictionaries(queryString, limit);
+  });
+  ipcMain.handle('create-dictionary', async (_event, dictionary) => {
+    return createDictionary(dictionary);
   });
 
   ipcMain.handle('get-preferences', async (_event) => {
