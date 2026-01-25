@@ -15,6 +15,11 @@ import {
   AlertDialogTrigger,
 } from '@renderer/components/ui/AlertDialog';
 import { Button } from '@renderer/components/ui/Button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@renderer/components/ui/Tooltip';
 import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
 import { useDeleteDictionaryMutation } from '@renderer/features/dictionary/queries/deleteDictionary.mutation';
@@ -80,11 +85,16 @@ export function DictionaryPage() {
           {canDeleteDictionary ? (
             <div className="ms-auto flex flex-row justify-end">
               <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="icon">
-                    <Trash />
-                  </Button>
-                </AlertDialogTrigger>
+                <Tooltip>
+                  <AlertDialogTrigger asChild>
+                    <TooltipTrigger asChild>
+                      <Button variant="destructive" size="icon">
+                        <Trash />
+                      </Button>
+                    </TooltipTrigger>
+                  </AlertDialogTrigger>
+                  <TooltipContent>Delete dictionary</TooltipContent>
+                </Tooltip>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
