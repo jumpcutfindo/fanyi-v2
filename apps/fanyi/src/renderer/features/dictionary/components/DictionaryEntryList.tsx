@@ -34,7 +34,7 @@ export function DictionaryEntryList() {
       <div className="flex flex-col gap-2">
         <Input
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Search for a word / pinyin / definition..."
+          placeholder="Search for a word, pinyin or definition..."
         />
         {!isPending ? (
           <span className="text-muted-foreground text-xs">
