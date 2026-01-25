@@ -52,7 +52,7 @@ export function DictionaryPage() {
               type="button"
               onClick={() => setSelectedDictionary(null)}
             >
-              <X />
+              <ArrowLeft />
             </Button>
           ) : null}
           <span className="text-sm">
