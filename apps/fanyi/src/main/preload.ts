@@ -13,7 +13,6 @@ import {
   CustomScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
-import { updateDictionary } from '@main/services/dictionary';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
