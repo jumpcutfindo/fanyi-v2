@@ -87,7 +87,7 @@ export function DictionaryPage() {
           </span>
           {canModifyDictionary ? (
             <>
-              <div className="ms-auto flex flex-row justify-end gap-3">
+              <div className="ms-auto flex flex-row justify-end gap-2">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
