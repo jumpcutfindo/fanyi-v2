@@ -4,6 +4,7 @@ import {
   CreateDictionaryPayload,
   DictionaryEntry,
   DictionarySearchOptions,
+  UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 import { OcrResponse } from '@shared/types/ocr';
 import { UserPreferences } from '@shared/types/preferences';
@@ -12,6 +13,7 @@ import {
   CustomScreenshotPreset,
   ScreenshotSource,
 } from '@shared/types/screenshot';
+import { updateDictionary } from '@main/services/dictionary';
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
@@ -71,6 +73,8 @@ contextBridge.exposeInMainWorld('api', {
   createDictionary: (dictionary: CreateDictionaryPayload) =>
     ipcRenderer.invoke('create-dictionary', dictionary),
   deleteDictionary: (id: string) => ipcRenderer.invoke('delete-dictionary', id),
+  updateDictionary: (dictionary: UpdateDictionaryPayload) =>
+    ipcRenderer.invoke('update-dictionary', dictionary),
 
   getPreferences: () => ipcRenderer.invoke('get-preferences'),
   setPreference: (

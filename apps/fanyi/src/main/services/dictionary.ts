@@ -14,6 +14,7 @@ import {
   DictionaryMinimal,
   DictionarySearchOptions,
   RawDictionaryEntry,
+  UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 
 const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
@@ -84,6 +85,17 @@ function rawEntriesToMap(
     },
     {} as Record<string, DictionaryEntry>
   );
+}
+
+function getMinimalDictionary(dictionary: Dictionary): DictionaryMinimal {
+  return {
+    id: dictionary.id,
+    type: dictionary.type,
+    name: dictionary.name,
+    createdOn: dictionary.createdOn,
+    modifiedOn: dictionary.modifiedOn,
+    wordCount: Object.keys(dictionary.wordMap).length,
+  };
 }
 
 export function initDefaultDictionary() {
@@ -169,24 +181,8 @@ export function listDictionaries(): DictionaryMinimal[] {
   }
 
   return [
-    {
-      id: defaultDictionary.id,
-      type: 'system',
-      name: defaultDictionary.name,
-      url: defaultDictionary.url,
-      createdOn: defaultDictionary.createdOn,
-      modifiedOn: defaultDictionary.modifiedOn,
-      wordCount: Object.keys(defaultDictionary.wordMap).length,
-    },
-    ...localDictionaries.map((dict) => ({
-      id: dict.id,
-      type: 'custom' as const,
-      name: dict.name,
-      url: dict.url,
-      createdOn: dict.createdOn,
-      modifiedOn: dict.modifiedOn,
-      wordCount: Object.keys(dict.wordMap).length,
-    })),
+    getMinimalDictionary(defaultDictionary),
+    ...localDictionaries.map((dict) => getMinimalDictionary(dict)),
   ];
 }
 
@@ -291,6 +287,24 @@ export function initLocalDictionaries() {
   }
 }
 
+function saveLocalDictionary(dictionary: CustomDictionary) {
+  // Run sanity check on the file's format
+  const parsedDictionary = customDictionarySchema.safeParse(dictionary);
+
+  if (parsedDictionary.error) {
+    throw new Error(parsedDictionary.error.message);
+  } else {
+    // Write the dictionary to a file
+    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${dictionary.id}.json`;
+    fs.writeFileSync(filePath, JSON.stringify(dictionary, null, 2));
+  }
+}
+
+function deleteLocalDictionary(id: string) {
+  const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${id}.json`;
+  fs.unlinkSync(filePath);
+}
+
 export function createDictionary(dictionary: CreateDictionaryPayload) {
   const newDictionary: CustomDictionary = {
     ...dictionary,
@@ -300,23 +314,19 @@ export function createDictionary(dictionary: CreateDictionaryPayload) {
     rawEntries: [],
   };
 
-  // Run sanity check on the file's format
-  const parsedDictionary = customDictionarySchema.safeParse(newDictionary);
+  // Save dictionary
+  saveLocalDictionary(newDictionary);
 
-  if (parsedDictionary.error) {
-    throw new Error(parsedDictionary.error.message);
-  } else {
-    // Write the dictionary to a file
-    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${newDictionary.id}.json`;
-    fs.writeFileSync(filePath, JSON.stringify(newDictionary, null, 2));
-  }
-
-  localDictionaries.push({
+  // Add dictionary to list
+  const fullDictionary = {
     ...newDictionary,
-    type: 'custom',
+    type: 'custom' as const,
     wordMap: {},
-  });
-  return newDictionary;
+  };
+
+  localDictionaries.push(fullDictionary);
+
+  return getMinimalDictionary(fullDictionary);
 }
 
 export function deleteDictionary(id: string) {
@@ -327,11 +337,32 @@ export function deleteDictionary(id: string) {
     localDictionaries.splice(index, 1);
 
     // Remove from local files
-    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${id}.json`;
-    fs.unlinkSync(filePath);
+    deleteLocalDictionary(id);
 
     console.log(`Deleted dictionary "${dictionary.name}" (${id})`);
   } else {
     console.warn(`Dictionary with ID ${id} not found`);
+  }
+}
+
+export function updateDictionary(dictionary: UpdateDictionaryPayload) {
+  const index = localDictionaries.findIndex(
+    (dict) => dict.id === dictionary.id
+  );
+
+  if (index !== -1) {
+    localDictionaries[index] = {
+      ...localDictionaries[index],
+      ...dictionary,
+    };
+
+    // Write updates to file
+    saveLocalDictionary(localDictionaries[index]);
+
+    console.log(`Updated dictionary "${dictionary.name}" (${dictionary.id})`);
+
+    return getMinimalDictionary(localDictionaries[index]);
+  } else {
+    console.warn(`Dictionary with ID ${dictionary.id} not found`);
   }
 }

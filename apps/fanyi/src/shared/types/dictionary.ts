@@ -66,3 +66,8 @@ export type CreateDictionaryPayload = Omit<
   Dictionary,
   'id' | 'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries' | 'type'
 >;
+
+export type UpdateDictionaryPayload = Omit<
+  Dictionary,
+  'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries' | 'type'
+>;

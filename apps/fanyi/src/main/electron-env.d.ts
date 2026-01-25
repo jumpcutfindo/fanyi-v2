@@ -48,8 +48,13 @@ interface Window {
       queryString: string,
       options: DictionarySearchOptions
     ): Promise<DictionaryEntry[]>;
-    createDictionary(dictionary: CreateDictionaryPayload): Promise<void>;
+    createDictionary(
+      dictionary: CreateDictionaryPayload
+    ): Promise<DictionaryMinimal>;
     deleteDictionary(id: string): Promise<void>;
+    updateDictionary(
+      dictionary: UpdateDictionaryPayload
+    ): Promise<DictionaryMinimal>;
 
     getPreferences: () => Promise<UserPreferences>;
     setPreference: (

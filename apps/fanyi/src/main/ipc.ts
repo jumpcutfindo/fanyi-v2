@@ -9,6 +9,7 @@ import {
   getDictionaryEntry,
   listDictionaries,
   searchDictionaries,
+  updateDictionary,
 } from '@main/services/dictionary';
 import {
   disableKeybinds,
@@ -128,6 +129,9 @@ export function registerIpcHandlers() {
   });
   ipcMain.handle('delete-dictionary', async (_event, id) => {
     return deleteDictionary(id);
+  });
+  ipcMain.handle('update-dictionary', async (_event, dictionary) => {
+    return updateDictionary(dictionary);
   });
 
   ipcMain.handle('get-preferences', async (_event) => {

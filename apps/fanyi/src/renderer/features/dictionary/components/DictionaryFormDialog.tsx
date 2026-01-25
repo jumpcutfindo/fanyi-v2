@@ -10,28 +10,36 @@ import {
 import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
 import { useCreateDictionaryMutation } from '@renderer/features/dictionary/queries/createDictionary.mutation';
-
-interface DictionaryFormDialogProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  mode: 'create' | 'edit';
-}
+import { useUpdateDictionaryMutation } from '@renderer/features/dictionary/queries/updateDictionary.mutation';
+import { useDictionariesStore } from '@renderer/stores/useDictionariesStore';
 
 interface DictionaryForm {
   name: string;
   url?: string;
 }
 
+interface DictionaryFormDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  mode: 'create' | 'edit';
+
+  initialState?: DictionaryForm & { id: string };
+}
+
 export function DictionaryFormDialog({
   open,
   setOpen,
   mode,
+  initialState,
 }: DictionaryFormDialogProps) {
-  const { mutate: createDictionary } = useCreateDictionaryMutation();
+  const { selectedDictionary, setSelectedDictionary } = useDictionariesStore();
 
-  const { register, handleSubmit, reset, formState } = useForm<DictionaryForm>(
-    {}
-  );
+  const { mutate: createDictionary } = useCreateDictionaryMutation();
+  const { mutate: updateDictionary } = useUpdateDictionaryMutation();
+
+  const { register, handleSubmit, reset, formState } = useForm<DictionaryForm>({
+    defaultValues: initialState,
+  });
 
   const handleClose = () => {
     if (mode === 'create') {
@@ -51,7 +59,23 @@ export function DictionaryFormDialog({
           },
         });
       case 'edit':
-        return;
+        if (!initialState) {
+          return;
+        }
+
+        return updateDictionary(
+          { ...data, id: initialState.id },
+          {
+            onSuccess: (newDictionary) => {
+              handleClose();
+              toast.success('Dictionary updated!');
+
+              if (selectedDictionary?.id === initialState.id) {
+                setSelectedDictionary(newDictionary);
+              }
+            },
+          }
+        );
     }
   };
 
@@ -88,7 +112,7 @@ export function DictionaryFormDialog({
           </div>
           <div className="flex flex-row gap-2">
             <Button variant="default" type="submit">
-              Create
+              {mode === 'create' ? 'Create' : 'Save'}
             </Button>
             <Button variant="outline" type="button" onClick={handleClose}>
               Cancel
