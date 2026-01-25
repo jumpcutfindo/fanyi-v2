@@ -212,12 +212,22 @@ export function searchDictionaries(
 ): DictionaryEntry[] {
   const dictionaries = getDictionariesFromOptions(options);
 
+  function spliceResult(entries: DictionaryEntry[]) {
+    return entries.splice(options.offset, options.limit);
+  }
+
   const allEntries = dictionaries.flatMap((dict) =>
     dict ? Object.values(dict.rawEntries) : []
   );
 
-  if (allEntries.length === 0 || !queryString) {
+  if (allEntries.length === 0) {
     return [];
+  }
+
+  if (!queryString || queryString === '') {
+    return spliceResult(
+      getDictionaryEntries(allEntries.map((entry) => entry.simplified))
+    );
   }
 
   const fuse = new Fuse(allEntries, {
@@ -236,7 +246,9 @@ export function searchDictionaries(
   });
   const rawResults = fuse.search(queryString);
 
-  return getDictionaryEntries(rawResults.map((rr) => rr.item.simplified));
+  return spliceResult(
+    getDictionaryEntries(rawResults.map((rr) => rr.item.simplified))
+  );
 }
 
 export function initLocalDictionaries() {

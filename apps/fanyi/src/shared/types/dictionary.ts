@@ -46,14 +46,19 @@ export interface DictionaryEntry {
   }[];
 }
 
-interface AllSearchOptions {
-  space: 'all';
+interface BaseSearchOptions {
+  offset: number;
+  limit: number;
 }
 
-interface SpecificSearchOptions {
+type AllSearchOptions = BaseSearchOptions & {
+  space: 'all';
+};
+
+type SpecificSearchOptions = BaseSearchOptions & {
   space: 'specific';
   dictionaryId: string;
-}
+};
 
 export type DictionarySearchOptions = AllSearchOptions | SpecificSearchOptions;
 
