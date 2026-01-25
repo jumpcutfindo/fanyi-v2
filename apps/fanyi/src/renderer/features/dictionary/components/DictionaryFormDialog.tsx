@@ -53,9 +53,11 @@ export function DictionaryFormDialog({
     switch (mode) {
       case 'create':
         return createDictionary(data, {
-          onSuccess: () => {
+          onSuccess: (newDictionary) => {
             handleClose();
             toast.success('Dictionary created!');
+
+            setSelectedDictionary(newDictionary);
           },
         });
       case 'edit':
