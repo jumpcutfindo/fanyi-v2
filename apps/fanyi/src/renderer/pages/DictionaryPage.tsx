@@ -1,4 +1,5 @@
 import { ArrowLeft, Trash, X } from 'lucide-react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { SidebarContainer } from '@renderer/components/Sidebar';
@@ -37,6 +38,19 @@ export function DictionaryPage() {
       });
     }
   };
+
+  // Handle 'Esc' key
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedDictionary) {
+        setSelectedDictionary(null);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [setSelectedDictionary]);
 
   return (
     <>
