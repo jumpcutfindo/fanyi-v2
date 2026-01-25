@@ -124,7 +124,7 @@ export function initDefaultDictionary() {
 
   defaultDictionary = {
     id: 'default',
-    type: 'custom',
+    type: 'system',
     name: 'Default (CEDICT)',
     createdOn: new Date(),
     modifiedOn: new Date(),
