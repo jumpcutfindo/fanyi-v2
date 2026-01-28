@@ -4,7 +4,7 @@ import glob
 import os
 from shutil import rmtree
 import sys
-
+from . import logger
 
 def handle_pyinstaller_folders():
     """Cleans up leaked temporary folders from previous PyInstaller runs."""
@@ -21,34 +21,30 @@ def handle_pyinstaller_folders():
 
         temp_folders = glob.glob(os.path.join(temp_dir, "_MEI*"))
 
-        print(
-            f"Found {len(temp_folders)} temp folders matching _MEI* pattern",
-            file=sys.stderr,
+        logger.info(
+            f"Found {len(temp_folders)} temp folders matching _MEI* pattern"
         )
 
         for folder in temp_folders:
             # Check if file "fanyi" exists in the folder
             if not os.path.exists(os.path.join(folder, "fanyi")):
-                print(
-                    f"Folder {folder} does not contain file 'fanyi', skipping delete",
-                    file=sys.stderr,
+                logger.info(
+                    f"Folder {folder} does not contain file 'fanyi', skipping delete"
                 )
                 continue
 
             # Check that this isn't the current temp file being used
             if folder == base_path:
-                print(
-                    f"Folder {folder} is the current temp file being used, skipping delete",
-                    file=sys.stderr,
+                logger.info(
+                    f"Folder {folder} is the current temp file being used, skipping delete"
                 )
                 continue
 
             # Delete old folder
-            print(f"Deleting old folder: {folder}", file=sys.stderr)
+            logger.info(f"Deleting old folder: {folder}")
             rmtree(folder)
     except Exception:
-        print(
-            "Exception occurred when trying to handle PyInstaller folders",
-            file=sys.stderr,
+        logger.info(
+            "Exception occurred when trying to handle PyInstaller folders"
         )
-        print(Exception, file=sys.stderr)
+        logger.info(Exception, )

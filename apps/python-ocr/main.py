@@ -2,19 +2,17 @@ import os
 import sys
 import json
 from app.utils import handle_pyinstaller_folders
+from app.ipc import write_and_send
 from app.engine import OCRAnalyzer
+from app import logger
 
 
 def main():
-    # Setup streams
-    sys.stdout = open(sys.stdout.fileno(), "w", encoding="utf-8", closefd=False)
-    sys.stderr = open(sys.stderr.fileno(), "w", encoding="utf-8", closefd=False)
-
     handle_pyinstaller_folders()
 
-    print("Initializing models...", file=sys.stderr)
+    logger.info("Initializing models...")
     analyzer = OCRAnalyzer()
-    print("Models are ready. Awaiting 'run-ocr' command...", file=sys.stderr)
+    logger.info("Models are ready. Awaiting 'run-ocr' command...")
 
     sys.stderr.flush()
 
@@ -27,37 +25,33 @@ def main():
                 image_path = sys.stdin.readline().strip()
 
                 if not image_path or not os.path.exists(image_path):
-                    print(
+                    logger.info(
                         f"Error: Invalid or non-existent image path received: {image_path}",
-                        file=sys.stderr,
                     )
-                    sys.stdout.write("ERROR\n")
-                    sys.stdout.flush()
+                    write_and_send("ERROR")
                     continue
 
                 ocr_result = analyzer.ocr_and_segment(image_path)
 
                 # JSON stringify and send
-                sys.stdout.write(json.dumps(ocr_result) + "\n")
-                sys.stdout.flush()
+                write_and_send(json.dumps(ocr_result))
 
             except Exception as e:
-                print(f"Error during OCR execution: {e}", file=sys.stderr)
+                logger.info(f"Error during OCR execution: {e}")
                 sys.stderr.flush()
-                sys.stdout.write("ERROR\n")
-                sys.stdout.flush()
+
+                write_and_send("ERROR")
         elif command == "exit":
-            print("Received 'exit' command. Shutting down.", file=sys.stderr)
+            logger.info("Received 'exit' command. Shutting down.")
             sys.exit(0)
         elif not command:
             # This case handles EOF (End of File), which signifies the pipe has been closed
-            print("End of input stream detected. Shutting down.", file=sys.stderr)
+            logger.info("End of input stream detected. Shutting down.")
             break
 
         else:
-            print(
-                f"Unknown command received: '{command}'. Awaiting 'run-ocr'.",
-                file=sys.stderr,
+            logger.info(
+                f"Unknown command received: '{command}'. Awaiting 'run-ocr'."
             )
 
 

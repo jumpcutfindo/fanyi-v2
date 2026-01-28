@@ -5,6 +5,7 @@ Encapsulates the OCR and segmentation operations for Fanyi
 import sys
 import easyocr
 import jieba
+from . import logger
 
 
 class OCRAnalyzer:
@@ -13,9 +14,8 @@ class OCRAnalyzer:
     """
 
     def __init__(self, languages=["ch_sim"]):
-        print(
-            "Initializing OCR and segmentation models. This may take a moment...",
-            file=sys.stderr,
+        logger.info(
+            "Initializing OCR and segmentation models. This may take a moment..."
         )
         self.reader = easyocr.Reader(languages)
 
