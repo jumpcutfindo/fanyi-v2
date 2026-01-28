@@ -70,16 +70,20 @@ export async function deleteScreenshotPreset(id: string) {
 async function registerPresetKeybind(preset: CustomScreenshotPreset) {
   if (!preset.keybind) return;
 
-  keybinds.registerKeybind(preset.keybind, async () => {
-    const screenshot = await takeScreenshotWithPreset(preset);
+  keybinds.registerKeybind(
+    `Preset ${preset.name}`,
+    preset.keybind,
+    async () => {
+      const screenshot = await takeScreenshotWithPreset(preset);
 
-    win?.webContents.send(
-      'trigger-screenshot-with-preset',
-      preset.id,
-      screenshot
-    );
-    logger.debug(`${preset.name} keybind triggered`, preset.keybind);
-  });
+      win?.webContents.send(
+        'trigger-screenshot-with-preset',
+        preset.id,
+        screenshot
+      );
+      logger.debug(`${preset.name} keybind triggered`, preset.keybind);
+    }
+  );
 }
 
 async function unregisterPresetKeybind(preset: CustomScreenshotPreset) {
