@@ -14,7 +14,9 @@ def main():
 
     print("Initializing models...", file=sys.stderr)
     analyzer = OCRAnalyzer()
-    print("Ready. Awaiting commands...", file=sys.stderr)
+    print("Models are ready. Awaiting 'run-ocr' command...", file=sys.stderr)
+
+    sys.stderr.flush()
 
     for line in sys.stdin:
         command = line.strip()
