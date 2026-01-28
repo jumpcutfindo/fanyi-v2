@@ -5,6 +5,7 @@ import {
   ScreenshotOptions,
   ScreenshotSource,
 } from '@shared/types/screenshot';
+import { logger } from '@main/logger';
 
 /**
  * Captures a screenshot of the primary screen and returns it as a Buffer.
@@ -28,7 +29,7 @@ async function takeScreenshot(options: ScreenshotOptions): Promise<Buffer> {
       return source.thumbnail.crop(options.crop).toPNG();
     }
   } catch (err) {
-    console.error('Failed to capture screenshot:', err);
+    logger.error('Failed to capture screenshot', err);
     throw err;
   }
 }

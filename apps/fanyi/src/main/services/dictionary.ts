@@ -16,6 +16,7 @@ import {
   RawDictionaryEntry,
   UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
+import { logger } from '@main/logger';
 
 const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
 
@@ -99,7 +100,7 @@ function getMinimalDictionary(dictionary: Dictionary): DictionaryMinimal {
 }
 
 export function initDefaultDictionary() {
-  console.log('Loading default dictionary...');
+  logger.info('Loading default dictionary...');
 
   // Retrieve the contents of the dictionary file
   const rawDictionary = fs.readFileSync(
@@ -132,7 +133,7 @@ export function initDefaultDictionary() {
     wordMap: rawEntriesToMap(rawEntries),
   };
 
-  console.log(`Loaded default dictionary with ${rawEntries.length} entries`);
+  logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
 export function getDictionaryEntries(queries: string[]) {
@@ -248,7 +249,7 @@ export function searchDictionaries(
 }
 
 export function initLocalDictionaries() {
-  console.log('Loading local dictionaries...', LOCAL_DICTIONARIES_DIR);
+  logger.info('Loading local dictionaries...');
 
   // If folder doesn't exist, create
   if (!fs.existsSync(LOCAL_DICTIONARIES_DIR)) {
@@ -267,7 +268,7 @@ export function initLocalDictionaries() {
 
       // If unable to parse, skip
       if (parsedDictionary.error) {
-        console.warn(
+        logger.warn(
           `Invalid dictionary data in ${filePath}: ${parsedDictionary.error.message}`
         );
       } else {
@@ -277,12 +278,12 @@ export function initLocalDictionaries() {
           wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
         });
 
-        console.log(
+        logger.info(
           `Loaded dictionary ${parsedDictionary.data.name} with ${parsedDictionary.data.rawEntries.length} entries`
         );
       }
     } catch (e) {
-      console.warn(`Failed to load dictionary ${file}: ${e}`);
+      logger.warn(`Failed to load dictionary ${file}: ${e}`);
     }
   }
 }
@@ -339,9 +340,9 @@ export function deleteDictionary(id: string) {
     // Remove from local files
     deleteLocalDictionary(id);
 
-    console.log(`Deleted dictionary "${dictionary.name}" (${id})`);
+    logger.info(`Deleted dictionary "${dictionary.name}" (${id})`);
   } else {
-    console.warn(`Dictionary with ID ${id} not found`);
+    logger.warn(`Dictionary with ID ${id} not found`);
   }
 }
 
@@ -359,10 +360,10 @@ export function updateDictionary(dictionary: UpdateDictionaryPayload) {
     // Write updates to file
     saveLocalDictionary(localDictionaries[index]);
 
-    console.log(`Updated dictionary "${dictionary.name}" (${dictionary.id})`);
+    logger.info(`Updated dictionary "${dictionary.name}" (${dictionary.id})`);
 
     return getMinimalDictionary(localDictionaries[index]);
   } else {
-    console.warn(`Dictionary with ID ${dictionary.id} not found`);
+    logger.warn(`Dictionary with ID ${dictionary.id} not found`);
   }
 }

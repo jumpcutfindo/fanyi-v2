@@ -2,6 +2,7 @@ import os from 'os';
 import { app, ipcMain, shell } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
+import { logger } from '@main/logger';
 import {
   createDictionary,
   deleteDictionary,
@@ -34,7 +35,7 @@ export function registerIpcHandlers() {
       const screenshot = await takeScreenshotWithPreset(preset);
       return screenshot;
     } catch (error) {
-      console.error('Failed to take screenshot with preset:', error);
+      logger.error('Failed to take screenshot with preset', error);
       throw error;
     }
   });
@@ -44,7 +45,7 @@ export function registerIpcHandlers() {
       const sources = await getScreenshotSources();
       return sources;
     } catch (error) {
-      console.error('Failed to get screenshot sources:', error);
+      logger.error('Failed to get screenshot sources', error);
       throw error;
     }
   });
@@ -53,7 +54,7 @@ export function registerIpcHandlers() {
     try {
       await addScreenshotPreset(preset);
     } catch (error) {
-      console.error('Failed to add screenshot preset:', error);
+      logger.error('Failed to add screenshot preset', error);
       throw error;
     }
   });
@@ -62,7 +63,7 @@ export function registerIpcHandlers() {
       const presets = await getScreenshotPresets();
       return presets;
     } catch (error) {
-      console.error('Failed to get screenshot presets:', error);
+      logger.error('Failed to get screenshot presets', error);
       throw error;
     }
   });
@@ -70,7 +71,7 @@ export function registerIpcHandlers() {
     try {
       await updateScreenshotPreset(preset);
     } catch (error) {
-      console.error('Failed to update screenshot preset:', error);
+      logger.error('Failed to update screenshot preset', error);
       throw error;
     }
   });
@@ -78,7 +79,7 @@ export function registerIpcHandlers() {
     try {
       await deleteScreenshotPreset(id);
     } catch (error) {
-      console.error('Failed to delete screenshot preset:', error);
+      logger.error('Failed to delete screenshot preset', error);
       throw error;
     }
   });
@@ -93,7 +94,7 @@ export function registerIpcHandlers() {
       const translations = getDictionaryEntries(ocrResult.segmented_text);
       return { ocrResult, translations };
     } catch (error) {
-      console.error('Failed to handle OCR request:', error);
+      logger.error('Failed to handle OCR request', error);
       throw error;
     }
   });

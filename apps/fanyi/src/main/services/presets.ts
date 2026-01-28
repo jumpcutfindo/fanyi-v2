@@ -5,6 +5,7 @@ import {
   AddScreenshotPresetPayload,
   CustomScreenshotPreset,
 } from '@shared/types/screenshot';
+import { logger } from '@main/logger';
 import { win } from '@main/main';
 import * as keybinds from '@main/services/keybinds';
 import { takeScreenshotWithPreset } from '@main/services/screenshot';
@@ -77,7 +78,7 @@ async function registerPresetKeybind(preset: CustomScreenshotPreset) {
       preset.id,
       screenshot
     );
-    console.log(`${preset.name} keybind triggered`, preset.keybind);
+    logger.info(`${preset.name} keybind triggered`, preset.keybind);
   });
 }
 
