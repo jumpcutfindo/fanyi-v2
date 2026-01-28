@@ -40,8 +40,8 @@ function initPythonOcr() {
 
   pythonOcr = spawn(pythonExecutable);
 
-  const prefixedStdout = new PrefixedStream('[OCR]');
-  const prefixedStderr = new PrefixedStream('[OCR]');
+  const prefixedStdout = new PrefixedStream('OCR');
+  const prefixedStderr = new PrefixedStream('OCR');
 
   // Directly pipe stdout and stderr to the Node.js console
   pythonOcr.stdout?.pipe(prefixedStdout);

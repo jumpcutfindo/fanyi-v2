@@ -4,16 +4,14 @@ import Logger from 'electron-log';
 import { logger } from '@main/logger';
 
 export class PrefixedStream extends Writable {
-  private prefix: string;
   private remainder: string = '';
 
   private ocrLogger: Logger.LogFunctions;
 
   constructor(prefix: string, options?: WritableOptions) {
     super(options);
-    this.prefix = prefix;
 
-    this.ocrLogger = logger.scope('OCR');
+    this.ocrLogger = logger.scope(prefix);
   }
 
   _write(
