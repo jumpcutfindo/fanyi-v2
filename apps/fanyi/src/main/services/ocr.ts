@@ -64,7 +64,7 @@ function initPythonOcr() {
 function cleanUpPythonOcr() {
   if (pythonOcr) {
     ocrStatus = 'shutdown';
-    logger.info('Stopping python OCR service');
+    logger.info('Stopping python OCR service...');
     pythonOcr.kill();
   }
 }
@@ -142,7 +142,7 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
 
       fs.writeFileSync(tempFilePath, imageBuffer);
 
-      logger.info(`Wrote image to ${tempFilePath}`);
+      logger.debug(`Wrote image to ${tempFilePath}`);
 
       // 3. Write the command and data to the Python process's stdin
       process.stdin?.write('run-ocr\n');

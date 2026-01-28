@@ -78,7 +78,7 @@ async function registerPresetKeybind(preset: CustomScreenshotPreset) {
       preset.id,
       screenshot
     );
-    logger.info(`${preset.name} keybind triggered`, preset.keybind);
+    logger.debug(`${preset.name} keybind triggered`, preset.keybind);
   });
 }
 

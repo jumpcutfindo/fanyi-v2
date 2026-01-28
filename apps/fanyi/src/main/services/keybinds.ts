@@ -1,5 +1,7 @@
 import { globalShortcut } from 'electron';
 
+import { logger } from '@main/logger';
+
 /**
  * Contains reserved keybinds that may perform actions defined by the system
  */
@@ -26,6 +28,7 @@ function isKeybindAvailable(keybind: string) {
 export function registerDefaultKeybinds() {
   for (const keybind in defaultKeybindToFnMap) {
     globalShortcut.register(keybind, defaultKeybindToFnMap[keybind]);
+    logger.debug(`Registered default keybind ${keybind}`);
   }
 }
 
@@ -36,15 +39,20 @@ export function registerKeybind(keybind: string, fn: () => void) {
 
   globalShortcut.register(keybind, fn);
   customKeybindToFnMap[keybind] = fn;
+
+  logger.debug(`Registered custom keybind ${keybind}`);
 }
 
 export function unregisterKeybind(keybind: string) {
   globalShortcut.unregister(keybind);
 
   delete customKeybindToFnMap[keybind];
+
+  logger.debug(`Unregistered custom keybind ${keybind}`);
 }
 
 export function enableKeybinds() {
+  logger.debug('Enabling keybinds');
   if (isKeybindsDisabled) {
     for (const keybind in customKeybindToFnMap) {
       globalShortcut.register(keybind, customKeybindToFnMap[keybind]);
@@ -55,6 +63,7 @@ export function enableKeybinds() {
 }
 
 export function disableKeybinds() {
+  logger.debug('Disabling keybinds');
   if (!isKeybindsDisabled) {
     for (const keybind in customKeybindToFnMap) {
       globalShortcut.unregister(keybind);

@@ -35,6 +35,7 @@ async function takeScreenshot(options: ScreenshotOptions): Promise<Buffer> {
 }
 
 export async function takeScreenshotWithPreset(preset: CustomScreenshotPreset) {
+  logger.debug('Taking screenshot with preset', preset);
   return takeScreenshot(preset.options);
 }
 
