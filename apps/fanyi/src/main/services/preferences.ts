@@ -1,6 +1,7 @@
 import Store from 'electron-store';
 
 import { UserPreferences } from '@shared/types/preferences';
+import { logger } from '@main/logger';
 
 export const preferencesStore = new Store<UserPreferences>({
   name: 'preferences',
@@ -21,6 +22,8 @@ export async function setPreference(
   const preferences = await getPreferences();
 
   preferencesStore.set('preferences', { ...preferences, [key]: value });
+
+  logger.debug(`Set preference ${key} to ${value}`);
 }
 
 export function addPreferenceChangeListener(

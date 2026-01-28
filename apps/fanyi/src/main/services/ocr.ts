@@ -6,6 +6,7 @@ import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 
 import { OcrResult, OcrStatus } from '@shared/types/ocr';
+import { logger } from '@main/logger';
 import { PrefixedStream } from '@main/utils/prefixed-stream';
 
 let pythonOcr: ChildProcess | null;
@@ -35,12 +36,12 @@ function initPythonOcr() {
 
   const pythonExecutable = getPythonExecutablePath();
 
-  console.log('Starting python OCR service', pythonExecutable);
+  logger.info('Starting python OCR service', pythonExecutable);
 
   pythonOcr = spawn(pythonExecutable);
 
-  const prefixedStdout = new PrefixedStream('[OCR]');
-  const prefixedStderr = new PrefixedStream('[OCR]');
+  const prefixedStdout = new PrefixedStream('OCR');
+  const prefixedStderr = new PrefixedStream('OCR');
 
   // Directly pipe stdout and stderr to the Node.js console
   pythonOcr.stdout?.pipe(prefixedStdout);
@@ -48,7 +49,7 @@ function initPythonOcr() {
 
   const onReady = (data: Buffer) => {
     if (data.toString().includes('Models are ready.')) {
-      console.log('Python OCR service is ready!');
+      logger.info('Python OCR service is ready!');
       ocrStatus = 'available';
 
       // Remove the listener
@@ -63,7 +64,7 @@ function initPythonOcr() {
 function cleanUpPythonOcr() {
   if (pythonOcr) {
     ocrStatus = 'shutdown';
-    console.log('Stopping python OCR service');
+    logger.info('Stopping python OCR service...');
     pythonOcr.kill();
   }
 }
@@ -111,7 +112,7 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
 
     const onError = (data: Buffer) => {
       const error = data.toString('utf-8');
-      console.error(`Python stderr: ${error}`);
+      logger.error(`Python stderr: ${error}`);
     };
 
     // Attach listeners for this specific request
@@ -141,7 +142,7 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
 
       fs.writeFileSync(tempFilePath, imageBuffer);
 
-      console.log(`Wrote image to ${tempFilePath}`);
+      logger.debug(`Wrote image to ${tempFilePath}`);
 
       // 3. Write the command and data to the Python process's stdin
       process.stdin?.write('run-ocr\n');

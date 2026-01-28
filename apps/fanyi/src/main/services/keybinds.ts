@@ -1,14 +1,17 @@
 import { globalShortcut } from 'electron';
 
+import { Keybind } from '@shared/types/keybind';
+import { logger } from '@main/logger';
+
 /**
  * Contains reserved keybinds that may perform actions defined by the system
  */
-const defaultKeybindToFnMap: Record<string, () => void> = {};
+const defaultKeybindToFnMap: Record<string, Keybind> = {};
 
 /**
  * Contains keybinds registered by the user
  */
-const customKeybindToFnMap: Record<string, () => void> = {};
+const customKeybindToFnMap: Record<string, Keybind> = {};
 
 let isKeybindsDisabled: boolean = false;
 
@@ -25,29 +28,41 @@ function isKeybindAvailable(keybind: string) {
 
 export function registerDefaultKeybinds() {
   for (const keybind in defaultKeybindToFnMap) {
-    globalShortcut.register(keybind, defaultKeybindToFnMap[keybind]);
+    globalShortcut.register(keybind, defaultKeybindToFnMap[keybind].keybindFn);
+    logger.debug(
+      `Registered default keybind "${defaultKeybindToFnMap[keybind].label}" ${keybind}`
+    );
   }
 }
 
-export function registerKeybind(keybind: string, fn: () => void) {
-  if (!isKeybindAvailable(keybind)) {
-    throw new Error(`Keybind ${keybind} is already in use`);
+export function registerKeybind(label: string, keys: string, fn: () => void) {
+  if (!isKeybindAvailable(keys)) {
+    throw new Error(`Keybind ${keys} is already in use`);
   }
 
-  globalShortcut.register(keybind, fn);
-  customKeybindToFnMap[keybind] = fn;
+  globalShortcut.register(keys, fn);
+  customKeybindToFnMap[keys] = {
+    label,
+    keybindFn: fn,
+  };
+
+  logger.debug(`Registered custom keybind "${label}" (${keys})`);
 }
 
-export function unregisterKeybind(keybind: string) {
-  globalShortcut.unregister(keybind);
+export function unregisterKeybind(keys: string) {
+  globalShortcut.unregister(keys);
 
-  delete customKeybindToFnMap[keybind];
+  const keybind = customKeybindToFnMap[keys];
+  delete customKeybindToFnMap[keys];
+
+  logger.debug(`Unregistered custom keybind "${keybind?.label}" (${keys})`);
 }
 
 export function enableKeybinds() {
+  logger.debug('Enabling keybinds');
   if (isKeybindsDisabled) {
     for (const keybind in customKeybindToFnMap) {
-      globalShortcut.register(keybind, customKeybindToFnMap[keybind]);
+      globalShortcut.register(keybind, customKeybindToFnMap[keybind].keybindFn);
     }
 
     isKeybindsDisabled = false;
@@ -55,6 +70,7 @@ export function enableKeybinds() {
 }
 
 export function disableKeybinds() {
+  logger.debug('Disabling keybinds');
   if (!isKeybindsDisabled) {
     for (const keybind in customKeybindToFnMap) {
       globalShortcut.unregister(keybind);
