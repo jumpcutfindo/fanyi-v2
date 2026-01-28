@@ -10,7 +10,7 @@ import {
 import { PresetKeybindDisplay } from '@renderer/features/screenshot/components/PresetKeybindDisplay';
 import { useGetScreenshotWithPreset } from '@renderer/features/screenshot/queries/getScreenshotWithPreset.query';
 import { cn } from '@renderer/lib/utils';
-import { useScreenshotSidebarStore } from '@renderer/stores/useScreenshotSidebarStore';
+import { useScreenshotStore } from '@renderer/stores/useScreenshotStore';
 import { PreviewTab, useTabStore } from '@renderer/stores/useTabStore';
 
 interface PreviewTabContentProps {
@@ -24,10 +24,8 @@ export function PreviewTabContent({ tab }: PreviewTabContentProps) {
     useGetScreenshotWithPreset(preset);
   const { data: ocrStatus } = useGetOcrStatusQuery();
 
-  const sidebarState = useScreenshotSidebarStore((state) => state.sidebarState);
-  const setSidebarState = useScreenshotSidebarStore(
-    (state) => state.setSidebarState
-  );
+  const sidebarState = useScreenshotStore((state) => state.sidebarState);
+  const setSidebarState = useScreenshotStore((state) => state.setSidebarState);
 
   const addTab = useTabStore((state) => state.addTab);
 

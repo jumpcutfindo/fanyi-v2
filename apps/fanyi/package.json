@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^13.7.0",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-context-menu": "^2.2.16",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-hover-card": "^1.1.15",
@@ -47,6 +48,7 @@
     "tailwindcss": "^4.1.12",
     "use-debounce": "^10.0.5",
     "uuid": "^11.1.0",
+    "zod": "^4.3.6",
     "zustand": "^5.0.7"
   },
   "devDependencies": {

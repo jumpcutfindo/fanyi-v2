@@ -3,10 +3,13 @@ import { app, ipcMain, shell } from 'electron';
 import { getOcrStatus, runOcr } from './services/ocr';
 
 import {
+  createDictionary,
+  deleteDictionary,
   getDictionaryEntries,
   getDictionaryEntry,
   listDictionaries,
   searchDictionaries,
+  updateDictionary,
 } from '@main/services/dictionary';
 import {
   disableKeybinds,
@@ -115,8 +118,20 @@ export function registerIpcHandlers() {
   ipcMain.handle('get-dictionaries', async (_event) => {
     return listDictionaries();
   });
-  ipcMain.handle('search-dictionaries', async (_event, queryString, limit) => {
-    return searchDictionaries(queryString, limit);
+  ipcMain.handle(
+    'search-dictionaries',
+    async (_event, queryString, options) => {
+      return searchDictionaries(queryString, options);
+    }
+  );
+  ipcMain.handle('create-dictionary', async (_event, dictionary) => {
+    return createDictionary(dictionary);
+  });
+  ipcMain.handle('delete-dictionary', async (_event, id) => {
+    return deleteDictionary(id);
+  });
+  ipcMain.handle('update-dictionary', async (_event, dictionary) => {
+    return updateDictionary(dictionary);
   });
 
   ipcMain.handle('get-preferences', async (_event) => {

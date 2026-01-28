@@ -1,6 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import { DictionaryEntry } from '@shared/types/dictionary';
+import {
+  CreateDictionaryPayload,
+  DictionaryEntry,
+  DictionarySearchOptions,
+  UpdateDictionaryPayload,
+} from '@shared/types/dictionary';
 import { OcrResponse } from '@shared/types/ocr';
 import { UserPreferences } from '@shared/types/preferences';
 import {
@@ -62,8 +67,13 @@ contextBridge.exposeInMainWorld('api', {
   getDictionaryEntryOfWord: (word: string): Promise<DictionaryEntry | null> =>
     ipcRenderer.invoke('get-dictionary-entry-of-word', word),
   getDictionaries: () => ipcRenderer.invoke('get-dictionaries'),
-  searchDictionaries: (queryString: string, limit?: number) =>
-    ipcRenderer.invoke('search-dictionaries', queryString, limit),
+  searchDictionaries: (queryString: string, options: DictionarySearchOptions) =>
+    ipcRenderer.invoke('search-dictionaries', queryString, options),
+  createDictionary: (dictionary: CreateDictionaryPayload) =>
+    ipcRenderer.invoke('create-dictionary', dictionary),
+  deleteDictionary: (id: string) => ipcRenderer.invoke('delete-dictionary', id),
+  updateDictionary: (dictionary: UpdateDictionaryPayload) =>
+    ipcRenderer.invoke('update-dictionary', dictionary),
 
   getPreferences: () => ipcRenderer.invoke('get-preferences'),
   setPreference: (

@@ -1,16 +1,26 @@
 import fs from 'fs';
 import path from 'path';
+import { app } from 'electron';
 import Fuse from 'fuse.js';
 import * as pinyin from 'pinyin-pro';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
+  CreateDictionaryPayload,
+  CustomDictionary,
+  customDictionarySchema,
   Dictionary,
   DictionaryEntry,
   DictionaryMinimal,
+  DictionarySearchOptions,
   RawDictionaryEntry,
+  UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 
+const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
+
 let defaultDictionary: Dictionary | null = null;
+const localDictionaries: Dictionary[] = [];
 
 function rawEntriesToMap(
   rawEntries: RawDictionaryEntry[]
@@ -77,8 +87,19 @@ function rawEntriesToMap(
   );
 }
 
+function getMinimalDictionary(dictionary: Dictionary): DictionaryMinimal {
+  return {
+    id: dictionary.id,
+    type: dictionary.type,
+    name: dictionary.name,
+    createdOn: dictionary.createdOn,
+    modifiedOn: dictionary.modifiedOn,
+    wordCount: Object.keys(dictionary.wordMap).length,
+  };
+}
+
 export function initDefaultDictionary() {
-  console.log('Loading dictionary...');
+  console.log('Loading default dictionary...');
 
   // Retrieve the contents of the dictionary file
   const rawDictionary = fs.readFileSync(
@@ -103,6 +124,7 @@ export function initDefaultDictionary() {
 
   defaultDictionary = {
     id: 'default',
+    type: 'system',
     name: 'Default (CEDICT)',
     createdOn: new Date(),
     modifiedOn: new Date(),
@@ -159,29 +181,49 @@ export function listDictionaries(): DictionaryMinimal[] {
   }
 
   return [
-    {
-      id: defaultDictionary.id,
-      name: defaultDictionary.name,
-      url: defaultDictionary.url,
-      createdOn: defaultDictionary.createdOn,
-      modifiedOn: defaultDictionary.modifiedOn,
-      wordCount: Object.keys(defaultDictionary.wordMap).length,
-    },
+    getMinimalDictionary(defaultDictionary),
+    ...localDictionaries.map((dict) => getMinimalDictionary(dict)),
   ];
+}
+
+function getDictionariesFromOptions(options: DictionarySearchOptions) {
+  switch (options.space) {
+    case 'specific':
+      if (options.dictionaryId === 'default') {
+        return [defaultDictionary];
+      }
+
+      return [
+        localDictionaries.find((dict) => dict.id === options.dictionaryId),
+      ];
+    case 'all':
+    default:
+      return [defaultDictionary, ...localDictionaries];
+  }
 }
 
 export function searchDictionaries(
   queryString: string,
-  limit: number
+  options: DictionarySearchOptions
 ): DictionaryEntry[] {
-  const activeDictionaries = [defaultDictionary];
+  const dictionaries = getDictionariesFromOptions(options);
 
-  const allEntries = activeDictionaries.flatMap((dict) =>
+  function spliceResult(entries: DictionaryEntry[]) {
+    return entries.splice(options.offset, options.limit);
+  }
+
+  const allEntries = dictionaries.flatMap((dict) =>
     dict ? Object.values(dict.rawEntries) : []
   );
 
-  if (allEntries.length === 0 || !queryString) {
+  if (allEntries.length === 0) {
     return [];
+  }
+
+  if (!queryString || queryString === '') {
+    return spliceResult(
+      getDictionaryEntries(allEntries.map((entry) => entry.simplified))
+    );
   }
 
   const fuse = new Fuse(allEntries, {
@@ -200,8 +242,127 @@ export function searchDictionaries(
   });
   const rawResults = fuse.search(queryString);
 
-  return getDictionaryEntries(rawResults.map((rr) => rr.item.simplified)).slice(
-    0,
-    limit
+  return spliceResult(
+    getDictionaryEntries(rawResults.map((rr) => rr.item.simplified))
   );
+}
+
+export function initLocalDictionaries() {
+  console.log('Loading local dictionaries...', LOCAL_DICTIONARIES_DIR);
+
+  // If folder doesn't exist, create
+  if (!fs.existsSync(LOCAL_DICTIONARIES_DIR)) {
+    fs.mkdirSync(LOCAL_DICTIONARIES_DIR);
+  }
+
+  // Look for all JSON files inside and load the data
+  const files = fs.readdirSync(LOCAL_DICTIONARIES_DIR);
+  for (const file of files) {
+    try {
+      const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${file}`;
+      const fileData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+      // Check whether data follows schema
+      const parsedDictionary = customDictionarySchema.safeParse(fileData);
+
+      // If unable to parse, skip
+      if (parsedDictionary.error) {
+        console.warn(
+          `Invalid dictionary data in ${filePath}: ${parsedDictionary.error.message}`
+        );
+      } else {
+        localDictionaries.push({
+          ...parsedDictionary.data,
+          type: 'custom',
+          wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
+        });
+
+        console.log(
+          `Loaded dictionary ${parsedDictionary.data.name} with ${parsedDictionary.data.rawEntries.length} entries`
+        );
+      }
+    } catch (e) {
+      console.warn(`Failed to load dictionary ${file}: ${e}`);
+    }
+  }
+}
+
+function saveLocalDictionary(dictionary: CustomDictionary) {
+  // Run sanity check on the file's format
+  const parsedDictionary = customDictionarySchema.safeParse(dictionary);
+
+  if (parsedDictionary.error) {
+    throw new Error(parsedDictionary.error.message);
+  } else {
+    // Write the dictionary to a file
+    const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${dictionary.id}.json`;
+    fs.writeFileSync(filePath, JSON.stringify(dictionary, null, 2));
+  }
+}
+
+function deleteLocalDictionary(id: string) {
+  const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${id}.json`;
+  fs.unlinkSync(filePath);
+}
+
+export function createDictionary(dictionary: CreateDictionaryPayload) {
+  const newDictionary: CustomDictionary = {
+    ...dictionary,
+    id: uuidv4(),
+    createdOn: new Date(),
+    modifiedOn: new Date(),
+    rawEntries: [],
+  };
+
+  // Save dictionary
+  saveLocalDictionary(newDictionary);
+
+  // Add dictionary to list
+  const fullDictionary = {
+    ...newDictionary,
+    type: 'custom' as const,
+    wordMap: {},
+  };
+
+  localDictionaries.push(fullDictionary);
+
+  return getMinimalDictionary(fullDictionary);
+}
+
+export function deleteDictionary(id: string) {
+  const index = localDictionaries.findIndex((dict) => dict.id === id);
+
+  if (index !== -1) {
+    const dictionary = localDictionaries[index];
+    localDictionaries.splice(index, 1);
+
+    // Remove from local files
+    deleteLocalDictionary(id);
+
+    console.log(`Deleted dictionary "${dictionary.name}" (${id})`);
+  } else {
+    console.warn(`Dictionary with ID ${id} not found`);
+  }
+}
+
+export function updateDictionary(dictionary: UpdateDictionaryPayload) {
+  const index = localDictionaries.findIndex(
+    (dict) => dict.id === dictionary.id
+  );
+
+  if (index !== -1) {
+    localDictionaries[index] = {
+      ...localDictionaries[index],
+      ...dictionary,
+    };
+
+    // Write updates to file
+    saveLocalDictionary(localDictionaries[index]);
+
+    console.log(`Updated dictionary "${dictionary.name}" (${dictionary.id})`);
+
+    return getMinimalDictionary(localDictionaries[index]);
+  } else {
+    console.warn(`Dictionary with ID ${dictionary.id} not found`);
+  }
 }

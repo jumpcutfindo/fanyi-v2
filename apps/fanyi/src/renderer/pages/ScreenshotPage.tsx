@@ -7,12 +7,12 @@ import { TabDisplay } from '@renderer/features/tabs/components/TabDisplay';
 import { TabList } from '@renderer/features/tabs/components/TabList';
 import { useDarkMode } from '@renderer/hooks/useDarkMode.hook';
 import { usePasteImageReceiver } from '@renderer/hooks/usePasteImageReceiver.hook';
-import { useScreenshotSidebarStore } from '@renderer/stores/useScreenshotSidebarStore';
+import { useScreenshotStore } from '@renderer/stores/useScreenshotStore';
 
 export function ScreenshotPage() {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const sidebarState = useScreenshotSidebarStore((state) => state.sidebarState);
+  const sidebarState = useScreenshotStore((state) => state.sidebarState);
   useDarkMode();
 
   // Handle pasting of images

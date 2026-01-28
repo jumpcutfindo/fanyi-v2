@@ -29,7 +29,7 @@ import { useDeleteScreenshotPresetMutation } from '@renderer/features/screenshot
 import { useGetScreenshotSources } from '@renderer/features/screenshot/queries/getScreenshotSources.query';
 import { useGetUsedKeybindsQuery } from '@renderer/features/screenshot/queries/getUsedKeybinds.query';
 import { useUpdateScreenshotPresetMutation } from '@renderer/features/screenshot/queries/updateScreenshotPreset.mutation';
-import { useScreenshotSidebarStore } from '@renderer/stores/useScreenshotSidebarStore';
+import { useScreenshotStore } from '@renderer/stores/useScreenshotStore';
 import { useTabStore } from '@renderer/stores/useTabStore';
 
 interface PresetEditorProps {
@@ -38,9 +38,7 @@ interface PresetEditorProps {
 }
 
 export function PresetEditor({ mode, initialValues }: PresetEditorProps) {
-  const setSidebarState = useScreenshotSidebarStore(
-    (state) => state.setSidebarState
-  );
+  const setSidebarState = useScreenshotStore((state) => state.setSidebarState);
 
   const previewTab = useTabStore((state) => state.previewTab);
   const setPreviewTab = useTabStore((state) => state.setPreviewTab);
