@@ -1,12 +1,19 @@
 import { Writable, WritableOptions } from 'node:stream';
+import Logger from 'electron-log';
+
+import { logger } from '@main/logger';
 
 export class PrefixedStream extends Writable {
   private prefix: string;
   private remainder: string = '';
 
+  private ocrLogger: Logger.LogFunctions;
+
   constructor(prefix: string, options?: WritableOptions) {
     super(options);
     this.prefix = prefix;
+
+    this.ocrLogger = logger.scope('OCR');
   }
 
   _write(
@@ -21,7 +28,7 @@ export class PrefixedStream extends Writable {
 
     lines.forEach((line) => {
       if (line.length > 0) {
-        process.stdout.write(`${this.prefix} ${line}\n`);
+        this.ocrLogger.info(`${line}`);
       }
     });
 

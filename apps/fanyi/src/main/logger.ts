@@ -4,6 +4,8 @@ log.initialize();
 
 log.transports.console.useStyles = true;
 log.transports.console.format =
-  '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] %c[{level}]%c{text}';
+  '{scope} [{y}-{m}-{d} {h}:{i}:{s}.{ms}] %c[{level}]%c{text}';
+log.scope.labelPadding = false;
+log.scope.defaultLabel = 'app';
 
 export const logger = log;
