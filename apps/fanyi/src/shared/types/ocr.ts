@@ -41,3 +41,14 @@ export type IncomingDataPayload =
   | IncomingModelReadyPayload
   | IncomingOcrResultPayload
   | IncomingErrorPayload;
+
+interface RunOcrCommandPayload {
+  action: 'run_ocr';
+  image_path: string;
+}
+
+interface ShutdownCommandPayload {
+  action: 'shutdown';
+}
+
+export type OcrCommandPayload = RunOcrCommandPayload | ShutdownCommandPayload;

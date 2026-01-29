@@ -2,6 +2,7 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import { ChildProcess } from 'node:child_process';
 import path from 'node:path';
+import { send } from 'node:process';
 import Stream from 'node:stream';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   IncomingDataPayload,
   IncomingLogPayload,
+  OcrCommandPayload,
   OcrResult,
   OcrStatus,
 } from '@shared/types/ocr';
@@ -48,6 +50,9 @@ function getPythonExecutablePath(): string {
   return path.join(process.resourcesPath, executableName);
 }
 
+/**
+ * Handles incoming data from the Python OCR process.
+ */
 function handleIncomingData(data: string | Buffer<ArrayBufferLike>) {
   try {
     const payload = JSON.parse(data.toString('utf-8')) as IncomingDataPayload;
@@ -72,6 +77,9 @@ function handleIncomingData(data: string | Buffer<ArrayBufferLike>) {
   }
 }
 
+/**
+ * Handles incoming log data from the Python OCR process.
+ */
 function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
   const ocrLogger = logger.scope('OCR');
 
@@ -96,6 +104,18 @@ function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
       logger.error(`Failed to parse incoming log data: ${e}`);
     }
   }
+}
+
+/**
+ * Sends a command to the Python OCR process.
+ */
+function sendCommand(command: OcrCommandPayload) {
+  if (!outgoingDataStream) {
+    throw new Error('Outgoing data stream is not initialized.');
+  }
+
+  outgoingDataStream.write(JSON.stringify(command));
+  outgoingDataStream.write('\n'); // Newline to signal end of line
 }
 
 function initPythonOcr() {
@@ -136,6 +156,8 @@ function cleanUpPythonOcr() {
     logStream?.destroy();
     incomingDataStream?.destroy();
     outgoingDataStream?.destroy();
+
+    sendCommand({ action: 'shutdown' });
 
     pythonOcr.kill();
   }
@@ -193,9 +215,10 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
 
       logger.debug(`Wrote image to ${tempFilePath}`);
 
-      // 3. Write the command and data to the Python process's stdin
-      outgoingDataStream.write('run-ocr\n');
-      outgoingDataStream.write(`${tempFilePath}\n`);
+      sendCommand({
+        action: 'run_ocr',
+        image_path: tempFilePath,
+      });
     } catch (err) {
       // Clean up in case of an immediate write error
       incomingDataStream.removeListener('data', onData);
