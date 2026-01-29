@@ -32,7 +32,12 @@ interface IncomingErrorPayload {
   message: string;
 }
 
-export type IncomingPayload =
+export interface IncomingLogPayload {
+  type: 'info' | 'error' | 'debug';
+  message: string;
+}
+
+export type IncomingDataPayload =
   | IncomingModelReadyPayload
   | IncomingOcrResultPayload
   | IncomingErrorPayload;

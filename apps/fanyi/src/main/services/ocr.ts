@@ -6,7 +6,12 @@ import Stream from 'node:stream';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 
-import { IncomingPayload, OcrResult, OcrStatus } from '@shared/types/ocr';
+import {
+  IncomingDataPayload,
+  IncomingLogPayload,
+  OcrResult,
+  OcrStatus,
+} from '@shared/types/ocr';
 import { logger } from '@main/logger';
 import { LoggerWithPrefix } from '@main/utils/prefixed-stream';
 
@@ -43,9 +48,9 @@ function getPythonExecutablePath(): string {
   return path.join(process.resourcesPath, executableName);
 }
 
-function incomingDataHandler(data: string | Buffer<ArrayBufferLike>) {
+function handleIncomingData(data: string | Buffer<ArrayBufferLike>) {
   try {
-    const payload = JSON.parse(data.toString('utf-8')) as IncomingPayload;
+    const payload = JSON.parse(data.toString('utf-8')) as IncomingDataPayload;
 
     switch (payload.action) {
       case 'model_ready':
@@ -63,7 +68,33 @@ function incomingDataHandler(data: string | Buffer<ArrayBufferLike>) {
         logger.warn(`Unknown action received from OCR process: ${payload}`);
     }
   } catch (e) {
-    logger.error(`Failed  to parse incoming data: ${e}`);
+    logger.error(`Failed to parse incoming data: ${e}`);
+  }
+}
+
+function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
+  const ocrLogger = logger.scope('OCR');
+
+  const lines = data.toString('utf-8').trim().split('\n');
+
+  for (const line of lines) {
+    try {
+      const payload = JSON.parse(line.trim()) as IncomingLogPayload;
+
+      switch (payload.type) {
+        case 'info':
+          ocrLogger.info(payload.message);
+          break;
+        case 'error':
+          ocrLogger.error(payload.message);
+          break;
+        case 'debug':
+          ocrLogger.debug(payload.message);
+          break;
+      }
+    } catch (e) {
+      logger.error(`Failed to parse incoming log data: ${e}`);
+    }
   }
 }
 
@@ -84,16 +115,12 @@ function initPythonOcr() {
 
   // Create streams
   logStream = streams[FileDescriptors.LOGS] as unknown as fs.ReadStream;
-
-  const loggerWithPrefix = new LoggerWithPrefix('OCR');
-  logStream.pipe(new LoggerWithPrefix('OCR')); // Pipe to logger
-  pythonOcr.stderr?.pipe(loggerWithPrefix); // Also pipe stderr
-  pythonOcr.stdout?.pipe(loggerWithPrefix); // Also pipe stdout
+  logStream.on('data', handleIncomingLog);
 
   incomingDataStream = streams[
     FileDescriptors.DATA_IN
   ] as unknown as fs.ReadStream;
-  incomingDataStream.on('data', incomingDataHandler);
+  incomingDataStream.on('data', handleIncomingData);
 
   outgoingDataStream = streams[
     FileDescriptors.DATA_OUT
@@ -138,7 +165,7 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
     const onData = (data: string | Buffer<ArrayBufferLike>) => {
       if (!incomingDataStream) return;
 
-      const payload = JSON.parse(data.toString('utf-8')) as IncomingPayload;
+      const payload = JSON.parse(data.toString('utf-8')) as IncomingDataPayload;
 
       // Look for a newline character to signal the end of the response
       if (payload.action === 'ocr_result') {

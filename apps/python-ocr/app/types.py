@@ -14,6 +14,10 @@ class OcrResult(TypedDict):
     results: List[OcrResultItem]
     segmented_text: List[str]
 
+class OutgoingLogPayload(TypedDict):
+    type: Literal['debug', 'info', 'error']
+    message: str
+
 class OutgoingModelReadyPayload(TypedDict):
     action: Literal['model_ready']
 
@@ -25,4 +29,4 @@ class OutgoingErrorPayload(TypedDict):
     action: Literal['error']
     message: str
 
-OutgoingPayload = Union[OutgoingOcrResultPayload, OutgoingModelReadyPayload, OutgoingErrorPayload]
+OutgoingDataPayload = Union[OutgoingOcrResultPayload, OutgoingModelReadyPayload, OutgoingErrorPayload]

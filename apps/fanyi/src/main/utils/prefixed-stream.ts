@@ -1,6 +1,7 @@
 import { Writable, WritableOptions } from 'node:stream';
 import Logger from 'electron-log';
 
+import { IncomingLogPayload } from '@shared/types/ocr';
 import { logger } from '@main/logger';
 
 export class LoggerWithPrefix extends Writable {
@@ -19,16 +20,20 @@ export class LoggerWithPrefix extends Writable {
     _encoding: BufferEncoding,
     callback: (error?: Error | null) => void
   ): void {
-    const data = this.remainder + chunk.toString();
-    const lines = data.split('\n');
+    console.log('blop:', chunk.toString().trim());
+    const data = JSON.parse(chunk.toString().trim()) as IncomingLogPayload;
 
-    this.remainder = lines.pop() || '';
-
-    lines.forEach((line) => {
-      if (line.length > 0) {
-        this.ocrLogger.info(`${line}`);
-      }
-    });
+    switch (data.type) {
+      case 'info':
+        this.ocrLogger.info(data.message);
+        break;
+      case 'error':
+        this.ocrLogger.error(data.message);
+        break;
+      case 'debug':
+        this.ocrLogger.debug(data.message);
+        break;
+    }
 
     callback();
   }
