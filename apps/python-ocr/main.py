@@ -1,11 +1,10 @@
 import os
 import sys
-import json
 from app.utils import handle_pyinstaller_folders
 from app.ipc import write_and_send
 from app.engine import OCRAnalyzer
 from app import logger
-from app.types import AppFD
+from app.types import AppFD, OutgoingErrorPayload, OutgoingModelReadyPayload, OutgoingOcrResultPayload
 
 in_stream = os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
 
@@ -14,7 +13,8 @@ def main():
 
     logger.info("Initializing models...")
     analyzer = OCRAnalyzer()
-    logger.info("Models are ready. Awaiting 'run-ocr' command...")
+
+    write_and_send(OutgoingModelReadyPayload(action="model_ready"))
 
     for line in in_stream:
         command = line.strip()
@@ -28,18 +28,25 @@ def main():
                     logger.info(
                         f"Error: Invalid or non-existent image path received: {image_path}",
                     )
-                    write_and_send("ERROR")
+                    write_and_send(OutgoingErrorPayload(action="error", message="Invalid image path"))
                     continue
 
                 ocr_result = analyzer.ocr_and_segment(image_path)
 
                 # JSON stringify and send
-                write_and_send(json.dumps(ocr_result))
+                write_and_send(OutgoingOcrResultPayload(
+                    action="ocr_result",
+                    data=ocr_result
+                ))
 
             except Exception as e:
                 logger.info(f"Error during OCR execution: {e}")
 
-                write_and_send("ERROR")
+                write_and_send(OutgoingErrorPayload(
+                    action="error",
+                    message=str(e)
+                ))
+
         elif command == "exit":
             logger.info("Received 'exit' command. Shutting down.")
             sys.exit(0)

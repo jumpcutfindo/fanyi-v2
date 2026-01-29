@@ -17,3 +17,22 @@ export interface OcrResponse {
   ocrResult: OcrResult;
   translations: DictionaryEntry[];
 }
+
+interface IncomingModelReadyPayload {
+  action: 'model_ready';
+}
+
+interface IncomingOcrResultPayload {
+  action: 'ocr_result';
+  data: OcrResult;
+}
+
+interface IncomingErrorPayload {
+  action: 'error';
+  message: string;
+}
+
+export type IncomingPayload =
+  | IncomingModelReadyPayload
+  | IncomingOcrResultPayload
+  | IncomingErrorPayload;

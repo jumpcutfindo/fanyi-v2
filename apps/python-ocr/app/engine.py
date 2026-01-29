@@ -6,6 +6,7 @@ import sys
 import easyocr
 import jieba
 from . import logger
+from .types import OcrResult
 
 
 class OCRAnalyzer:
@@ -22,7 +23,9 @@ class OCRAnalyzer:
         # Warm up jieba
         list(jieba.cut("初始化", cut_all=False))
 
-    def ocr_and_segment(self, image_path):
+    def ocr_and_segment(self, image_path: str) -> OcrResult:
+        logger.debug(f"Performing OCR and segmentation on image: {image_path} ")
+
         """
         Performs OCR and text segmentation on an image given its file path.
         """
@@ -30,9 +33,13 @@ class OCRAnalyzer:
             # Pass the file path directly to easyocr.readtext()
             results = self.reader.readtext(image_path)
 
+            logger.debug(f"Extracted text from {image_path}")
+
             # Extract the segmented text from the results
             text = "".join([result[1] for result in results])
             seg_list = jieba.cut(text, cut_all=False)
+
+            logger.debug(f"Segmented text from {image_path}")
 
             return {
                 "results": list(
