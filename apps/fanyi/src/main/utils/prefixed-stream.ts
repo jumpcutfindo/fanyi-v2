@@ -3,7 +3,7 @@ import Logger from 'electron-log';
 
 import { logger } from '@main/logger';
 
-export class PrefixedStream extends Writable {
+export class LoggerWithPrefix extends Writable {
   private remainder: string = '';
 
   private ocrLogger: Logger.LogFunctions;

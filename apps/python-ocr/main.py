@@ -5,7 +5,9 @@ from app.utils import handle_pyinstaller_folders
 from app.ipc import write_and_send
 from app.engine import OCRAnalyzer
 from app import logger
+from app.types import AppFD
 
+in_stream = os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
 
 def main():
     handle_pyinstaller_folders()
@@ -14,15 +16,13 @@ def main():
     analyzer = OCRAnalyzer()
     logger.info("Models are ready. Awaiting 'run-ocr' command...")
 
-    sys.stderr.flush()
-
-    for line in sys.stdin:
+    for line in in_stream:
         command = line.strip()
 
         if command == "run-ocr":
             try:
                 # Read the full file path from stdin
-                image_path = sys.stdin.readline().strip()
+                image_path = in_stream.readline().strip()
 
                 if not image_path or not os.path.exists(image_path):
                     logger.info(
@@ -38,7 +38,6 @@ def main():
 
             except Exception as e:
                 logger.info(f"Error during OCR execution: {e}")
-                sys.stderr.flush()
 
                 write_and_send("ERROR")
         elif command == "exit":

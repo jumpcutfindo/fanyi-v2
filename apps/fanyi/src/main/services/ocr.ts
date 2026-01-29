@@ -7,9 +7,20 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { OcrResult, OcrStatus } from '@shared/types/ocr';
 import { logger } from '@main/logger';
-import { PrefixedStream } from '@main/utils/prefixed-stream';
+import { LoggerWithPrefix } from '@main/utils/prefixed-stream';
+
+enum FileDescriptors {
+  DATA_OUT = 3,
+  DATA_IN = 4,
+  LOGS = 5,
+}
 
 let pythonOcr: ChildProcess | null;
+
+let logStream: fs.ReadStream | null;
+let outgoingDataStream: fs.WriteStream | null;
+let incomingDataStream: fs.ReadStream | null;
+
 let ocrStatus: OcrStatus = 'startup';
 
 function getPythonExecutablePath(): string {
@@ -38,33 +49,50 @@ function initPythonOcr() {
 
   logger.info('Starting python OCR service', pythonExecutable);
 
-  pythonOcr = spawn(pythonExecutable);
+  pythonOcr = spawn(pythonExecutable, {
+    stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe', 'pipe'],
+  });
 
-  const prefixedStdout = new PrefixedStream('OCR');
-  const prefixedStderr = new PrefixedStream('OCR');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const streams = pythonOcr.stdio as any;
 
-  // Directly pipe stdout and stderr to the Node.js console
-  pythonOcr.stdout?.pipe(prefixedStdout);
-  pythonOcr.stderr?.pipe(prefixedStderr);
+  // Create streams
+  logStream = streams[FileDescriptors.LOGS] as unknown as fs.ReadStream;
+  logStream.pipe(new LoggerWithPrefix('OCR')); // Pipe to logger
 
-  const onReady = (data: Buffer) => {
+  incomingDataStream = streams[
+    FileDescriptors.DATA_IN
+  ] as unknown as fs.ReadStream;
+
+  outgoingDataStream = streams[
+    FileDescriptors.DATA_OUT
+  ] as unknown as fs.WriteStream;
+
+  const onReady = (data: string | Buffer<ArrayBufferLike>) => {
+    if (!incomingDataStream) return;
+
     if (data.toString().includes('Models are ready.')) {
       logger.info('Python OCR service is ready!');
       ocrStatus = 'available';
 
       // Remove the listener
-      pythonOcr?.stderr?.removeListener('data', onReady);
+      incomingDataStream.removeListener('data', onReady);
     }
   };
 
   // Check for ready message
-  pythonOcr.stderr?.on('data', onReady);
+  incomingDataStream.on('data', onReady);
 }
 
 function cleanUpPythonOcr() {
   if (pythonOcr) {
     ocrStatus = 'shutdown';
     logger.info('Stopping python OCR service...');
+
+    // Close streams
+    logStream?.close();
+    incomingDataStream?.close();
+
     pythonOcr.kill();
   }
 }
@@ -76,7 +104,12 @@ function getOcrStatus(): Promise<OcrStatus> {
 function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
   return new Promise((resolve, reject) => {
     // 1. Ensure the persistent process is running
-    if (!pythonOcr || !pythonOcr.stdin || !pythonOcr.stdout) {
+    if (
+      !pythonOcr ||
+      pythonOcr.killed ||
+      !incomingDataStream ||
+      !outgoingDataStream
+    ) {
       return reject(
         new Error('Python OCR service is not initialized or is closed.')
       );
@@ -86,7 +119,9 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
     let receivedData = '';
 
     // Create a one-time listener for the response
-    const onData = (data: Buffer) => {
+    const onData = (data: string | Buffer<ArrayBufferLike>) => {
+      if (!incomingDataStream) return;
+
       receivedData += data.toString('utf-8');
 
       // Look for a newline character to signal the end of the response
@@ -94,8 +129,8 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
         const responseLine = receivedData.trim();
 
         // Remove the listener to avoid processing old data on the next request
-        process.stdout?.removeListener('data', onData);
-        process.stderr?.removeListener('data', onError);
+        incomingDataStream.removeListener('data', onData);
+        incomingDataStream.removeListener('data', onError);
 
         // 2. Check for an error signal from the Python process
         if (responseLine === 'ERROR') {
@@ -110,19 +145,20 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
       }
     };
 
-    const onError = (data: Buffer) => {
+    const onError = (data: string | Buffer<ArrayBufferLike>) => {
       const error = data.toString('utf-8');
       logger.error(`Python stderr: ${error}`);
     };
 
     // Attach listeners for this specific request
-    process.stdout?.on('data', onData);
-    process.stderr?.on('data', onError);
+    incomingDataStream.on('data', onData);
+    incomingDataStream.on('data', onError);
 
     // Handle potential disconnects
     const onClose = (code: number) => {
-      process.stdout?.removeListener('data', onData);
-      process.stderr?.removeListener('data', onError);
+      if (!incomingDataStream) return;
+
+      incomingDataStream.removeListener('data', onData);
       ocrStatus = 'unavailable';
       reject(new Error(`Python process disconnected with code ${code}.`));
     };
@@ -145,12 +181,12 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
       logger.debug(`Wrote image to ${tempFilePath}`);
 
       // 3. Write the command and data to the Python process's stdin
-      process.stdin?.write('run-ocr\n');
-      process.stdin?.write(`${tempFilePath}\n`);
+      outgoingDataStream.write('run-ocr\n');
+      outgoingDataStream.write(`${tempFilePath}\n`);
     } catch (err) {
       // Clean up in case of an immediate write error
-      process.stdout?.removeListener('data', onData);
-      process.stderr?.removeListener('data', onError);
+      incomingDataStream.removeListener('data', onData);
+      incomingDataStream.removeListener('data', onError);
       reject(new Error(`Failed to write to Python process: ${err}`));
     }
   });
