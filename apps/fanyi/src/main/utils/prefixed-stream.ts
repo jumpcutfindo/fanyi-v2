@@ -5,8 +5,6 @@ import { IncomingLogPayload } from '@shared/types/ocr';
 import { logger } from '@main/logger';
 
 export class LoggerWithPrefix extends Writable {
-  private remainder: string = '';
-
   private ocrLogger: Logger.LogFunctions;
 
   constructor(prefix: string, options?: WritableOptions) {
