@@ -2,7 +2,6 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import { ChildProcess } from 'node:child_process';
 import path from 'node:path';
-import { send } from 'node:process';
 import Stream from 'node:stream';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,7 +14,6 @@ import {
   OcrStatus,
 } from '@shared/types/ocr';
 import { logger } from '@main/logger';
-import { LoggerWithPrefix } from '@main/utils/prefixed-stream';
 
 enum FileDescriptors {
   DATA_OUT = 3,
@@ -180,8 +178,6 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
         new Error('Python OCR service is not initialized or is closed.')
       );
     }
-
-    const process = pythonOcr;
 
     // Create a one-time listener for the response
     const onData = (data: string | Buffer<ArrayBufferLike>) => {

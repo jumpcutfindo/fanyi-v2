@@ -2,7 +2,6 @@
 Encapsulates the OCR and segmentation operations for Fanyi
 """
 
-import sys
 import easyocr
 import jieba
 from . import logger
