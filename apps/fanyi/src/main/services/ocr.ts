@@ -2,14 +2,31 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import { ChildProcess } from 'node:child_process';
 import path from 'node:path';
+import Stream from 'node:stream';
 import { app } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 
-import { OcrResult, OcrStatus } from '@shared/types/ocr';
+import {
+  IncomingDataPayload,
+  IncomingLogPayload,
+  OcrCommandPayload,
+  OcrResult,
+  OcrStatus,
+} from '@shared/types/ocr';
 import { logger } from '@main/logger';
-import { PrefixedStream } from '@main/utils/prefixed-stream';
+
+enum FileDescriptors {
+  DATA_OUT = 3,
+  DATA_IN = 4,
+  LOGS = 5,
+}
 
 let pythonOcr: ChildProcess | null;
+
+let logStream: Stream.Readable,
+  outgoingDataStream: Stream.Writable,
+  incomingDataStream: Stream.Readable;
+
 let ocrStatus: OcrStatus = 'startup';
 
 function getPythonExecutablePath(): string {
@@ -31,6 +48,74 @@ function getPythonExecutablePath(): string {
   return path.join(process.resourcesPath, executableName);
 }
 
+/**
+ * Handles incoming data from the Python OCR process.
+ */
+function handleIncomingData(data: string | Buffer<ArrayBufferLike>) {
+  try {
+    const payload = JSON.parse(data.toString('utf-8')) as IncomingDataPayload;
+
+    switch (payload.action) {
+      case 'model_ready':
+        logger.info('OCR model is ready to be used');
+        ocrStatus = 'available';
+        break;
+      case 'ocr_result':
+        logger.info('Received OCR result from Python process');
+        // Handle OCR result if needed
+        break;
+      case 'error':
+        logger.error(`Error observed in OCR process: ${payload.message}`);
+        break;
+      default:
+        logger.warn(`Unknown action received from OCR process: ${payload}`);
+    }
+  } catch (e) {
+    logger.error(`Failed to parse incoming data: ${e}`);
+  }
+}
+
+/**
+ * Handles incoming log data from the Python OCR process.
+ */
+function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
+  const ocrLogger = logger.scope('OCR');
+
+  const lines = data.toString('utf-8').trim().split('\n');
+
+  for (const line of lines) {
+    try {
+      const payload = JSON.parse(line.trim()) as IncomingLogPayload;
+
+      switch (payload.type) {
+        case 'info':
+          ocrLogger.info(payload.message);
+          break;
+        case 'error':
+          ocrLogger.error(payload.message);
+          break;
+        case 'debug':
+          ocrLogger.debug(payload.message);
+          break;
+      }
+    } catch (e) {
+      logger.error(`Failed to parse incoming log data: ${e}`);
+    }
+  }
+}
+
+/**
+ * Sends a command to the Python OCR process.
+ */
+function sendCommand(command: OcrCommandPayload) {
+  if (!outgoingDataStream) {
+    throw new Error('Outgoing data stream is not initialized.');
+  }
+
+  outgoingDataStream.write(JSON.stringify(command));
+  outgoingDataStream.write('\n'); // Newline to signal end of line
+}
+
 function initPythonOcr() {
   ocrStatus = 'startup';
 
@@ -38,33 +123,40 @@ function initPythonOcr() {
 
   logger.info('Starting python OCR service', pythonExecutable);
 
-  pythonOcr = spawn(pythonExecutable);
+  pythonOcr = spawn(pythonExecutable, {
+    // Open additional file descriptors for IPC
+    stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe', 'pipe'],
+  });
 
-  const prefixedStdout = new PrefixedStream('OCR');
-  const prefixedStderr = new PrefixedStream('OCR');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const streams = pythonOcr.stdio as any;
 
-  // Directly pipe stdout and stderr to the Node.js console
-  pythonOcr.stdout?.pipe(prefixedStdout);
-  pythonOcr.stderr?.pipe(prefixedStderr);
+  // Create streams
+  logStream = streams[FileDescriptors.LOGS] as unknown as fs.ReadStream;
+  logStream.on('data', handleIncomingLog);
 
-  const onReady = (data: Buffer) => {
-    if (data.toString().includes('Models are ready.')) {
-      logger.info('Python OCR service is ready!');
-      ocrStatus = 'available';
+  incomingDataStream = streams[
+    FileDescriptors.DATA_IN
+  ] as unknown as fs.ReadStream;
+  incomingDataStream.on('data', handleIncomingData);
 
-      // Remove the listener
-      pythonOcr?.stderr?.removeListener('data', onReady);
-    }
-  };
-
-  // Check for ready message
-  pythonOcr.stderr?.on('data', onReady);
+  outgoingDataStream = streams[
+    FileDescriptors.DATA_OUT
+  ] as unknown as fs.WriteStream;
 }
 
 function cleanUpPythonOcr() {
   if (pythonOcr) {
     ocrStatus = 'shutdown';
     logger.info('Stopping python OCR service...');
+
+    // Close streams
+    logStream?.destroy();
+    incomingDataStream?.destroy();
+    outgoingDataStream?.destroy();
+
+    sendCommand({ action: 'shutdown' });
+
     pythonOcr.kill();
   }
 }
@@ -76,58 +168,33 @@ function getOcrStatus(): Promise<OcrStatus> {
 function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
   return new Promise((resolve, reject) => {
     // 1. Ensure the persistent process is running
-    if (!pythonOcr || !pythonOcr.stdin || !pythonOcr.stdout) {
+    if (
+      !pythonOcr ||
+      pythonOcr.killed ||
+      !incomingDataStream ||
+      !outgoingDataStream
+    ) {
       return reject(
         new Error('Python OCR service is not initialized or is closed.')
       );
     }
 
-    const process = pythonOcr;
-    let receivedData = '';
-
     // Create a one-time listener for the response
-    const onData = (data: Buffer) => {
-      receivedData += data.toString('utf-8');
+    const onData = (data: string | Buffer<ArrayBufferLike>) => {
+      if (!incomingDataStream) return;
+
+      const payload = JSON.parse(data.toString('utf-8')) as IncomingDataPayload;
 
       // Look for a newline character to signal the end of the response
-      if (receivedData.includes('\n')) {
-        const responseLine = receivedData.trim();
-
+      if (payload.action === 'ocr_result') {
         // Remove the listener to avoid processing old data on the next request
-        process.stdout?.removeListener('data', onData);
-        process.stderr?.removeListener('data', onError);
-
-        // 2. Check for an error signal from the Python process
-        if (responseLine === 'ERROR') {
-          return reject(
-            new Error(
-              'Python OCR process returned an error. Check its stderr for details.'
-            )
-          );
-        }
-
-        resolve(JSON.parse(responseLine) as unknown as OcrResult);
+        incomingDataStream.removeListener('data', onData);
+        resolve(payload.data);
       }
     };
 
-    const onError = (data: Buffer) => {
-      const error = data.toString('utf-8');
-      logger.error(`Python stderr: ${error}`);
-    };
-
     // Attach listeners for this specific request
-    process.stdout?.on('data', onData);
-    process.stderr?.on('data', onError);
-
-    // Handle potential disconnects
-    const onClose = (code: number) => {
-      process.stdout?.removeListener('data', onData);
-      process.stderr?.removeListener('data', onError);
-      ocrStatus = 'unavailable';
-      reject(new Error(`Python process disconnected with code ${code}.`));
-    };
-
-    process.on('close', onClose);
+    incomingDataStream.on('data', onData);
 
     try {
       const appDataDir = path.join(app.getPath('temp'), 'fanyi');
@@ -144,13 +211,13 @@ function runOcr(imageBuffer: Buffer): Promise<OcrResult> {
 
       logger.debug(`Wrote image to ${tempFilePath}`);
 
-      // 3. Write the command and data to the Python process's stdin
-      process.stdin?.write('run-ocr\n');
-      process.stdin?.write(`${tempFilePath}\n`);
+      sendCommand({
+        action: 'run_ocr',
+        image_path: tempFilePath,
+      });
     } catch (err) {
       // Clean up in case of an immediate write error
-      process.stdout?.removeListener('data', onData);
-      process.stderr?.removeListener('data', onError);
+      incomingDataStream.removeListener('data', onData);
       reject(new Error(`Failed to write to Python process: ${err}`));
     }
   });

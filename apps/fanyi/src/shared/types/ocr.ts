@@ -17,3 +17,38 @@ export interface OcrResponse {
   ocrResult: OcrResult;
   translations: DictionaryEntry[];
 }
+
+interface IncomingModelReadyPayload {
+  action: 'model_ready';
+}
+
+interface IncomingOcrResultPayload {
+  action: 'ocr_result';
+  data: OcrResult;
+}
+
+interface IncomingErrorPayload {
+  action: 'error';
+  message: string;
+}
+
+export interface IncomingLogPayload {
+  type: 'info' | 'error' | 'debug';
+  message: string;
+}
+
+export type IncomingDataPayload =
+  | IncomingModelReadyPayload
+  | IncomingOcrResultPayload
+  | IncomingErrorPayload;
+
+interface RunOcrCommandPayload {
+  action: 'run_ocr';
+  image_path: string;
+}
+
+interface ShutdownCommandPayload {
+  action: 'shutdown';
+}
+
+export type OcrCommandPayload = RunOcrCommandPayload | ShutdownCommandPayload;
