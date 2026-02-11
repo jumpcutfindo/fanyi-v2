@@ -7,6 +7,7 @@ import { DictionaryEntryCard } from '@renderer/components/DictionaryEntryCard';
 import { Button } from '@renderer/components/ui/Button';
 import { Input } from '@renderer/components/ui/Input';
 import { Separator } from '@renderer/components/ui/Separator';
+import { AddDictionaryEntryDialog } from '@renderer/features/dictionary/components/AddDictionaryEntryDialog';
 import { useSearchDictionaries } from '@renderer/features/dictionary/queries/searchDictionaries.query';
 import { cn } from '@renderer/lib/utils';
 import { useDictionariesStore } from '@renderer/stores/useDictionariesStore';
@@ -50,6 +51,11 @@ export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
         ) : null}
       </div>
       <Separator className="mt-3" />
+      <>
+        <div className="flex w-full flex-row items-center justify-end p-4">
+          <AddDictionaryEntryDialog />
+        </div>
+      </>
       <div className="grow">
         {isPending ? (
           <div className="grow justify-items-center">
@@ -58,6 +64,7 @@ export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
         ) : null}
         {!isPending && allEntries && allEntries.length ? (
           <Virtuoso
+            className="grow"
             data={allEntries}
             endReached={() => {
               if (hasNextPage && !isFetchingNextPage) {
