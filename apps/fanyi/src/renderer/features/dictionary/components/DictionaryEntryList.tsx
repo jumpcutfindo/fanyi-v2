@@ -51,11 +51,6 @@ export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
         ) : null}
       </div>
       <Separator className="mt-3" />
-      <>
-        <div className="flex w-full flex-row items-center justify-end p-4">
-          <AddDictionaryEntryDialog />
-        </div>
-      </>
       <div className="grow">
         {isPending ? (
           <div className="grow justify-items-center">
@@ -91,6 +86,14 @@ export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
             }}
           />
         ) : null}
+      </div>
+
+      <Separator />
+      <div className="flex w-full flex-row items-center p-4">
+        <span className="text-sm font-medium">Actions</span>
+        <div className="ms-auto flex flex-row">
+          <AddDictionaryEntryDialog />
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { pinyin } from 'pinyin-pro';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { Button } from '@renderer/components/ui/Button';
@@ -63,10 +63,17 @@ export function AddDictionaryEntryDialog() {
     console.log(data);
   };
 
+  useEffect(() => {
+    // Add an empty entry if definitions array is empty
+    if (definitions.length === 0) {
+      addDefinition('');
+    }
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="default" size="icon">
           <Plus />
         </Button>
       </DialogTrigger>
@@ -140,7 +147,7 @@ export function AddDictionaryEntryDialog() {
               </Label>
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 size="icon"
                 onClick={() => addDefinition('')}
               >
