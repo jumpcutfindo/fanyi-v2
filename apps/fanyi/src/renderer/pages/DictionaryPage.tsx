@@ -21,6 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@renderer/components/ui/Tooltip';
+import { AddDictionaryEntryDialog } from '@renderer/features/dictionary/components/AddDictionaryEntryDialog';
 import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryFormDialog } from '@renderer/features/dictionary/components/DictionaryFormDialog';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
@@ -89,6 +90,8 @@ export function DictionaryPage() {
           {canModifyDictionary ? (
             <>
               <div className="ms-auto flex flex-row justify-end gap-2">
+                <AddDictionaryEntryDialog />
+                <Separator orientation="vertical" />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button

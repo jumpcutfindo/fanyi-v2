@@ -87,14 +87,6 @@ export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
           />
         ) : null}
       </div>
-
-      <Separator />
-      <div className="flex w-full flex-row items-center p-4">
-        <span className="text-sm font-medium">Actions</span>
-        <div className="ms-auto flex flex-row">
-          <AddDictionaryEntryDialog />
-        </div>
-      </div>
     </div>
   );
 }

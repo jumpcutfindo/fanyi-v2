@@ -13,6 +13,11 @@ import {
 } from '@renderer/components/ui/Dialog';
 import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@renderer/components/ui/Tooltip';
 import { s2t, t2s } from '@renderer/utils/translation.util';
 
 interface AddDictionaryEntryForm {
@@ -72,11 +77,16 @@ export function AddDictionaryEntryDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default" size="icon">
-          <Plus />
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <DialogTrigger asChild>
+          <TooltipTrigger>
+            <Button variant="outline" size="icon">
+              <Plus />
+            </Button>
+          </TooltipTrigger>
+        </DialogTrigger>
+        <TooltipContent>Add a new word</TooltipContent>
+      </Tooltip>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add a new word</DialogTitle>
