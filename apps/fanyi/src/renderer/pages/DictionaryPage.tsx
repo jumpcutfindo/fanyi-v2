@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from '@renderer/components/ui/AlertDialog';
 import { Button } from '@renderer/components/ui/Button';
+import { Separator } from '@renderer/components/ui/Separator';
 import {
   Tooltip,
   TooltipContent,
@@ -65,8 +66,8 @@ export function DictionaryPage() {
       <SidebarContainer className="min-w-70">
         <DictionaryManager />
       </SidebarContainer>
-      <div className="flex w-full flex-col gap-4 p-4">
-        <div className="flex h-6 flex-row items-center gap-2">
+      <div className="flex w-full flex-col gap-4">
+        <div className="mx-4 mt-4 flex h-6 flex-row items-center gap-2">
           {selectedDictionary ? (
             <Button
               variant="ghost"
@@ -135,7 +136,6 @@ export function DictionaryPage() {
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
-
               <DictionaryFormDialog
                 mode="edit"
                 open={isEditDialogOpen}
@@ -145,7 +145,7 @@ export function DictionaryPage() {
             </>
           ) : null}
         </div>
-        <DictionaryEntryList />
+        <DictionaryEntryList mode={canModifyDictionary ? 'edit' : 'view'} />
       </div>
     </>
   );
