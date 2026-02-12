@@ -4,6 +4,9 @@ import os
 import sys
 from unittest.mock import MagicMock, call
 
+# Replace here since in-line replacement isn't working for shutil.rmtree
+# sys.modules['shutil'] = MagicMock()
+
 from app.utils import handle_pyinstaller_folders
 
 
@@ -23,28 +26,28 @@ def test_handle_pyinstaller_folders_cleanup(mocker: MagicMock):
     mocker.patch.object(sys, "_MEIPASS", current_mei_folder, create=True)
 
     # Mock filesystem functions
-    mock_rmtree = mocker.patch("shutil.rmtree")
+    mock_rmtree = mocker.patch("app.utils.rmtree") # Replace the already imported rmtree
     mock_glob = mocker.patch("glob.glob", return_value=all_mei_folders)
     mocker.patch("builtins.open", mocker.mock_open())
     # Mock logger to prevent side effects
     mocker.patch("app.utils.logger")
 
     # This side effect function simulates which folders have the 'fanyi' indicator file
-    def mock_path_exists(path):
-        mocker.patch("os.path.exists", side_effect=mock_path_exists)
-
+    def mock_path_exists(path: str) -> bool:
         # The 'fanyi' file should exist in the old fanyi-related folder
         if path == os.path.join(old_fanyi_folder, "fanyi"):
             return True
+        
         # It should NOT exist in the other old folder
         if path == os.path.join(old_other_folder, "fanyi"):
             return False
+        
         return True # Assume other paths exist for simplicity
-
+    
+    mocker.patch("os.path.exists", side_effect=mock_path_exists)
 
     # 2. Call the function to be tested
     handle_pyinstaller_folders()
-
 
     # 3. Assertions
     # Check that glob was called to find all _MEI* folders
