@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 import {
+  CreateDictionaryEntryPayload,
   CreateDictionaryPayload,
   DictionaryEntry,
   DictionarySearchOptions,
@@ -66,6 +67,12 @@ contextBridge.exposeInMainWorld('api', {
 
   getDictionaryEntryOfWord: (word: string): Promise<DictionaryEntry | null> =>
     ipcRenderer.invoke('get-dictionary-entry-of-word', word),
+  createDictionaryEntry: (
+    dictionaryId: string,
+    entry: CreateDictionaryEntryPayload
+  ): Promise<void> =>
+    ipcRenderer.invoke('create-dictionary-entry', dictionaryId, entry),
+
   getDictionaries: () => ipcRenderer.invoke('get-dictionaries'),
   searchDictionaries: (queryString: string, options: DictionarySearchOptions) =>
     ipcRenderer.invoke('search-dictionaries', queryString, options),

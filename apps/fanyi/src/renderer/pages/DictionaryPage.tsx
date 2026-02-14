@@ -196,6 +196,7 @@ export function DictionaryPage() {
           }));
         }}
         mode={entryDialogState.mode}
+        dictionaryId={selectedDictionary?.id ?? ''}
         entry={entryDialogState.entry}
       />
     </>

@@ -5,6 +5,7 @@ import { getOcrStatus, runOcr } from './services/ocr';
 import { logger } from '@main/logger';
 import {
   createDictionary,
+  createDictionaryEntry,
   deleteDictionary,
   getDictionaryEntries,
   getDictionaryEntry,
@@ -116,6 +117,13 @@ export function registerIpcHandlers() {
   ipcMain.handle('get-dictionary-entry-of-word', async (_event, word) => {
     return getDictionaryEntry(word);
   });
+  ipcMain.handle(
+    'create-dictionary-entry',
+    async (_event, dictionaryId, entry) => {
+      return createDictionaryEntry(dictionaryId, entry);
+    }
+  );
+
   ipcMain.handle('get-dictionaries', async (_event) => {
     return listDictionaries();
   });

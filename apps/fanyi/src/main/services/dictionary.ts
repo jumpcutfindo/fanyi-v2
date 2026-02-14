@@ -6,6 +6,7 @@ import * as pinyin from 'pinyin-pro';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
+  CreateDictionaryEntryPayload,
   CreateDictionaryPayload,
   CustomDictionary,
   customDictionarySchema,
@@ -23,6 +24,15 @@ const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionarie
 let defaultDictionary: Dictionary | null = null;
 const localDictionaries: Dictionary[] = [];
 
+/**
+ * Converts a list of raw dictionary entries into a map of entries.
+ *
+ * Note: This function is difficult to split out due to the reliance of building the map
+ * on previously seen entries.
+ *
+ * Comment: Maybe this can be improved with a custom class, such that adding each item is less
+ * taxing?
+ */
 function rawEntriesToMap(
   rawEntries: RawDictionaryEntry[]
 ): Record<string, DictionaryEntry> {
@@ -185,6 +195,37 @@ export function getDictionaryEntry(query: string) {
   }
 
   return defaultDictionary.wordMap[query];
+}
+
+export function createDictionaryEntry(
+  dictionaryId: string,
+  entry: CreateDictionaryEntryPayload
+) {
+  logger.debug(`Adding dictionary entry ${entry.simplified}`);
+
+  const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
+
+  if (!dictionary) {
+    logger.warn(`Dictionary with ID ${dictionaryId} not found`);
+    return;
+  }
+
+  logger.debug(
+    `Dictionary entry ${entry.simplified} will be added to dictionary ${dictionary.name} (${dictionary.id})`
+  );
+
+  if (dictionary) {
+    dictionary.rawEntries.push({
+      simplified: entry.simplified,
+      traditional: entry.traditional,
+      pinyin: entry.pinyin,
+      definitions: entry.definitions.join('/'),
+    });
+
+    // Note: This function is potentially expensive if there are many words in the dictionary
+    // However, this is necessary due to the interdependence of words on each other
+    dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+  }
 }
 
 export function listDictionaries(): DictionaryMinimal[] {

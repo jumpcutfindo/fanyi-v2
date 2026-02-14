@@ -43,6 +43,11 @@ interface Window {
     getScreenshotSources: () => Promise<ScreenshotSource[]>;
 
     getDictionaryEntryOfWord(word: string): Promise<DictionaryEntry | null>;
+    createDictionaryEntry(
+      dictionaryId: string,
+      entry: CreateDictionaryEntryPayload
+    ): Promise<void>;
+
     getDictionaries(): Promise<DictionaryMinimal[]>;
     searchDictionaries(
       queryString: string,

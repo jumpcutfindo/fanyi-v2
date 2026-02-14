@@ -71,3 +71,10 @@ export type UpdateDictionaryPayload = Omit<
   Dictionary,
   'createdOn' | 'modifiedOn' | 'wordMap' | 'rawEntries' | 'type'
 >;
+
+export type CreateDictionaryEntryPayload = Omit<
+  RawDictionaryEntry,
+  'definitions'
+> & {
+  definitions: string[];
+};

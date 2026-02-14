@@ -13,6 +13,7 @@ import {
 } from '@renderer/components/ui/Dialog';
 import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
+import { useCreateDictionaryEntryMutation } from '@renderer/features/dictionary/queries/createDictionaryEntry.mutation';
 import { s2t, t2s } from '@renderer/utils/translation.util';
 
 interface DictionaryEntryForm {
@@ -24,6 +25,7 @@ interface DictionaryEntryForm {
 
 interface BaseDictionaryEntryDialogProps {
   mode: 'create' | 'edit' | 'view';
+  dictionaryId: string;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -51,7 +53,9 @@ type DictionaryEntryDialogProps =
   | ViewDictionaryEntryDialogProps;
 
 export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
-  const { mode, isOpen, setIsOpen } = props;
+  const { dictionaryId, mode, isOpen, setIsOpen } = props;
+
+  const { mutate: createDictionaryEntry } = useCreateDictionaryEntryMutation();
 
   const { handleSubmit, register, setValue, formState, control, reset } =
     useForm<DictionaryEntryForm>({
@@ -96,7 +100,19 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
   });
 
   const onSubmit = (data: DictionaryEntryForm) => {
-    console.log(data);
+    switch (mode) {
+      case 'create':
+        return createDictionaryEntry(
+          { dictionaryId, entry: data },
+          {
+            onSuccess: () => {
+              setIsOpen(false);
+            },
+          }
+        );
+      default:
+        return;
+    }
   };
 
   useEffect(() => {
