@@ -285,7 +285,7 @@ export function searchDictionaries(
       { name: 'traditional', weight: 1.0 },
       { name: 'simplified', weight: 1.0 },
       { name: 'pinyin', weight: 1.0 },
-      { name: 'definition', weight: 1.0 },
+      { name: 'definitions', weight: 1.0 },
     ],
     ignoreDiacritics: true,
     includeScore: true,
