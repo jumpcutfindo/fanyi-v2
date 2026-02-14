@@ -4,7 +4,7 @@ const rawDictionaryEntrySchema = z.object({
   simplified: z.string(),
   traditional: z.string(),
   pinyin: z.string(),
-  definition: z.string(),
+  definitions: z.string(),
 });
 
 export const customDictionarySchema = z.object({

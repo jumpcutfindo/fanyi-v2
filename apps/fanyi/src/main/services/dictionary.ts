@@ -29,7 +29,7 @@ function rawEntriesToMap(
   return rawEntries.reduce(
     (acc, entry) => {
       // Skip useless entries
-      if (entry.definition.includes('variant of')) {
+      if (entry.definitions.includes('variant of')) {
         return acc;
       }
 
@@ -38,14 +38,14 @@ function rawEntriesToMap(
         format: 'numToSymbol',
       });
 
-      // Modify all pinyins within definition
-      const pinyins = entry.definition.matchAll(/\[(.*?)\]/g);
+      // Modify all pinyins within definitions
+      const pinyins = entry.definitions.matchAll(/\[(.*?)\]/g);
 
       for (const match of pinyins) {
         const individualPinyin = match[0].matchAll(/[a-z]+[1-4]/gi);
 
         for (const innerMatch of individualPinyin) {
-          entry.definition = entry.definition.replace(
+          entry.definitions = entry.definitions.replace(
             innerMatch[0],
             pinyin.convert(innerMatch[0].toLowerCase(), {
               format: 'numToSymbol',
@@ -54,32 +54,37 @@ function rawEntriesToMap(
         }
       }
 
-      // Retrieve links from the definition
-      const externalReferences = entry.definition.matchAll(/[\u4E00-\u9FFF]+/g);
-      const links = [];
+      // Split and process definitions
+      const definitions = entry.definitions.split('/');
 
-      for (const match of externalReferences) {
-        links.push({
-          word: match[0],
-          start: match.index,
-        });
-      }
+      for (const definition of definitions) {
+        // Retrieve links from the definition
+        const externalReferences = definition.matchAll(/[\u4E00-\u9FFF]+/g);
 
-      if (acc[entry.simplified]) {
-        acc[entry.simplified].definitions.push({
-          definition: entry.definition,
-          links,
-        });
-      } else {
-        acc[entry.simplified] = {
-          ...entry,
-          definitions: [
-            {
-              definition: entry.definition,
-              links,
-            },
-          ],
-        };
+        const links = [];
+        for (const match of externalReferences) {
+          links.push({
+            word: match[0],
+            start: match.index,
+          });
+        }
+
+        if (acc[entry.simplified]) {
+          acc[entry.simplified].definitions.push({
+            definition,
+            links,
+          });
+        } else {
+          acc[entry.simplified] = {
+            ...entry,
+            definitions: [
+              {
+                definition,
+                links,
+              },
+            ],
+          };
+        }
       }
 
       return acc;
@@ -110,16 +115,22 @@ export function initDefaultDictionary() {
 
   // Define the regex with named capture groups
   const regex =
-    /^(?<traditional>.*?)\s+(?<simplified>.*?)\s+\[(?<pinyin>.*?)\]\s+\/(?<definition>.*?)\/\s*?/gm;
+    /^(?<traditional>\S+)\s+(?<simplified>\S+)\s+\[(?<pinyin>[^\]]+)\]\s+\/(?<definitions>.*)\/\s*$/gm;
 
-  const rawEntries = [];
+  const rawEntries: RawDictionaryEntry[] = [];
 
   for (const match of rawDictionary.matchAll(regex)) {
+    if (!match.groups) {
+      continue;
+    }
+
+    const { traditional, simplified, pinyin, definitions } = match.groups;
+
     rawEntries.push({
-      traditional: match.groups!.traditional,
-      simplified: match.groups!.simplified,
-      pinyin: match.groups!.pinyin.toLowerCase(),
-      definition: match.groups!.definition,
+      traditional,
+      simplified,
+      pinyin: pinyin.toLowerCase(),
+      definitions,
     });
   }
 
@@ -233,7 +244,7 @@ export function searchDictionaries(
       { name: 'traditional', weight: 1.0 },
       { name: 'simplified', weight: 1.0 },
       { name: 'pinyin', weight: 1.0 },
-      { name: 'definition', weight: 1.0 },
+      { name: 'definitions', weight: 1.0 },
     ],
     ignoreDiacritics: true,
     includeScore: true,
