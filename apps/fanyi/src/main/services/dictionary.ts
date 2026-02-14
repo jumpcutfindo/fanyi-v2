@@ -177,41 +177,30 @@ export function getDictionaryEntries(
 
   for (const query of queries) {
     for (const dict of dictionaries) {
-      if (!dict.wordMap[query]) {
+      const sourceEntry = dict.wordMap[query];
+
+      if (!sourceEntry) {
+        // Skip if entry not found
         continue;
       }
 
       if (entryMap[query]) {
         // Combine definition with existing query
-        entryMap[query].definitions.push(...dict.wordMap[query].definitions);
+        entryMap[query].definitions = [
+          ...entryMap[query].definitions,
+          ...sourceEntry.definitions,
+        ];
       } else {
         // If not, add the entry
-        entryMap[query] = dict.wordMap[query];
+        entryMap[query] = {
+          ...sourceEntry,
+          definitions: [...sourceEntry.definitions],
+        };
       }
     }
   }
 
-  const results: DictionaryEntry[] = [];
-
-  // Break up items with no entries into individual words, and process them
-  for (const key of Object.keys(entryMap)) {
-    if (!entryMap[key]) {
-      // Split the key into individual words
-      const individualWords = key.split('');
-
-      // Check all provided dictionaries for the word
-      for (const dict of dictionaries) {
-        if (dict.wordMap[key]) {
-          entryMap[key] = dict.wordMap[key];
-          break;
-        }
-      }
-    } else {
-      results.push(entryMap[key]);
-    }
-  }
-
-  return results.filter((entry) => entry !== undefined);
+  return Object.values(entryMap).filter((entry) => entry !== undefined);
 }
 
 export function getDictionaryEntry(query: string) {
