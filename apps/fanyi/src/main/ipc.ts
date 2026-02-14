@@ -7,6 +7,7 @@ import {
   createDictionary,
   createDictionaryEntry,
   deleteDictionary,
+  getDefaultDictionaryEntries,
   getDictionaryEntries,
   getDictionaryEntry,
   listDictionaries,
@@ -92,7 +93,11 @@ export function registerIpcHandlers() {
   ipcMain.handle('perform-ocr-with-screenshot', async (_event, screenshot) => {
     try {
       const ocrResult = await runOcr(screenshot);
-      const translations = getDictionaryEntries(ocrResult.segmented_text);
+
+      // FIXME: This search should eventually just search all dictionaries
+      const translations = getDefaultDictionaryEntries(
+        ocrResult.segmented_text
+      );
       return { ocrResult, translations };
     } catch (error) {
       logger.error('Failed to handle OCR request', error);

@@ -157,6 +157,12 @@ export function initDefaultDictionary() {
   logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
+export function getDefaultDictionaryEntries(queries: string[]) {
+  return defaultDictionary
+    ? getDictionaryEntries([defaultDictionary], queries)
+    : [];
+}
+
 export function getDictionaryEntries(
   dictionaries: Dictionary[],
   queries: string[]
