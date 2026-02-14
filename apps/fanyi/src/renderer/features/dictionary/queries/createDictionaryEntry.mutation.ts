@@ -16,6 +16,7 @@ export function useCreateDictionaryEntryMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries'] });
+      queryClient.invalidateQueries({ queryKey: ['search-dictionaries'] });
     },
   });
 }
