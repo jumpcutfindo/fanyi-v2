@@ -1,43 +1,67 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { pinyin } from 'pinyin-pro';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
 import { Button } from '@renderer/components/ui/Button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@renderer/components/ui/Dialog';
 import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@renderer/components/ui/Tooltip';
 import { s2t, t2s } from '@renderer/utils/translation.util';
 
-interface AddDictionaryEntryForm {
+interface DictionaryEntryForm {
   traditional: string;
   simplified: string;
   pinyin: string;
   definitions: string[];
 }
 
-export function AddDictionaryEntryDialog() {
-  const [isOpen, setIsOpen] = useState(false);
+interface BaseDictionaryEntryDialogProps {
+  mode: 'create' | 'edit';
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}
+
+interface EditDictionaryEntryDialogProps
+  extends BaseDictionaryEntryDialogProps {
+  mode: 'edit';
+  entry?: DictionaryEntry;
+}
+
+interface CreateDictionaryEntryDialogProps
+  extends BaseDictionaryEntryDialogProps {
+  mode: 'create';
+}
+
+type DictionaryEntryDialogProps =
+  | EditDictionaryEntryDialogProps
+  | CreateDictionaryEntryDialogProps;
+
+export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
+  const { mode, isOpen, setIsOpen } = props;
 
   const { handleSubmit, register, setValue, formState, control, reset } =
-    useForm<AddDictionaryEntryForm>({
-      defaultValues: {
-        traditional: '',
-        simplified: '',
-        pinyin: '',
-        definitions: [''],
-      },
+    useForm<DictionaryEntryForm>({
+      defaultValues:
+        props.mode === 'edit'
+          ? {
+              traditional: props.entry?.traditional,
+              simplified: props.entry?.simplified,
+              pinyin: props.entry?.pinyin,
+              definitions: props.entry?.definitions.map((d) => d.definition),
+            }
+          : {
+              traditional: '',
+              simplified: '',
+              pinyin: '',
+              definitions: [''],
+            },
     });
 
   const {
@@ -64,7 +88,7 @@ export function AddDictionaryEntryDialog() {
     },
   });
 
-  const onSubmit = (data: AddDictionaryEntryForm) => {
+  const onSubmit = (data: DictionaryEntryForm) => {
     console.log(data);
   };
 
@@ -75,21 +99,38 @@ export function AddDictionaryEntryDialog() {
     }
   });
 
+  useEffect(() => {
+    if (props.mode === 'edit' && props.entry) {
+      reset({
+        traditional: props.entry.traditional,
+        simplified: props.entry.simplified,
+        pinyin: props.entry.pinyin,
+        definitions: props.entry.definitions.map((d) => d.definition),
+      });
+    } else {
+      reset({
+        traditional: '',
+        simplified: '',
+        pinyin: '',
+        definitions: [''],
+      });
+    }
+  }, [
+    isOpen,
+    props.mode,
+    (props as EditDictionaryEntryDialogProps).entry,
+    reset,
+  ]);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <Tooltip>
-        <DialogTrigger asChild>
-          <TooltipTrigger>
-            <Button variant="outline" size="icon">
-              <Plus />
-            </Button>
-          </TooltipTrigger>
-        </DialogTrigger>
-        <TooltipContent>Add a new word</TooltipContent>
-      </Tooltip>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a new word</DialogTitle>
+          <DialogTitle>
+            {mode === 'create'
+              ? 'Add a new word'
+              : `Edit word ${props.entry?.simplified}|${props.entry?.traditional}`}
+          </DialogTitle>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-2">

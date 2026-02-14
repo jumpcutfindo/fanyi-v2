@@ -1,7 +1,8 @@
-import { ArrowLeft, SquarePen, Trash } from 'lucide-react';
+import { ArrowLeft, Plus, SquarePen, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
 import { SidebarContainer } from '@renderer/components/Sidebar';
 import {
   AlertDialog,
@@ -21,7 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@renderer/components/ui/Tooltip';
-import { AddDictionaryEntryDialog } from '@renderer/features/dictionary/components/AddDictionaryEntryDialog';
+import { DictionaryEntryDialog } from '@renderer/features/dictionary/components/DictionaryEntryDialog';
 import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryFormDialog } from '@renderer/features/dictionary/components/DictionaryFormDialog';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
@@ -34,6 +35,16 @@ export function DictionaryPage() {
   const { mutate: deleteDictionary } = useDeleteDictionaryMutation();
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const [entryDialogState, setEntryDialogState] = useState<{
+    isOpen: boolean;
+    entry?: DictionaryEntry;
+    mode: 'create' | 'edit';
+  }>({
+    isOpen: false,
+    mode: 'create',
+    entry: undefined,
+  });
 
   const canModifyDictionary =
     selectedDictionary !== null && selectedDictionary.type !== 'system';
@@ -90,7 +101,24 @@ export function DictionaryPage() {
           {canModifyDictionary ? (
             <>
               <div className="ms-auto flex flex-row justify-end gap-2">
-                <AddDictionaryEntryDialog />
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        setEntryDialogState({
+                          isOpen: true,
+                          mode: 'create',
+                          entry: undefined,
+                        })
+                      }
+                    >
+                      <Plus />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Add a new word</TooltipContent>
+                </Tooltip>
                 <Separator orientation="vertical" />
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -148,8 +176,28 @@ export function DictionaryPage() {
             </>
           ) : null}
         </div>
-        <DictionaryEntryList mode={canModifyDictionary ? 'edit' : 'view'} />
+        <DictionaryEntryList
+          handleSelectEntry={(entry) => {
+            setEntryDialogState({
+              mode: 'edit',
+              isOpen: true,
+              entry,
+            });
+          }}
+        />
       </div>
+
+      <DictionaryEntryDialog
+        isOpen={entryDialogState.isOpen}
+        setIsOpen={(isOpen) => {
+          setEntryDialogState((prev) => ({
+            ...prev,
+            isOpen,
+          }));
+        }}
+        mode={entryDialogState.mode}
+        entry={entryDialogState.entry}
+      />
     </>
   );
 }

@@ -3,20 +3,23 @@ import { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useDebounce } from 'use-debounce';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
 import { DictionaryEntryCard } from '@renderer/components/DictionaryEntryCard';
 import { Button } from '@renderer/components/ui/Button';
 import { Input } from '@renderer/components/ui/Input';
 import { Separator } from '@renderer/components/ui/Separator';
-import { AddDictionaryEntryDialog } from '@renderer/features/dictionary/components/AddDictionaryEntryDialog';
+import { DictionaryEntryDialog } from '@renderer/features/dictionary/components/DictionaryEntryDialog';
 import { useSearchDictionaries } from '@renderer/features/dictionary/queries/searchDictionaries.query';
 import { cn } from '@renderer/lib/utils';
 import { useDictionariesStore } from '@renderer/stores/useDictionariesStore';
 
 interface DictionaryEntryListProps {
-  mode: 'view' | 'edit';
+  handleSelectEntry?: (entry: DictionaryEntry) => void;
 }
 
-export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
+export function DictionaryEntryList({
+  handleSelectEntry,
+}: DictionaryEntryListProps) {
   const { selectedDictionary } = useDictionariesStore();
 
   const [inputValue, setInputValue] = useState('');
@@ -74,6 +77,7 @@ export function DictionaryEntryList({ mode }: DictionaryEntryListProps) {
                   idx === allEntries.length - 1 ? 'pb-4' : ''
                 )}
                 entry={allEntries[idx]}
+                handleSelect={handleSelectEntry}
               />
             )}
             components={{
