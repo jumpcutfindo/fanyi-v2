@@ -157,15 +157,31 @@ export function initDefaultDictionary() {
   logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
-export function getDictionaryEntries(queries: string[]) {
-  if (!defaultDictionary) {
-    throw new Error('Dictionary not initialized');
+export function getDictionaryEntries(
+  dictionaries: Dictionary[],
+  queries: string[]
+) {
+  if (dictionaries.length === 0) {
+    logger.warn('No dictionaries were provided getDictionaryEntries');
+    return [];
   }
 
   const entryMap: Record<string, DictionaryEntry> = {};
 
   for (const query of queries) {
-    entryMap[query] = defaultDictionary.wordMap[query];
+    for (const dict of dictionaries) {
+      if (!dict.wordMap[query]) {
+        continue;
+      }
+
+      if (entryMap[query]) {
+        // Combine definition with existing query
+        entryMap[query].definitions.push(...dict.wordMap[query].definitions);
+      } else {
+        // If not, add the entry
+        entryMap[query] = dict.wordMap[query];
+      }
+    }
   }
 
   const results: DictionaryEntry[] = [];
@@ -176,10 +192,12 @@ export function getDictionaryEntries(queries: string[]) {
       // Split the key into individual words
       const individualWords = key.split('');
 
-      entryMap[key] = defaultDictionary.wordMap[key];
-
-      for (const word of individualWords) {
-        results.push(defaultDictionary.wordMap[word]);
+      // Check all provided dictionaries for the word
+      for (const dict of dictionaries) {
+        if (dict.wordMap[key]) {
+          entryMap[key] = dict.wordMap[key];
+          break;
+        }
       }
     } else {
       results.push(entryMap[key]);
@@ -239,19 +257,29 @@ export function listDictionaries(): DictionaryMinimal[] {
   ];
 }
 
-function getDictionariesFromOptions(options: DictionarySearchOptions) {
-  switch (options.space) {
-    case 'specific':
-      if (options.dictionaryId === 'default') {
-        return [defaultDictionary];
-      }
+function getDictionariesFromOptions(
+  options: DictionarySearchOptions
+): Dictionary[] {
+  if (!defaultDictionary) {
+    throw new Error('Default dictionary not initialized');
+  }
 
-      return [
-        localDictionaries.find((dict) => dict.id === options.dictionaryId),
-      ];
-    case 'all':
-    default:
-      return [defaultDictionary, ...localDictionaries];
+  if (options.space === 'specific') {
+    if (!options.dictionaryId) {
+      return [defaultDictionary];
+    }
+
+    const matchingDictionary = localDictionaries.find(
+      (dict) => dict.id === options.dictionaryId
+    );
+
+    if (!matchingDictionary) {
+      return [];
+    } else {
+      return [matchingDictionary];
+    }
+  } else {
+    return [defaultDictionary, ...localDictionaries];
   }
 }
 
@@ -275,7 +303,10 @@ export function searchDictionaries(
 
   if (!queryString || queryString === '') {
     return spliceResult(
-      getDictionaryEntries(allEntries.map((entry) => entry.simplified))
+      getDictionaryEntries(
+        dictionaries,
+        allEntries.map((entry) => entry.simplified)
+      )
     );
   }
 
@@ -296,7 +327,10 @@ export function searchDictionaries(
   const rawResults = fuse.search(queryString);
 
   return spliceResult(
-    getDictionaryEntries(rawResults.map((rr) => rr.item.simplified))
+    getDictionaryEntries(
+      dictionaries,
+      rawResults.map((rr) => rr.item.simplified)
+    )
   );
 }
 
