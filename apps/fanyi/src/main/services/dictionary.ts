@@ -225,7 +225,7 @@ export function createDictionaryEntry(
   dictionaryId: string,
   entry: CreateDictionaryEntryPayload
 ) {
-  logger.debug(`Adding dictionary entry ${entry.simplified}`);
+  logger.debug(`Adding dictionary entry "${entry.simplified}"`);
 
   const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
 
@@ -235,7 +235,7 @@ export function createDictionaryEntry(
   }
 
   logger.debug(
-    `Dictionary entry ${entry.simplified} will be added to dictionary ${dictionary.name} (${dictionary.id})`
+    `Dictionary entry "${entry.simplified}" will be added to dictionary "${dictionary.name}" (${dictionary.id})`
   );
 
   if (dictionary) {
@@ -249,6 +249,16 @@ export function createDictionaryEntry(
     // Note: This function is potentially expensive if there are many words in the dictionary
     // However, this is necessary due to the interdependence of words on each other
     dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+
+    // Persist to file
+    saveLocalDictionary({
+      id: dictionary.id,
+      name: dictionary.name,
+      createdOn: dictionary.createdOn,
+      url: dictionary.url,
+      rawEntries: dictionary.rawEntries,
+      modifiedOn: new Date(),
+    });
   }
 }
 
@@ -390,6 +400,10 @@ function saveLocalDictionary(dictionary: CustomDictionary) {
     // Write the dictionary to a file
     const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${dictionary.id}.json`;
     fs.writeFileSync(filePath, JSON.stringify(dictionary, null, 2));
+
+    logger.debug(
+      `Saved dictionary "${parsedDictionary.data.name}" with ${parsedDictionary.data.rawEntries.length} entries`
+    );
   }
 }
 
