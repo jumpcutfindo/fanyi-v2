@@ -23,7 +23,7 @@ interface DictionaryEntryForm {
 }
 
 interface BaseDictionaryEntryDialogProps {
-  mode: 'create' | 'edit';
+  mode: 'create' | 'edit' | 'view';
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
@@ -39,9 +39,16 @@ interface CreateDictionaryEntryDialogProps
   mode: 'create';
 }
 
+interface ViewDictionaryEntryDialogProps
+  extends BaseDictionaryEntryDialogProps {
+  mode: 'view';
+  entry?: DictionaryEntry;
+}
+
 type DictionaryEntryDialogProps =
   | EditDictionaryEntryDialogProps
-  | CreateDictionaryEntryDialogProps;
+  | CreateDictionaryEntryDialogProps
+  | ViewDictionaryEntryDialogProps;
 
 export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
   const { mode, isOpen, setIsOpen } = props;
@@ -49,7 +56,7 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
   const { handleSubmit, register, setValue, formState, control, reset } =
     useForm<DictionaryEntryForm>({
       defaultValues:
-        props.mode === 'edit'
+        props.mode === 'edit' || props.mode === 'view'
           ? {
               traditional: props.entry?.traditional,
               simplified: props.entry?.simplified,
@@ -100,7 +107,7 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
   });
 
   useEffect(() => {
-    if (props.mode === 'edit' && props.entry) {
+    if ((props.mode === 'edit' || props.mode === 'view') && props.entry) {
       reset({
         traditional: props.entry.traditional,
         simplified: props.entry.simplified,
@@ -129,7 +136,9 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
           <DialogTitle>
             {mode === 'create'
               ? 'Add a new word'
-              : `Edit word ${props.entry?.simplified}|${props.entry?.traditional}`}
+              : mode === 'edit'
+                ? `Edit word ${props.entry?.simplified}|${props.entry?.traditional}`
+                : `View word ${props.entry?.simplified}|${props.entry?.traditional}`}
           </DialogTitle>
         </DialogHeader>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
@@ -150,6 +159,7 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
                     setValue('traditional', s2t(val)); // Sync traditional field
                     setValue('pinyin', pinyin(val, { toneType: 'num' }));
                   }}
+                  disabled={mode === 'view'}
                 />
               )}
             />
@@ -180,6 +190,7 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
                   }}
                 />
               )}
+              disabled={mode === 'view'}
             />
             {formState.errors.traditional && (
               <span className="text-destructive text-xs">
@@ -196,14 +207,16 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
               <Label>
                 Definitions <span className="text-destructive">*</span>
               </Label>
-              <Button
-                type="button"
-                variant="default"
-                size="icon"
-                onClick={() => addDefinition('')}
-              >
-                <Plus />
-              </Button>
+              {mode !== 'view' ? (
+                <Button
+                  type="button"
+                  variant="default"
+                  size="icon"
+                  onClick={() => addDefinition('')}
+                >
+                  <Plus />
+                </Button>
+              ) : null}
             </div>
 
             <div className="flex flex-col gap-2 overflow-y-auto">
@@ -212,15 +225,18 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
                   <Input
                     {...register(`definitions.${index}`)}
                     placeholder={`Definition ${index + 1}`}
+                    disabled={mode === 'view'}
                   />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => removeDefinition(index)}
-                    className="shrink-0"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {mode !== 'view' ? (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => removeDefinition(index)}
+                      className="shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                   {formState.errors.definitions?.[index] && (
                     <span className="text-destructive text-[10px]">
                       This definition is required
@@ -237,19 +253,32 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
             )}
           </div>
           <div className="flex flex-row gap-2">
-            <Button variant="default" type="submit">
-              Save
-            </Button>
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => {
-                reset();
-                setIsOpen(false);
-              }}
-            >
-              Cancel
-            </Button>
+            {mode === 'view' ? (
+              <Button
+                variant="default"
+                type="button"
+                onClick={() => setIsOpen(false)}
+              >
+                Close
+              </Button>
+            ) : null}
+            {mode !== 'view' ? (
+              <>
+                <Button variant="default" type="submit">
+                  Save
+                </Button>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => {
+                    reset();
+                    setIsOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : null}
           </div>
         </form>
       </DialogContent>

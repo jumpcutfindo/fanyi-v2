@@ -39,7 +39,7 @@ export function DictionaryPage() {
   const [entryDialogState, setEntryDialogState] = useState<{
     isOpen: boolean;
     entry?: DictionaryEntry;
-    mode: 'create' | 'edit';
+    mode: 'create' | 'edit' | 'view';
   }>({
     isOpen: false,
     mode: 'create',
@@ -179,7 +179,7 @@ export function DictionaryPage() {
         <DictionaryEntryList
           handleSelectEntry={(entry) => {
             setEntryDialogState({
-              mode: 'edit',
+              mode: canModifyDictionary ? 'edit' : 'view',
               isOpen: true,
               entry,
             });
