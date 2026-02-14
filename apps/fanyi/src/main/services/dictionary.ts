@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   CreateDictionaryEntryPayload,
+  CreateDictionaryEntryResult,
   CreateDictionaryPayload,
   CustomDictionary,
   customDictionarySchema,
@@ -224,42 +225,50 @@ export function getDictionaryEntry(query: string) {
 export function createDictionaryEntry(
   dictionaryId: string,
   entry: CreateDictionaryEntryPayload
-) {
+): CreateDictionaryEntryResult {
   logger.debug(`Adding dictionary entry "${entry.simplified}"`);
 
   const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
 
   if (!dictionary) {
     logger.warn(`Dictionary with ID ${dictionaryId} not found`);
-    return;
+    return { status: 'error' };
   }
 
   logger.debug(
     `Dictionary entry "${entry.simplified}" will be added to dictionary "${dictionary.name}" (${dictionary.id})`
   );
 
-  if (dictionary) {
-    dictionary.rawEntries.push({
-      simplified: entry.simplified,
-      traditional: entry.traditional,
-      pinyin: entry.pinyin,
-      definitions: entry.definitions.join('/'),
-    });
-
-    // Note: This function is potentially expensive if there are many words in the dictionary
-    // However, this is necessary due to the interdependence of words on each other
-    dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
-
-    // Persist to file
-    saveLocalDictionary({
-      id: dictionary.id,
-      name: dictionary.name,
-      createdOn: dictionary.createdOn,
-      url: dictionary.url,
-      rawEntries: dictionary.rawEntries,
-      modifiedOn: new Date(),
-    });
+  // Check if the word already exists and throw an error if it does
+  if (dictionary.wordMap[entry.simplified]) {
+    logger.warn(
+      `Dictionary entry "${entry.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
+    );
+    return { status: 'duplicate' };
   }
+
+  dictionary.rawEntries.push({
+    simplified: entry.simplified,
+    traditional: entry.traditional,
+    pinyin: entry.pinyin,
+    definitions: entry.definitions.join('/'),
+  });
+
+  // Note: This function is potentially expensive if there are many words in the dictionary
+  // However, this is necessary due to the interdependence of words on each other
+  dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+
+  // Persist to file
+  saveLocalDictionary({
+    id: dictionary.id,
+    name: dictionary.name,
+    createdOn: dictionary.createdOn,
+    url: dictionary.url,
+    rawEntries: dictionary.rawEntries,
+    modifiedOn: new Date(),
+  });
+
+  return { status: 'success' };
 }
 
 export function listDictionaries(): DictionaryMinimal[] {

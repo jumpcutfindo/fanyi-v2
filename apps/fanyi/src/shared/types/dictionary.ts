@@ -78,3 +78,7 @@ export type CreateDictionaryEntryPayload = Omit<
 > & {
   definitions: string[];
 };
+
+export interface CreateDictionaryEntryResult {
+  status: 'success' | 'duplicate' | 'error';
+}

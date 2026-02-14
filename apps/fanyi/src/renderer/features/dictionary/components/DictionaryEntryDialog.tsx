@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { pinyin } from 'pinyin-pro';
 import { useEffect } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
@@ -55,7 +55,12 @@ type DictionaryEntryDialogProps =
 export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
   const { dictionaryId, mode, isOpen, setIsOpen } = props;
 
-  const { mutate: createDictionaryEntry } = useCreateDictionaryEntryMutation();
+  const {
+    mutate: createDictionaryEntry,
+    isPending: isCreatingDictionaryEntry,
+    error: isCreatingDictionaryEntryError,
+    reset: resetCreateDictionaryEntry,
+  } = useCreateDictionaryEntryMutation();
 
   const { handleSubmit, register, setValue, formState, control, reset } =
     useForm<DictionaryEntryForm>({
@@ -138,6 +143,9 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
         definitions: [''],
       });
     }
+
+    // Reset mutation on dialog open or close
+    resetCreateDictionaryEntry();
   }, [
     isOpen,
     props.mode,
@@ -280,8 +288,16 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
             ) : null}
             {mode !== 'view' ? (
               <>
-                <Button variant="default" type="submit">
-                  Save
+                <Button
+                  variant="default"
+                  type="submit"
+                  disabled={isCreatingDictionaryEntry}
+                >
+                  {isCreatingDictionaryEntry ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    'Save'
+                  )}
                 </Button>
                 <Button
                   variant="outline"
@@ -297,6 +313,11 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
             ) : null}
           </div>
         </form>
+        {isCreatingDictionaryEntryError ? (
+          <span className="text-destructive text-xs">
+            {isCreatingDictionaryEntryError.message}
+          </span>
+        ) : null}
       </DialogContent>
     </Dialog>
   );
