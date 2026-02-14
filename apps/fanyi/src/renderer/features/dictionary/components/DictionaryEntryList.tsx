@@ -54,7 +54,7 @@ export function DictionaryEntryList({
         ) : null}
       </div>
       <Separator className="mt-3" />
-      <div className="grow">
+      <div className="bg-muted grow">
         {isPending ? (
           <div className="grow justify-items-center">
             <Loader2 className="animate-spin" />
@@ -89,6 +89,13 @@ export function DictionaryEntryList({
                 ) : null,
             }}
           />
+        ) : null}
+        {!isPending && allEntries && allEntries.length === 0 ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
+            <span className="text-muted-foreground italic">
+              No entries found
+            </span>
+          </div>
         ) : null}
       </div>
     </div>
