@@ -325,7 +325,7 @@ export function searchDictionaries(
   }
 
   const fuse = new Fuse(allEntries, {
-    threshold: 0.0, // 0.0 is a perfect match, 1.0 matches anything
+    threshold: 0.2, // 0.0 is a perfect match, 1.0 matches anything
     keys: [
       { name: 'traditional', weight: 1.0 },
       { name: 'simplified', weight: 1.0 },
@@ -334,6 +334,7 @@ export function searchDictionaries(
     ],
     ignoreDiacritics: true,
     includeScore: true,
+    sortFn: (a, b) => a.score - b.score,
 
     location: 0,
     distance: 600,
