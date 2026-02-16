@@ -1,11 +1,17 @@
 import { z } from 'zod';
 
 const rawDictionaryEntrySchema = z.object({
+  id: z.string(),
   simplified: z.string(),
   traditional: z.string(),
   pinyin: z.string(),
   definitions: z.string(),
 });
+
+/**
+ * Represents a dictionary entry when parsed from the CEDICT dictionary
+ */
+export type RawDictionaryEntry = z.infer<typeof rawDictionaryEntrySchema>;
 
 export const customDictionarySchema = z.object({
   id: z.string(),
@@ -29,11 +35,11 @@ export type DictionaryMinimal = Omit<Dictionary, 'wordMap' | 'rawEntries'> & {
 };
 
 /**
- * Represents a dictionary entry when parsed from the CEDICT dictionary
+ * Represents an app-internal version of the dictionary entry
+ * This entry is processed from RawDictionaryEntry
  */
-export type RawDictionaryEntry = z.infer<typeof rawDictionaryEntrySchema>;
-
 export interface DictionaryEntry {
+  id: string; // Value should be derived from the raw entry
   traditional: string;
   simplified: string;
   pinyin: string;
@@ -74,7 +80,7 @@ export type UpdateDictionaryPayload = Omit<
 
 export type CreateDictionaryEntryPayload = Omit<
   RawDictionaryEntry,
-  'definitions'
+  'id' | 'definitions'
 > & {
   definitions: string[];
 };

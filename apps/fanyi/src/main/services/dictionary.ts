@@ -138,6 +138,7 @@ export function initDefaultDictionary() {
     const { traditional, simplified, pinyin, definitions } = match.groups;
 
     rawEntries.push({
+      id: uuidv4(),
       traditional,
       simplified,
       pinyin: pinyin.toLowerCase(),
@@ -237,6 +238,7 @@ export function createDictionaryEntry(
   }
 
   dictionary.rawEntries.push({
+    id: uuidv4(),
     simplified: entry.simplified,
     traditional: entry.traditional,
     pinyin: entry.pinyin,
