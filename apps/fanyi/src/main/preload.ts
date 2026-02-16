@@ -72,6 +72,11 @@ contextBridge.exposeInMainWorld('api', {
     entry: CreateDictionaryEntryPayload
   ): Promise<void> =>
     ipcRenderer.invoke('create-dictionary-entry', dictionaryId, entry),
+  deleteDictionaryEntry: (
+    dictionaryId: string,
+    entryId: string
+  ): Promise<void> =>
+    ipcRenderer.invoke('delete-dictionary-entry', dictionaryId, entryId),
 
   getDictionaries: () => ipcRenderer.invoke('get-dictionaries'),
   searchDictionaries: (queryString: string, options: DictionarySearchOptions) =>

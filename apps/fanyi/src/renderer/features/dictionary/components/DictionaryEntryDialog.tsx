@@ -14,6 +14,7 @@ import {
 import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
 import { useCreateDictionaryEntryMutation } from '@renderer/features/dictionary/queries/createDictionaryEntry.mutation';
+import { useDeleteDictionaryEntryMutation } from '@renderer/features/dictionary/queries/deleteDictionaryEntry.mutation';
 import { s2t, t2s } from '@renderer/utils/translation.util';
 
 interface DictionaryEntryForm {
@@ -61,6 +62,12 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
     error: isCreatingDictionaryEntryError,
     reset: resetCreateDictionaryEntry,
   } = useCreateDictionaryEntryMutation();
+
+  const {
+    mutate: deleteDictionaryEntry,
+    isPending: isDeletingDictionaryEntry,
+    error: isDeletingDictionaryEntryError,
+  } = useDeleteDictionaryEntryMutation();
 
   const { handleSubmit, register, setValue, formState, control, reset } =
     useForm<DictionaryEntryForm>({
@@ -310,6 +317,24 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
                   Cancel
                 </Button>
               </>
+            ) : null}
+
+            {mode === 'edit' ? (
+              <Button
+                variant="destructive"
+                type="button"
+                className="ms-auto"
+                onClick={() => {
+                  deleteDictionaryEntry({
+                    dictionaryId,
+                    entryId: props.entry!.id,
+                  });
+
+                  setIsOpen(false);
+                }}
+              >
+                Delete
+              </Button>
             ) : null}
           </div>
         </form>

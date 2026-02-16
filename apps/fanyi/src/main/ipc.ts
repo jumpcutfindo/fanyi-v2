@@ -7,6 +7,7 @@ import {
   createDictionary,
   createDictionaryEntry,
   deleteDictionary,
+  deleteDictionaryEntry,
   getDefaultDictionaryEntries,
   getDictionaryEntries,
   getDictionaryEntry,
@@ -126,6 +127,12 @@ export function registerIpcHandlers() {
     'create-dictionary-entry',
     async (_event, dictionaryId, entry) => {
       return createDictionaryEntry(dictionaryId, entry);
+    }
+  );
+  ipcMain.handle(
+    'delete-dictionary-entry',
+    async (_event, dictionaryId, entryId) => {
+      return deleteDictionaryEntry(dictionaryId, entryId);
     }
   );
 

@@ -11,6 +11,7 @@ import {
   CreateDictionaryPayload,
   CustomDictionary,
   customDictionarySchema,
+  DeleteDictionaryEntryPayload,
   Dictionary,
   DictionaryEntry,
   DictionaryMinimal,
@@ -260,6 +261,33 @@ export function createDictionaryEntry(
   });
 
   return { status: 'success' };
+}
+
+export function deleteDictionaryEntry(dictionaryId: string, entryId: string) {
+  const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
+
+  if (!dictionary) {
+    logger.warn(`Dictionary with ID ${dictionaryId} not found`);
+    return;
+  }
+
+  dictionary.rawEntries = dictionary.rawEntries.filter(
+    (entry) => entry.id !== entryId
+  );
+
+  // Note: This function is potentially expensive if there are many words in the dictionary
+  // However, this is necessary due to the interdependence of words on each other
+  dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+
+  // Persist to file
+  saveLocalDictionary({
+    id: dictionary.id,
+    name: dictionary.name,
+    url: dictionary.url,
+    rawEntries: dictionary.rawEntries,
+    createdOn: dictionary.createdOn,
+    modifiedOn: new Date(),
+  });
 }
 
 export function listDictionaries(): DictionaryMinimal[] {

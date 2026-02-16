@@ -88,3 +88,8 @@ export type CreateDictionaryEntryPayload = Omit<
 export interface CreateDictionaryEntryResult {
   status: 'success' | 'duplicate' | 'error';
 }
+
+export type DeleteDictionaryEntryPayload = {
+  dictionaryId: string;
+  entryId: string;
+};
