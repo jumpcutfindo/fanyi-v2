@@ -54,7 +54,7 @@ export function DictionaryEntryList({
         ) : null}
       </div>
       <Separator className="mt-3" />
-      <div className="bg-muted grow">
+      <div className="bg-muted flex grow items-center justify-center">
         {isPending ? (
           <div className="grow justify-items-center">
             <Loader2 className="animate-spin" />
