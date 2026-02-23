@@ -51,7 +51,6 @@ def main():
                         action="error",
                         message=str(e)
                     ))
-                break
             case 'exit':
                 logger.info("Received 'exit' command. Shutting down.")
                 sys.exit(0)
