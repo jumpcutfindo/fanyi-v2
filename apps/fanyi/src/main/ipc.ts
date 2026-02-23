@@ -14,6 +14,7 @@ import {
   listDictionaries,
   searchDictionaries,
   updateDictionary,
+  updateDictionaryEntry,
 } from '@main/services/dictionary';
 import {
   disableKeybinds,
@@ -133,6 +134,12 @@ export function registerIpcHandlers() {
     'delete-dictionary-entry',
     async (_event, dictionaryId, entryId) => {
       return deleteDictionaryEntry(dictionaryId, entryId);
+    }
+  );
+  ipcMain.handle(
+    'update-dictionary-entry',
+    async (_event, dictionaryId, entryId, payload) => {
+      return updateDictionaryEntry(dictionaryId, entryId, payload);
     }
   );
 

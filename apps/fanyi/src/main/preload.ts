@@ -5,6 +5,7 @@ import {
   CreateDictionaryPayload,
   DictionaryEntry,
   DictionarySearchOptions,
+  UpdateDictionaryEntryPayload,
   UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 import { OcrResponse } from '@shared/types/ocr';
@@ -77,6 +78,17 @@ contextBridge.exposeInMainWorld('api', {
     entryId: string
   ): Promise<void> =>
     ipcRenderer.invoke('delete-dictionary-entry', dictionaryId, entryId),
+  updateDictionaryEntry: (
+    dictionaryId: string,
+    entryId: string,
+    payload: UpdateDictionaryEntryPayload
+  ): Promise<void> =>
+    ipcRenderer.invoke(
+      'update-dictionary-entry',
+      dictionaryId,
+      entryId,
+      payload
+    ),
 
   getDictionaries: () => ipcRenderer.invoke('get-dictionaries'),
   searchDictionaries: (queryString: string, options: DictionarySearchOptions) =>

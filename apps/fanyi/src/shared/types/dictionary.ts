@@ -93,3 +93,7 @@ export type DeleteDictionaryEntryPayload = {
   dictionaryId: string;
   entryId: string;
 };
+
+export type UpdateDictionaryEntryPayload = CreateDictionaryEntryPayload;
+
+export type UpdateDictionaryEntryResult = CreateDictionaryEntryResult;

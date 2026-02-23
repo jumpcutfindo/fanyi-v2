@@ -15,6 +15,7 @@ import { Input } from '@renderer/components/ui/Input';
 import { Label } from '@renderer/components/ui/Label';
 import { useCreateDictionaryEntryMutation } from '@renderer/features/dictionary/queries/createDictionaryEntry.mutation';
 import { useDeleteDictionaryEntryMutation } from '@renderer/features/dictionary/queries/deleteDictionaryEntry.mutation';
+import { useUpdateDictionaryEntryMutation } from '@renderer/features/dictionary/queries/updateDictionaryEntry.mutation';
 import { s2t, t2s } from '@renderer/utils/translation.util';
 
 interface DictionaryEntryForm {
@@ -69,6 +70,12 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
     error: isDeletingDictionaryEntryError,
   } = useDeleteDictionaryEntryMutation();
 
+  const {
+    mutate: updateDictionaryEntry,
+    isPending: isUpdatingDictionaryEntry,
+    error: isUpdatingDictionaryEntryError,
+  } = useUpdateDictionaryEntryMutation();
+
   const { handleSubmit, register, setValue, formState, control, reset } =
     useForm<DictionaryEntryForm>({
       defaultValues:
@@ -116,6 +123,15 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
       case 'create':
         return createDictionaryEntry(
           { dictionaryId, entry: data },
+          {
+            onSuccess: () => {
+              setIsOpen(false);
+            },
+          }
+        );
+      case 'edit':
+        return updateDictionaryEntry(
+          { dictionaryId, entryId: props.entry!.id, entry: data },
           {
             onSuccess: () => {
               setIsOpen(false);
@@ -298,9 +314,11 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
                 <Button
                   variant="default"
                   type="submit"
-                  disabled={isCreatingDictionaryEntry}
+                  disabled={
+                    isCreatingDictionaryEntry || isUpdatingDictionaryEntry
+                  }
                 >
-                  {isCreatingDictionaryEntry ? (
+                  {isCreatingDictionaryEntry || isUpdatingDictionaryEntry ? (
                     <Loader2 className="animate-spin" />
                   ) : (
                     'Save'

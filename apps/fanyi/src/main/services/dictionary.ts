@@ -17,6 +17,8 @@ import {
   DictionaryMinimal,
   DictionarySearchOptions,
   RawDictionaryEntry,
+  UpdateDictionaryEntryPayload,
+  UpdateDictionaryEntryResult,
   UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 import { logger } from '@main/logger';
@@ -288,6 +290,59 @@ export function deleteDictionaryEntry(dictionaryId: string, entryId: string) {
     createdOn: dictionary.createdOn,
     modifiedOn: new Date(),
   });
+}
+
+export function updateDictionaryEntry(
+  dictionaryId: string,
+  entryId: string,
+  payload: UpdateDictionaryEntryPayload
+): UpdateDictionaryEntryResult {
+  const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
+
+  if (!dictionary) {
+    logger.warn(`Dictionary with ID ${dictionaryId} not found`);
+    return { status: 'error' };
+  }
+
+  const entryToUpdate = dictionary.rawEntries.find(
+    (rawEntry) => rawEntry.id === entryId
+  );
+
+  if (!entryToUpdate) {
+    logger.warn(
+      `Dictionary entry with ID ${entryId} not found in dictiionary ${dictionaryId}`
+    );
+    return { status: 'error' };
+  }
+
+  // Check if the word already exists
+  if (dictionary.wordMap[payload.simplified]) {
+    logger.warn(
+      `Dictionary entry "${payload.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
+    );
+    return { status: 'duplicate' };
+  }
+
+  entryToUpdate.simplified = payload.simplified;
+  entryToUpdate.traditional = payload.traditional;
+  entryToUpdate.pinyin = payload.pinyin;
+  entryToUpdate.definitions = payload.definitions.join('/');
+
+  // Note: This function is potentially expensive if there are many words in the dictionary
+  // However, this is necessary due to the interdependence of words on each other
+  dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+
+  // Persist to file
+  saveLocalDictionary({
+    id: dictionary.id,
+    name: dictionary.name,
+    url: dictionary.url,
+    rawEntries: dictionary.rawEntries,
+    createdOn: dictionary.createdOn,
+    modifiedOn: new Date(),
+  });
+
+  return { status: 'success' };
 }
 
 export function listDictionaries(): DictionaryMinimal[] {
