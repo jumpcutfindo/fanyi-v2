@@ -24,9 +24,13 @@ export function useCreateDictionaryEntryMutation() {
         throw new Error('Failed to create dictionary entry');
       }
     },
-    onSuccess: () => {
+    onSuccess: (_, { entry }) => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries'] });
       queryClient.invalidateQueries({ queryKey: ['search-dictionaries'] });
+
+      toast.success(
+        `Dictionary entry "${entry.simplified}" created successfully`
+      );
     },
   });
 }
