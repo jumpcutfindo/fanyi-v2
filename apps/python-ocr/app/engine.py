@@ -13,14 +13,15 @@ class OCRAnalyzer:
     Encapsulates the OCR and segmentation operations for Fanyi
     """
 
-    def __init__(self, languages=["ch_sim"]):
+    def __init__(self, jieba_dict_path: str, languages=["ch_sim"]):
         logger.info(
             "Initializing OCR and segmentation models. This may take a moment..."
         )
         self.reader = easyocr.Reader(languages)
 
-        # Warm up jieba
-        list(jieba.cut("初始化", cut_all=False))
+        # Setup and warmup
+        logger.debug(f'Loading jieba dictionary from {jieba_dict_path}')
+        jieba.load_userdict(jieba_dict_path)
 
     def ocr_and_segment(self, image_path: str) -> OcrResult:
         logger.debug(f"Performing OCR and segmentation on image: {image_path} ")
@@ -36,9 +37,9 @@ class OCRAnalyzer:
 
             # Extract the segmented text from the results
             text = "".join([result[1] for result in results])
-            seg_list = jieba.cut(text, cut_all=False)
+            seg_list = list(jieba.cut(text, cut_all=False))
 
-            logger.debug(f"Segmented text from {image_path}")
+            logger.debug(f"Segmented text from {image_path}: {seg_list}")
 
             return {
                 "results": list(
@@ -57,7 +58,7 @@ class OCRAnalyzer:
                         results,
                     )
                 ),
-                "segmented_text": list(seg_list),
+                "segmented_text": seg_list,
             }
 
         except Exception as e:

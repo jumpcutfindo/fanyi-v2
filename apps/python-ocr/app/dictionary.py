@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from . import logger
 
 class Dictionary:
@@ -15,6 +16,8 @@ class Dictionary:
             self._load_user_dictionaries(user_data_path)
 
             logger.debug(f"Dictionary initialized. Total entries: {len(self.public_dict)}")
+
+            self._create_jieba_file(os.path.join(sys._MEIPASS, "jieba_dict.txt"))
 
     def _load_system_dictionary(self, path: str):
         try:
@@ -63,3 +66,15 @@ class Dictionary:
                     logger.debug(f"Loaded {len(entries)} entries from {filename}")
                 except Exception as e:
                     logger.error(f"Could not read user dictionary {filename}: {e}")
+
+    def _create_jieba_file(self, output_path: str):
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                for word in self.public_dict.keys():
+                    f.write(f"{word}\n")
+            logger.debug(f"Created jieba dictionary file at {output_path}")
+        except Exception as e:
+            logger.error(f"Failed to create jieba dictionary file: {e}")
+
+    def get_jieba_dict_path(self) -> str:
+        return os.path.join(sys._MEIPASS, "jieba_dict.txt")

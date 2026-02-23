@@ -19,44 +19,46 @@ def main():
     dictionary = Dictionary(public_path=args[0], user_data_path=args[1])
 
     logger.info("Initializing models...")
-    analyzer = OCRAnalyzer()
+    analyzer = OCRAnalyzer(jieba_dict_path=dictionary.get_jieba_dict_path())
 
     write_and_send(OutgoingModelReadyPayload(action="model_ready"))
 
     for line in in_stream:
-        command = json.loads(line.strip())
-        
-        match command['action']:
-            case 'run_ocr':
-                logger.debug(f"Received 'run_ocr' command with image path {command['image_path']}")
-                
-                if not command['image_path'] or not os.path.exists(command['image_path']):
-                    logger.error(
-                        f"Error: Invalid or non-existent image path received: {command['image_path']}",
-                    )
-                    write_and_send(OutgoingErrorPayload(action="error", message="Invalid image path"))
-                    continue
-                
-                try:
-                    ocr_result = analyzer.ocr_and_segment(command['image_path'])
+        try:  
+            command = json.loads(line.strip())
+            
+            match command['action']:
+                case 'run_ocr':
+                    logger.debug(f"Received 'run_ocr' command with image path {command['image_path']}")
+                    
+                    if not command['image_path'] or not os.path.exists(command['image_path']):
+                        logger.error(
+                            f"Error: Invalid or non-existent image path received: {command['image_path']}",
+                        )
+                        write_and_send(OutgoingErrorPayload(action="error", message="Invalid image path"))
+                        continue
+                    
+                    try:
+                        ocr_result = analyzer.ocr_and_segment(command['image_path'])
 
-                    write_and_send(OutgoingOcrResultPayload(
-                        action="ocr_result",
-                        data=ocr_result
-                    ))
-                except Exception as e:
-                    logger.error(f"Error during OCR execution: {e}")
+                        write_and_send(OutgoingOcrResultPayload(
+                            action="ocr_result",
+                            data=ocr_result
+                        ))
+                    except Exception as e:
+                        logger.error(f"Error during OCR execution: {e}")
 
-                    write_and_send(OutgoingErrorPayload(
-                        action="error",
-                        message=str(e)
-                    ))
-            case 'exit':
-                logger.info("Received 'exit' command. Shutting down.")
-                sys.exit(0)
-            case _:
-                logger.info(f"Unknown command received: '{command['action']}'")
-
+                        write_and_send(OutgoingErrorPayload(
+                            action="error",
+                            message=str(e)
+                        ))
+                case 'exit':
+                    logger.info("Received 'exit' command. Shutting down.")
+                    sys.exit(0)
+                case _:
+                    logger.info(f"Unknown command received: '{command['action']}'")
+        except Exception as e:
+            logger.error(f"Failed to process incoming command: {e}")
 
 if __name__ == "__main__":
     main()
