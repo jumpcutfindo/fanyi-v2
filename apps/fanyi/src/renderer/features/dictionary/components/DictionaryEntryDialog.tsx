@@ -332,8 +332,13 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
 
                   setIsOpen(false);
                 }}
+                disabled={isDeletingDictionaryEntry}
               >
-                Delete
+                {isDeletingDictionaryEntry ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  'Delete'
+                )}
               </Button>
             ) : null}
           </div>
@@ -341,6 +346,11 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
         {isCreatingDictionaryEntryError ? (
           <span className="text-destructive text-xs">
             {isCreatingDictionaryEntryError.message}
+          </span>
+        ) : null}
+        {isDeletingDictionaryEntryError ? (
+          <span className="text-destructive text-xs">
+            {isDeletingDictionaryEntryError.message}
           </span>
         ) : null}
       </DialogContent>
