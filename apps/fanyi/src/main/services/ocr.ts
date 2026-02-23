@@ -126,6 +126,7 @@ function initPythonOcr() {
   pythonOcr = spawn(pythonExecutable, {
     // Open additional file descriptors for IPC
     stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe', 'pipe'],
+    argv0: `${process.env.VITE_PUBLIC}|||${app.getPath('userData')}`,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -4,6 +4,7 @@ import sys
 from app.utils import handle_pyinstaller_folders
 from app.ipc import write_and_send
 from app.engine import OCRAnalyzer
+from app.dictionary import Dictionary
 from app import logger
 from app.types import AppFD, OutgoingErrorPayload, OutgoingModelReadyPayload, OutgoingOcrResultPayload
 
@@ -11,6 +12,11 @@ in_stream = os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
 
 def main():
     handle_pyinstaller_folders()
+
+    args = sys.argv[0].split('|||')
+
+    logger.info("Initializing dictionary...")
+    dictionary = Dictionary(public_path=args[0], user_data_path=args[1])
 
     logger.info("Initializing models...")
     analyzer = OCRAnalyzer()
