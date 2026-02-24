@@ -107,7 +107,7 @@ function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
 /**
  * Sends a command to the Python OCR process.
  */
-function sendCommand(command: OcrCommandPayload) {
+export function sendCommand(command: OcrCommandPayload) {
   if (!outgoingDataStream) {
     throw new Error('Outgoing data stream is not initialized.');
   }

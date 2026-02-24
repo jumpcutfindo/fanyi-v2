@@ -64,3 +64,7 @@ class OCRAnalyzer:
         except Exception as e:
             # Re-raise exceptions with a custom message for better debugging
             raise RuntimeError(f"OCR or segmentation failed: {e}") from e
+
+    def reload_jieba_dict(self, jieba_dict_path: str):
+        logger.debug(f"Reloading jieba dictionary from {jieba_dict_path}")
+        jieba.load_userdict(jieba_dict_path)

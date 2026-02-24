@@ -14,7 +14,7 @@ class Processor:
         self.dictionary = Dictionary(public_path, user_data_path)
 
         logger.info("Initializing models...")
-        self.analyzer = OCRAnalyzer(jieba_dict_path=self.dictionary.get_jieba_dict_path())
+        self.engine = OCRAnalyzer(jieba_dict_path=self.dictionary.get_jieba_dict_path())
 
         pass
 
@@ -30,7 +30,7 @@ class Processor:
                         ipc.write_and_send(OutgoingErrorPayload(action="error", message="Invalid image path"))
                     
                     try:
-                        ocr_result = self.analyzer.ocr_and_segment(data['image_path'])
+                        ocr_result = self.engine.ocr_and_segment(data['image_path'])
 
                         ipc.write_and_send(OutgoingOcrResultPayload(
                             action="ocr_result",
@@ -43,6 +43,25 @@ class Processor:
                             action="error",
                             message=str(e)
                         ))
+                case 'entry_change':
+                    logger.debug(f"Received 'entry_change' command with type {data['type']}")
+
+                    jieba_update_required = False
+
+                    match (data['type']):
+                        case 'add':
+                            logger.debug(f"Adding word {data['entry']} to dictionary")
+                            jieba_update_required = self.dictionary.add_word(data['entry'])
+                        case 'remove':
+                            logger.debug(f"Removing word {data['entry']} from dictionary")
+                            jieba_update_required = self.dictionary.remove_word(data['entry'])
+                        case _:
+                            logger.error(f"Unknown entry change type received: '{data['type']}")
+
+                    if jieba_update_required:
+                        logger.debug("Jieba dictionary update required. Reloading...")
+                        self.engine.reload_jieba_dict(self.dictionary.get_jieba_dict_path())
+
                 case 'exit':
                     logger.info("Received 'exit' command. Shutting down.")
                     sys.exit(0)

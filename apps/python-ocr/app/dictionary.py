@@ -3,6 +3,8 @@ import os
 import sys
 from . import logger
 
+JIEBA_DICT_FILENAME = "jieba_dict.txt"
+
 class Dictionary:
     def __init__(self, public_path: str, user_data_path: str):
             """
@@ -17,7 +19,7 @@ class Dictionary:
 
             logger.debug(f"Dictionary initialized. Total entries: {len(self.public_dict)}")
 
-            self._create_jieba_file(os.path.join(sys._MEIPASS, "jieba_dict.txt"))
+            self._create_jieba_file(os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME))
 
     def _load_system_dictionary(self, path: str):
         try:
@@ -77,4 +79,37 @@ class Dictionary:
             logger.error(f"Failed to create jieba dictionary file: {e}")
 
     def get_jieba_dict_path(self) -> str:
-        return os.path.join(sys._MEIPASS, "jieba_dict.txt")
+        return os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME)
+    
+    def add_word(self, word: str) -> bool:
+        """
+        Adds a word to the dictionary. Returns true if a new entry was created.
+        """
+        if word not in self.public_dict:
+            self.public_dict[word] = 1
+
+            # Update jieba file
+            self._create_jieba_file(os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME))
+
+            return True
+        else:
+            self.public_dict[word] += 1
+            return False
+    
+    def remove_word(self, word: str) -> bool:
+        """
+        Removes a word from the dictionary. Returns true if a word was removed.
+        """
+        if word not in self.public_dict:
+            return False
+        
+        if self.public_dict[word] > 1:
+            self.public_dict[word] -= 1
+            return False
+        else:
+            del self.public_dict[word]
+
+            # Update jieba file
+            self._create_jieba_file(os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME))
+
+            return True
