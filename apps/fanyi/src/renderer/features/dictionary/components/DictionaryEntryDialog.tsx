@@ -73,7 +73,6 @@ export function DictionaryEntryDialog(props: DictionaryEntryDialogProps) {
   const {
     mutate: updateDictionaryEntry,
     isPending: isUpdatingDictionaryEntry,
-    error: isUpdatingDictionaryEntryError,
   } = useUpdateDictionaryEntryMutation();
 
   const { handleSubmit, register, setValue, formState, control, reset } =

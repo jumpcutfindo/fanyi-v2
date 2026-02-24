@@ -9,7 +9,6 @@ import {
   deleteDictionary,
   deleteDictionaryEntry,
   getDefaultDictionaryEntries,
-  getDictionaryEntries,
   getDictionaryEntry,
   listDictionaries,
   searchDictionaries,

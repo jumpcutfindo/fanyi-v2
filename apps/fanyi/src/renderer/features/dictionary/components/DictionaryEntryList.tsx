@@ -1,14 +1,12 @@
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { useDebounce } from 'use-debounce';
 
 import { DictionaryEntry } from '@shared/types/dictionary';
 import { DictionaryEntryCard } from '@renderer/components/DictionaryEntryCard';
-import { Button } from '@renderer/components/ui/Button';
 import { Input } from '@renderer/components/ui/Input';
 import { Separator } from '@renderer/components/ui/Separator';
-import { DictionaryEntryDialog } from '@renderer/features/dictionary/components/DictionaryEntryDialog';
 import { useSearchDictionaries } from '@renderer/features/dictionary/queries/searchDictionaries.query';
 import { cn } from '@renderer/lib/utils';
 import { useDictionariesStore } from '@renderer/stores/useDictionariesStore';

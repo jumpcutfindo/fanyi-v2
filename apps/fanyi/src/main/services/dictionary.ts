@@ -11,7 +11,6 @@ import {
   CreateDictionaryPayload,
   CustomDictionary,
   customDictionarySchema,
-  DeleteDictionaryEntryPayload,
   Dictionary,
   DictionaryEntry,
   DictionaryMinimal,
