@@ -5,12 +5,15 @@ import { getOcrStatus, runOcr } from './services/ocr';
 import { logger } from '@main/logger';
 import {
   createDictionary,
+  createDictionaryEntry,
   deleteDictionary,
-  getDictionaryEntries,
+  deleteDictionaryEntry,
+  getDefaultDictionaryEntries,
   getDictionaryEntry,
   listDictionaries,
   searchDictionaries,
   updateDictionary,
+  updateDictionaryEntry,
 } from '@main/services/dictionary';
 import {
   disableKeybinds,
@@ -91,7 +94,11 @@ export function registerIpcHandlers() {
   ipcMain.handle('perform-ocr-with-screenshot', async (_event, screenshot) => {
     try {
       const ocrResult = await runOcr(screenshot);
-      const translations = getDictionaryEntries(ocrResult.segmented_text);
+
+      // FIXME: This search should eventually just search all dictionaries
+      const translations = getDefaultDictionaryEntries(
+        ocrResult.segmented_text
+      );
       return { ocrResult, translations };
     } catch (error) {
       logger.error('Failed to handle OCR request', error);
@@ -116,6 +123,25 @@ export function registerIpcHandlers() {
   ipcMain.handle('get-dictionary-entry-of-word', async (_event, word) => {
     return getDictionaryEntry(word);
   });
+  ipcMain.handle(
+    'create-dictionary-entry',
+    async (_event, dictionaryId, entry) => {
+      return createDictionaryEntry(dictionaryId, entry);
+    }
+  );
+  ipcMain.handle(
+    'delete-dictionary-entry',
+    async (_event, dictionaryId, entryId) => {
+      return deleteDictionaryEntry(dictionaryId, entryId);
+    }
+  );
+  ipcMain.handle(
+    'update-dictionary-entry',
+    async (_event, dictionaryId, entryId, payload) => {
+      return updateDictionaryEntry(dictionaryId, entryId, payload);
+    }
+  );
+
   ipcMain.handle('get-dictionaries', async (_event) => {
     return listDictionaries();
   });

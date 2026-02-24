@@ -15,6 +15,7 @@ interface DictionaryEntryCardProps {
   handleSelect?: (entry: DictionaryEntry) => void;
   isSelected?: boolean;
   ref?: (ref: HTMLButtonElement) => void;
+  className?: string;
 }
 
 export function DictionaryEntryCard({
@@ -22,6 +23,7 @@ export function DictionaryEntryCard({
   entry,
   isSelected,
   handleSelect,
+  className,
 }: DictionaryEntryCardProps) {
   const renderDefinition = (d: DictionaryEntry['definitions'][number]) => {
     if (d.links.length === 0) {
@@ -51,7 +53,7 @@ export function DictionaryEntryCard({
   };
 
   return (
-    <div className="pb-1">
+    <div className={cn('pb-1', className)}>
       <button
         type="button"
         ref={ref}
