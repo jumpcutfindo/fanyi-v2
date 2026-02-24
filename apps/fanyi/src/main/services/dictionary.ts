@@ -163,10 +163,15 @@ export function initDefaultDictionary() {
   logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
-export function getDefaultDictionaryEntries(queries: string[]) {
-  return defaultDictionary
-    ? getDictionaryEntries([defaultDictionary], queries)
-    : [];
+export function getDictionaryEntriesFromAllDictionaries(queries: string[]) {
+  if (!defaultDictionary) {
+    throw new Error('Default dictionary not initialized');
+  }
+
+  return getDictionaryEntries(
+    [defaultDictionary, ...localDictionaries],
+    queries
+  );
 }
 
 export function getDictionaryEntries(
