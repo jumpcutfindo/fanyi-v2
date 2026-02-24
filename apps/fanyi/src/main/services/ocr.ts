@@ -107,7 +107,7 @@ function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
 /**
  * Sends a command to the Python OCR process.
  */
-function sendCommand(command: OcrCommandPayload) {
+export function sendCommand(command: OcrCommandPayload) {
   if (!outgoingDataStream) {
     throw new Error('Outgoing data stream is not initialized.');
   }
@@ -126,6 +126,7 @@ function initPythonOcr() {
   pythonOcr = spawn(pythonExecutable, {
     // Open additional file descriptors for IPC
     stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe', 'pipe'],
+    argv0: `${process.env.VITE_PUBLIC}|||${app.getPath('userData')}`,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

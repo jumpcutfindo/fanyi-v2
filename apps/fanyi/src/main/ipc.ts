@@ -8,7 +8,7 @@ import {
   createDictionaryEntry,
   deleteDictionary,
   deleteDictionaryEntry,
-  getDefaultDictionaryEntries,
+  getDictionaryEntriesFromAllDictionaries,
   getDictionaryEntry,
   listDictionaries,
   searchDictionaries,
@@ -96,7 +96,7 @@ export function registerIpcHandlers() {
       const ocrResult = await runOcr(screenshot);
 
       // FIXME: This search should eventually just search all dictionaries
-      const translations = getDefaultDictionaryEntries(
+      const translations = getDictionaryEntriesFromAllDictionaries(
         ocrResult.segmented_text
       );
       return { ocrResult, translations };

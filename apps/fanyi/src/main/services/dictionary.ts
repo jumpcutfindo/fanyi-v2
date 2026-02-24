@@ -21,6 +21,7 @@ import {
   UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 import { logger } from '@main/logger';
+import { sendCommand } from '@main/services/ocr';
 
 const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
 
@@ -161,10 +162,15 @@ export function initDefaultDictionary() {
   logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
-export function getDefaultDictionaryEntries(queries: string[]) {
-  return defaultDictionary
-    ? getDictionaryEntries([defaultDictionary], queries)
-    : [];
+export function getDictionaryEntriesFromAllDictionaries(queries: string[]) {
+  if (!defaultDictionary) {
+    throw new Error('Default dictionary not initialized');
+  }
+
+  return getDictionaryEntries(
+    [defaultDictionary, ...localDictionaries],
+    queries
+  );
 }
 
 export function getDictionaryEntries(
@@ -247,6 +253,13 @@ export function createDictionaryEntry(
     definitions: entry.definitions.join('/'),
   });
 
+  // Send a message to update OCR process on entry change
+  sendCommand({
+    action: 'entry_change',
+    type: 'add',
+    entry: entry.simplified,
+  });
+
   // Note: This function is potentially expensive if there are many words in the dictionary
   // However, this is necessary due to the interdependence of words on each other
   dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
@@ -272,9 +285,23 @@ export function deleteDictionaryEntry(dictionaryId: string, entryId: string) {
     return;
   }
 
+  const entry = dictionary.rawEntries.find((entry) => entry.id === entryId);
+
+  if (!entry) {
+    logger.warn(`Dictionary entry with ID ${entryId} not found`);
+    return;
+  }
+
   dictionary.rawEntries = dictionary.rawEntries.filter(
     (entry) => entry.id !== entryId
   );
+
+  // Send a message to update OCR process on entry change
+  sendCommand({
+    action: 'entry_change',
+    type: 'remove',
+    entry: entry.simplified,
+  });
 
   // Note: This function is potentially expensive if there are many words in the dictionary
   // However, this is necessary due to the interdependence of words on each other
@@ -309,7 +336,7 @@ export function updateDictionaryEntry(
 
   if (!entryToUpdate) {
     logger.warn(
-      `Dictionary entry with ID ${entryId} not found in dictiionary ${dictionaryId}`
+      `Dictionary entry with ID ${entryId} not found in dictionary ${dictionaryId}`
     );
     return { status: 'error' };
   }
@@ -320,6 +347,21 @@ export function updateDictionaryEntry(
       `Dictionary entry "${payload.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
     );
     return { status: 'duplicate' };
+  }
+
+  if (entryToUpdate.simplified !== payload.simplified) {
+    // Word changed completely, send message to OCR process
+    sendCommand({
+      action: 'entry_change',
+      type: 'remove',
+      entry: entryToUpdate.simplified,
+    });
+
+    sendCommand({
+      action: 'entry_change',
+      type: 'add',
+      entry: payload.simplified,
+    });
   }
 
   entryToUpdate.simplified = payload.simplified;

@@ -51,4 +51,13 @@ interface ShutdownCommandPayload {
   action: 'shutdown';
 }
 
-export type OcrCommandPayload = RunOcrCommandPayload | ShutdownCommandPayload;
+interface EntryChangeCommandPayload {
+  action: 'entry_change';
+  type: 'add' | 'remove';
+  entry: string;
+}
+
+export type OcrCommandPayload =
+  | EntryChangeCommandPayload
+  | RunOcrCommandPayload
+  | ShutdownCommandPayload;
