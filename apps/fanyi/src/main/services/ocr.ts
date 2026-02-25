@@ -127,6 +127,7 @@ function initPythonOcr() {
     // Open additional file descriptors for IPC
     stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe', 'pipe'],
     argv0: `${process.env.VITE_PUBLIC}|||${app.getPath('userData')}`,
+    windowsHide: true, // Hide console window on launch on Windows
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
