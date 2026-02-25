@@ -9,13 +9,15 @@ from app.types import AppFD, OutgoingModelReadyPayload
 
 in_stream = os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
 
+public_path = os.environ.get("PUBLIC_PATH")
+user_data_path = os.environ.get("USER_DATA_PATH")
+
 def main():
+    # On start, immediately try to fix leaked temp folders
     handle_pyinstaller_folders()
 
-    args = sys.argv[0].split('|||')
-
     logger.info("Setting up processor...")
-    processor = Processor(public_path=args[0], user_data_path=args[1])
+    processor = Processor(public_path, user_data_path)
 
     logger.info("Processor ready to accept commands")
     write_and_send(OutgoingModelReadyPayload(action="model_ready"))
