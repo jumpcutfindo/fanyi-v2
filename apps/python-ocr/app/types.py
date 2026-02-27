@@ -8,7 +8,7 @@ class AppFD:
 
 
 class OcrResultItem(TypedDict):
-  coordinates: List[List[float]]  # number[][]
+  coordinates: List[List[int]]
   text: str
   confidence: float
 

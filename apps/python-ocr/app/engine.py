@@ -2,10 +2,14 @@
 Encapsulates the OCR and segmentation operations for Fanyi
 """
 
-import easyocr
+import json
+import os
+from typing import List
+
+from paddleocr import PaddleOCR
 import jieba
 from . import logger
-from .types import OcrResult
+from .types import OcrResult, OcrResultItem
 
 
 class OCRAnalyzer:
@@ -13,9 +17,13 @@ class OCRAnalyzer:
   Encapsulates the OCR and segmentation operations for Fanyi
   """
 
-  def __init__(self, jieba_dict_path: str, languages=["ch_sim"]):
+  def __init__(self, jieba_dict_path: str):
     logger.info("Initializing OCR and segmentation models. This may take a moment...")
-    self.reader = easyocr.Reader(languages)
+    self.ocr = PaddleOCR(
+      use_doc_orientation_classify=False,
+      use_doc_unwarping=False,
+      use_textline_orientation=False,
+    )
 
     # Setup and warmup
     logger.debug(f"Loading jieba dictionary from {jieba_dict_path}")
@@ -36,35 +44,30 @@ class OCRAnalyzer:
         """
     try:
       # Pass the file path directly to easyocr.readtext()
-      results = self.reader.readtext(image_path)
+      raw_data = self.ocr.predict(input=image_path)[0]
 
       logger.debug(f"Extracted text from {image_path}")
+      
+      boxes = raw_data.get('dt_polys', []) if isinstance(raw_data, dict) else raw_data[0]
+      texts = raw_data.get('rec_texts', [])
+      scores = raw_data.get('rec_scores', [])
 
       # Extract the segmented text from the results
-      text = "".join([result[1] for result in results])
-      seg_list = list(jieba.cut(text, cut_all=False))
+      combined_text = "".join(texts)
+      seg_list = list(jieba.cut(combined_text, cut_all=False))
 
       logger.debug(f"Segmented text from {image_path}: {seg_list}")
 
-      return {
-        "results": list(
-          map(
-            lambda result: {
-              # Convert coordinates to integers
-              "coordinates": list(
-                map(
-                  lambda point: [int(point[0]), int(point[1])],
-                  result[0],
-                )
-              ),
-              "text": result[1],
-              "confidence": result[2],
-            },
-            results,
-          )
-        ),
-        "segmented_text": seg_list,
-      }
+      formatted_results: List[OcrResultItem] = []
+    
+      for box, text, score in zip(boxes, texts, scores):
+          formatted_results.append({
+              "coordinates": [[int(pt[0]), int(pt[1])] for pt in box],
+              "text": str(text),
+              "confidence": float(score)
+          })
+
+      return OcrResult(results=formatted_results, segmented_text=seg_list)
 
     except Exception as e:
       # Re-raise exceptions with a custom message for better debugging
