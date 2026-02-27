@@ -19,7 +19,14 @@ class OCRAnalyzer:
 
     # Setup and warmup
     logger.debug(f"Loading jieba dictionary from {jieba_dict_path}")
-    jieba.load_userdict(jieba_dict_path)
+
+    # Check if file exists
+    if os.path.exists(jieba_dict_path):
+      jieba.load_userdict(jieba_dict_path)
+    else:
+      logger.warn(f"Jieba dictionary file not found at {jieba_dict_path}, continuing without custom dictionary")
+
+
 
   def ocr_and_segment(self, image_path: str) -> OcrResult:
     logger.debug(f"Performing OCR and segmentation on image: {image_path} ")

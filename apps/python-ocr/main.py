@@ -7,7 +7,7 @@ from app.processor import Processor
 from app import logger
 from app.types import AppFD, OutgoingModelReadyPayload
 
-in_stream = os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
+in_stream = os.environ.get("ENV") == "development" and sys.stdin or os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
 
 public_path = os.environ.get("PUBLIC_PATH")
 user_data_path = os.environ.get("USER_DATA_PATH")

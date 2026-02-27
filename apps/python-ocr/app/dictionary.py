@@ -3,7 +3,10 @@ import os
 import sys
 from . import logger
 
+# If sys._MEIPASS exists, use it. Otherwise, use the local tmp directory.
+JIEBA_DICT_DIR = getattr(sys, '_MEIPASS', os.path.abspath('./tmp'))
 JIEBA_DICT_FILENAME = "jieba_dict.txt"
+JIEBA_DICT_PATH = os.path.join(JIEBA_DICT_DIR, JIEBA_DICT_FILENAME)
 
 
 class Dictionary:
@@ -22,7 +25,7 @@ class Dictionary:
 
     logger.debug(f"Dictionary initialized. Total entries: {len(self.public_dict)}")
 
-    self._create_jieba_file(os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME))
+    self._create_jieba_file(JIEBA_DICT_PATH)
 
   def _load_system_dictionary(self, path: str):
     try:
@@ -83,7 +86,7 @@ class Dictionary:
       logger.error(f"Failed to create jieba dictionary file: {e}")
 
   def get_jieba_dict_path(self) -> str:
-    return os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME)
+    return JIEBA_DICT_PATH
 
   def add_word(self, word: str) -> bool:
     """
@@ -93,7 +96,7 @@ class Dictionary:
       self.public_dict[word] = 1
 
       # Update jieba file
-      self._create_jieba_file(os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME))
+      self._create_jieba_file(JIEBA_DICT_PATH)
 
       return True
     else:
@@ -114,6 +117,6 @@ class Dictionary:
       del self.public_dict[word]
 
       # Update jieba file
-      self._create_jieba_file(os.path.join(sys._MEIPASS, JIEBA_DICT_FILENAME))
+      self._create_jieba_file(JIEBA_DICT_PATH)
 
       return True

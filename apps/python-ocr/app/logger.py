@@ -4,7 +4,7 @@ import sys
 from .types import AppFD, OutgoingLogPayload
 
 # Setup stream for writing logs
-log_stream = os.fdopen(AppFD.LOGS, "w", encoding="utf-8", closefd=False)
+log_stream = os.environ.get("ENV") == "development" and sys.stdout or os.fdopen(AppFD.LOGS, "w", encoding="utf-8", closefd=False)
 sys.stdout = log_stream
 
 

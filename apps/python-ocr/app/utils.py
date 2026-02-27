@@ -13,6 +13,10 @@ def handle_pyinstaller_folders():
   try:
     logger.info("Handling PyInstaller temporary folders...")
 
+    if not sys._MEIPASS:
+      logger.warn("MEIPASS is not set, skipping temp folder cleanup (probably not in pyinstaller context?)")
+      return
+
     # pylint: disable=protected-access,no-member
     base_path = sys._MEIPASS
 

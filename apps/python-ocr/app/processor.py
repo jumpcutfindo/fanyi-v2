@@ -17,8 +17,6 @@ class Processor:
     logger.info("Initializing models...")
     self.engine = OCRAnalyzer(jieba_dict_path=self.dictionary.get_jieba_dict_path())
 
-    pass
-
   def process(self, command: str, data: Any):
     match command:
       case "run_ocr":
