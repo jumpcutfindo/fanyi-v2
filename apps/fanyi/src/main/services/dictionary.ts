@@ -224,7 +224,12 @@ export function getDictionaryEntry(query: string) {
     throw new Error('Dictionary not initialized');
   }
 
-  return defaultDictionary.wordMap[query];
+  const matches = getDictionaryEntries(
+    [defaultDictionary, ...localDictionaries],
+    [query]
+  );
+
+  return matches.length === 1 ? matches[0] : null;
 }
 
 export function createDictionaryEntry(
