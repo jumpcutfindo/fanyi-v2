@@ -33,7 +33,7 @@ interface IncomingErrorPayload {
 }
 
 export interface IncomingLogPayload {
-  type: 'info' | 'error' | 'debug';
+  type: 'info' | 'warn' | 'error' | 'debug';
   message: string;
 }
 

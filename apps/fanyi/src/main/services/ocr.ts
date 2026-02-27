@@ -91,6 +91,9 @@ function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
         case 'info':
           ocrLogger.info(payload.message);
           break;
+        case 'warn':
+          ocrLogger.warn(payload.message);
+          break;
         case 'error':
           ocrLogger.error(payload.message);
           break;
@@ -126,7 +129,12 @@ function initPythonOcr() {
   pythonOcr = spawn(pythonExecutable, {
     // Open additional file descriptors for IPC
     stdio: ['inherit', 'inherit', 'inherit', 'pipe', 'pipe', 'pipe'],
-    argv0: `${process.env.VITE_PUBLIC}|||${app.getPath('userData')}`,
+    env: {
+      ...process.env,
+      PUBLIC_PATH: process.env.VITE_PUBLIC,
+      USER_DATA_PATH: app.getPath('userData'),
+    },
+    windowsHide: true, // Hide console window on launch on Windows
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
