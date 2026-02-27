@@ -84,22 +84,19 @@ function rawEntriesToMap(
           });
         }
 
+        const finalDefinition: DictionaryEntry['definitions'][number] = {
+          sourceDictionaryName: dictionary.name,
+          dictionaryType: 'type' in dictionary ? dictionary.type : 'custom',
+          definition,
+          links,
+        };
+
         if (acc[entry.simplified]) {
-          acc[entry.simplified].definitions.push({
-            sourceDictionaryName: dictionary.name,
-            definition,
-            links,
-          });
+          acc[entry.simplified].definitions.push(finalDefinition);
         } else {
           acc[entry.simplified] = {
             ...entry,
-            definitions: [
-              {
-                sourceDictionaryName: dictionary.name,
-                definition,
-                links,
-              },
-            ],
+            definitions: [finalDefinition],
           };
         }
       }

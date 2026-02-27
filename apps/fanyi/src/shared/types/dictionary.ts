@@ -46,6 +46,7 @@ export interface DictionaryEntry {
   definitions: {
     definition: string;
     sourceDictionaryName: string;
+    dictionaryType: Dictionary['type'];
     links: {
       word: string;
       start: number;

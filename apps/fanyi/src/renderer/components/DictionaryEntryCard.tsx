@@ -56,9 +56,11 @@ export function DictionaryEntryCard({
     return (
       <div key={d.definition} className="flex flex-col">
         <span>{definitionLine}</span>
-        <span className="text-muted-foreground text-[8pt] italic">
-          {d.sourceDictionaryName}
-        </span>
+        {d.dictionaryType === 'custom' ? (
+          <span className="text-muted-foreground text-[8pt] italic">
+            {d.sourceDictionaryName}
+          </span>
+        ) : null}
       </div>
     );
   };
