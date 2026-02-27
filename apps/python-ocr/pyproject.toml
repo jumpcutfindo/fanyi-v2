@@ -15,3 +15,11 @@ dependencies = [
 dev = [
     "pyinstaller>=6.15.0",
 ]
+
+[tool.ruff]
+indent-width = 2
+  
+[tool.ruff.format]
+quote-style="double"
+line-ending="lf"
+indent-style="space"
