@@ -5,11 +5,13 @@ import os
 current_env = os.environ.copy()
 
 # Add your specific variables
-current_env.update({
+current_env.update(
+  {
     "ENV": "development",
     "PUBLIC_PATH": "../fanyi/public",
     "USER_DATA_PATH": "../fanyi/data",
-})
+  }
+)
 
 cmd = "uv run main.py"
 print(f"Running command: {cmd}")

@@ -2,7 +2,6 @@
 Encapsulates the OCR and segmentation operations for Fanyi
 """
 
-import json
 import os
 from typing import List
 
@@ -32,9 +31,9 @@ class OCRAnalyzer:
     if os.path.exists(jieba_dict_path):
       jieba.load_userdict(jieba_dict_path)
     else:
-      logger.warn(f"Jieba dictionary file not found at {jieba_dict_path}, continuing without custom dictionary")
-
-
+      logger.warn(
+        f"Jieba dictionary file not found at {jieba_dict_path}, continuing without custom dictionary"
+      )
 
   def ocr_and_segment(self, image_path: str) -> OcrResult:
     logger.debug(f"Performing OCR and segmentation on image: {image_path} ")
@@ -47,10 +46,12 @@ class OCRAnalyzer:
       raw_data = self.ocr.predict(input=image_path)[0]
 
       logger.debug(f"Extracted text from {image_path}")
-      
-      boxes = raw_data.get('dt_polys', []) if isinstance(raw_data, dict) else raw_data[0]
-      texts = raw_data.get('rec_texts', [])
-      scores = raw_data.get('rec_scores', [])
+
+      boxes = (
+        raw_data.get("dt_polys", []) if isinstance(raw_data, dict) else raw_data[0]
+      )
+      texts = raw_data.get("rec_texts", [])
+      scores = raw_data.get("rec_scores", [])
 
       # Extract the segmented text from the results
       combined_text = "".join(texts)
@@ -59,13 +60,15 @@ class OCRAnalyzer:
       logger.debug(f"Segmented text from {image_path}: {seg_list}")
 
       formatted_results: List[OcrResultItem] = []
-    
+
       for box, text, score in zip(boxes, texts, scores):
-          formatted_results.append({
-              "coordinates": [[int(pt[0]), int(pt[1])] for pt in box],
-              "text": str(text),
-              "confidence": float(score)
-          })
+        formatted_results.append(
+          {
+            "coordinates": [[int(pt[0]), int(pt[1])] for pt in box],
+            "text": str(text),
+            "confidence": float(score),
+          }
+        )
 
       return OcrResult(results=formatted_results, segmented_text=seg_list)
 

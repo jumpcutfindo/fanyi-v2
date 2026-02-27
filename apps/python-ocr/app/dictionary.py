@@ -4,7 +4,7 @@ import sys
 from . import logger
 
 # If sys._MEIPASS exists, use it. Otherwise, use the local tmp directory.
-JIEBA_DICT_DIR = getattr(sys, '_MEIPASS', os.path.abspath('./tmp'))
+JIEBA_DICT_DIR = getattr(sys, "_MEIPASS", os.path.abspath("./tmp"))
 JIEBA_DICT_FILENAME = "jieba_dict.txt"
 JIEBA_DICT_PATH = os.path.join(JIEBA_DICT_DIR, JIEBA_DICT_FILENAME)
 
