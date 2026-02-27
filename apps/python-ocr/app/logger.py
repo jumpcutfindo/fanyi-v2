@@ -12,6 +12,10 @@ def info(message: str) -> None:
   print(json.dumps(OutgoingLogPayload(type="info", message=message)), file=log_stream)
   log_stream.flush()
 
+def warn(message: str) -> None:
+  print(json.dumps(OutgoingLogPayload(type="warn", message=message)), file=log_stream)
+  log_stream.flush()
+
 
 def error(message: str) -> None:
   print(json.dumps(OutgoingLogPayload(type="error", message=message)), file=log_stream)

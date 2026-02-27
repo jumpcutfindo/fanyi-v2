@@ -91,6 +91,9 @@ function handleIncomingLog(data: string | Buffer<ArrayBufferLike>) {
         case 'info':
           ocrLogger.info(payload.message);
           break;
+        case 'warn':
+          ocrLogger.warn(payload.message);
+          break;
         case 'error':
           ocrLogger.error(payload.message);
           break;
