@@ -95,7 +95,6 @@ export function registerIpcHandlers() {
     try {
       const ocrResult = await runOcr(screenshot);
 
-      // FIXME: This search should eventually just search all dictionaries
       const translations = getDictionaryEntriesFromAllDictionaries(
         ocrResult.segmented_text
       );

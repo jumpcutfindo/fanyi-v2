@@ -26,30 +26,41 @@ export function DictionaryEntryCard({
   className,
 }: DictionaryEntryCardProps) {
   const renderDefinition = (d: DictionaryEntry['definitions'][number]) => {
+    let definitionLine = null;
+
     if (d.links.length === 0) {
-      return <span key={d.definition}>{d.definition}</span>;
+      definitionLine = <span key={d.definition}>{d.definition}</span>;
+    } else {
+      let lastIndex = 0;
+      const chunks = [];
+
+      for (const link of d.links) {
+        chunks.push(d.definition.slice(lastIndex, link.start));
+        chunks.push(
+          <DictionaryHoverCard
+            key={`${entry.simplified} + ${link.word}`}
+            word={d.definition.slice(link.start, link.start + link.word.length)}
+          />
+        );
+        lastIndex = link.start + link.word.length;
+      }
+
+      // Append rest
+      if (lastIndex < d.definition.length) {
+        chunks.push(d.definition.slice(lastIndex));
+      }
+
+      definitionLine = <span>{chunks}</span>;
     }
 
-    let lastIndex = 0;
-    const chunks = [];
-
-    for (const link of d.links) {
-      chunks.push(d.definition.slice(lastIndex, link.start));
-      chunks.push(
-        <DictionaryHoverCard
-          key={`${entry.simplified} + ${link.word}`}
-          word={d.definition.slice(link.start, link.start + link.word.length)}
-        />
-      );
-      lastIndex = link.start + link.word.length;
-    }
-
-    // Append rest
-    if (lastIndex < d.definition.length) {
-      chunks.push(d.definition.slice(lastIndex));
-    }
-
-    return <span key={d.definition}>{chunks}</span>;
+    return (
+      <div key={d.definition} className="flex flex-col">
+        <span>{definitionLine}</span>
+        <span className="text-muted-foreground text-[8pt] italic">
+          {d.sourceDictionaryName}
+        </span>
+      </div>
+    );
   };
 
   return (

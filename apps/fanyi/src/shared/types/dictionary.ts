@@ -45,6 +45,7 @@ export interface DictionaryEntry {
   pinyin: string;
   definitions: {
     definition: string;
+    sourceDictionaryName: string;
     links: {
       word: string;
       start: number;
