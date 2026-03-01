@@ -19,7 +19,7 @@ class OcrResult(TypedDict):
 
 
 class OutgoingLogPayload(TypedDict):
-  type: Literal["debug", "info", "error"]
+  type: Literal["debug", "info", "error", "warn"]
   message: str
 
 

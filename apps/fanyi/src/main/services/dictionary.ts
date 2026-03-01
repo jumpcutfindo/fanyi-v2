@@ -38,6 +38,7 @@ const localDictionaries: Dictionary[] = [];
  * taxing?
  */
 function rawEntriesToMap(
+  dictionary: Dictionary | CustomDictionary,
   rawEntries: RawDictionaryEntry[]
 ): Record<string, DictionaryEntry> {
   return rawEntries.reduce(
@@ -83,20 +84,19 @@ function rawEntriesToMap(
           });
         }
 
+        const finalDefinition: DictionaryEntry['definitions'][number] = {
+          sourceDictionaryName: dictionary.name,
+          dictionaryType: 'type' in dictionary ? dictionary.type : 'custom',
+          definition,
+          links,
+        };
+
         if (acc[entry.simplified]) {
-          acc[entry.simplified].definitions.push({
-            definition,
-            links,
-          });
+          acc[entry.simplified].definitions.push(finalDefinition);
         } else {
           acc[entry.simplified] = {
             ...entry,
-            definitions: [
-              {
-                definition,
-                links,
-              },
-            ],
+            definitions: [finalDefinition],
           };
         }
       }
@@ -149,15 +149,19 @@ export function initDefaultDictionary() {
     });
   }
 
+  const defaultDictionaryName = 'Default (CEDICT)';
+
   defaultDictionary = {
     id: 'default',
     type: 'system',
-    name: 'Default (CEDICT)',
+    name: defaultDictionaryName,
     createdOn: new Date(),
     modifiedOn: new Date(),
     rawEntries,
-    wordMap: rawEntriesToMap(rawEntries),
+    wordMap: {},
   };
+
+  defaultDictionary.wordMap = rawEntriesToMap(defaultDictionary, rawEntries);
 
   logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
@@ -184,7 +188,10 @@ export function getDictionaryEntries(
 
   const entryMap: Record<string, DictionaryEntry> = {};
 
-  for (const query of queries) {
+  // Remove duplicates
+  const querySet = new Set(queries);
+
+  for (const query of querySet) {
     for (const dict of dictionaries) {
       const sourceEntry = dict.wordMap[query];
 
@@ -217,7 +224,12 @@ export function getDictionaryEntry(query: string) {
     throw new Error('Dictionary not initialized');
   }
 
-  return defaultDictionary.wordMap[query];
+  const matches = getDictionaryEntries(
+    [defaultDictionary, ...localDictionaries],
+    [query]
+  );
+
+  return matches.length === 1 ? matches[0] : null;
 }
 
 export function createDictionaryEntry(
@@ -262,7 +274,7 @@ export function createDictionaryEntry(
 
   // Note: This function is potentially expensive if there are many words in the dictionary
   // However, this is necessary due to the interdependence of words on each other
-  dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+  dictionary.wordMap = rawEntriesToMap(dictionary, dictionary.rawEntries);
 
   // Persist to file
   saveLocalDictionary({
@@ -305,7 +317,7 @@ export function deleteDictionaryEntry(dictionaryId: string, entryId: string) {
 
   // Note: This function is potentially expensive if there are many words in the dictionary
   // However, this is necessary due to the interdependence of words on each other
-  dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+  dictionary.wordMap = rawEntriesToMap(dictionary, dictionary.rawEntries);
 
   // Persist to file
   saveLocalDictionary({
@@ -371,7 +383,7 @@ export function updateDictionaryEntry(
 
   // Note: This function is potentially expensive if there are many words in the dictionary
   // However, this is necessary due to the interdependence of words on each other
-  dictionary.wordMap = rawEntriesToMap(dictionary.rawEntries);
+  dictionary.wordMap = rawEntriesToMap(dictionary, dictionary.rawEntries);
 
   // Persist to file
   saveLocalDictionary({
@@ -502,7 +514,10 @@ export function initLocalDictionaries() {
         localDictionaries.push({
           ...parsedDictionary.data,
           type: 'custom',
-          wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
+          wordMap: rawEntriesToMap(
+            parsedDictionary.data,
+            parsedDictionary.data.rawEntries
+          ),
         });
 
         logger.info(
