@@ -2,9 +2,10 @@
   "name": "python-ocr",
   "version": "1.0.0",
   "scripts": {
+    "dev": "uv run scripts/dev.py",
     "install": "uv sync",
     "test": "uv run pytest",
-    "build": "uv run pyinstaller --onefile main.py --name fanyi_ocr",
+    "build": "uv run scripts/package.py",
     "build:conditional": "git diff --name-only | findstr /R \"main.py dist/fanyi_ocr.exe\" >nul && pnpm run build || echo \"No changes found for 'main.py' or 'fanyi_ocr.exe', skipping build.\"",
     "lint": "ruff check",
     "format": "ruff check --fix"

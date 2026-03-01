@@ -6,6 +6,8 @@ import * as pinyin from 'pinyin-pro';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
+  CreateDictionaryEntryPayload,
+  CreateDictionaryEntryResult,
   CreateDictionaryPayload,
   CustomDictionary,
   customDictionarySchema,
@@ -14,22 +16,35 @@ import {
   DictionaryMinimal,
   DictionarySearchOptions,
   RawDictionaryEntry,
+  UpdateDictionaryEntryPayload,
+  UpdateDictionaryEntryResult,
   UpdateDictionaryPayload,
 } from '@shared/types/dictionary';
 import { logger } from '@main/logger';
+import { sendCommand } from '@main/services/ocr';
 
 const LOCAL_DICTIONARIES_DIR = `${app.getPath('userData')}${path.sep}dictionaries`;
 
 let defaultDictionary: Dictionary | null = null;
 const localDictionaries: Dictionary[] = [];
 
+/**
+ * Converts a list of raw dictionary entries into a map of entries.
+ *
+ * Note: This function is difficult to split out due to the reliance of building the map
+ * on previously seen entries.
+ *
+ * Comment: Maybe this can be improved with a custom class, such that adding each item is less
+ * taxing?
+ */
 function rawEntriesToMap(
+  dictionary: Dictionary | CustomDictionary,
   rawEntries: RawDictionaryEntry[]
 ): Record<string, DictionaryEntry> {
   return rawEntries.reduce(
     (acc, entry) => {
       // Skip useless entries
-      if (entry.definition.includes('variant of')) {
+      if (entry.definitions.includes('variant of')) {
         return acc;
       }
 
@@ -38,14 +53,14 @@ function rawEntriesToMap(
         format: 'numToSymbol',
       });
 
-      // Modify all pinyins within definition
-      const pinyins = entry.definition.matchAll(/\[(.*?)\]/g);
+      // Modify all pinyins within definitions
+      const pinyins = entry.definitions.matchAll(/\[(.*?)\]/g);
 
       for (const match of pinyins) {
         const individualPinyin = match[0].matchAll(/[a-z]+[1-4]/gi);
 
         for (const innerMatch of individualPinyin) {
-          entry.definition = entry.definition.replace(
+          entry.definitions = entry.definitions.replace(
             innerMatch[0],
             pinyin.convert(innerMatch[0].toLowerCase(), {
               format: 'numToSymbol',
@@ -54,32 +69,36 @@ function rawEntriesToMap(
         }
       }
 
-      // Retrieve links from the definition
-      const externalReferences = entry.definition.matchAll(/[\u4E00-\u9FFF]+/g);
-      const links = [];
+      // Split and process definitions
+      const definitions = entry.definitions.split('/');
 
-      for (const match of externalReferences) {
-        links.push({
-          word: match[0],
-          start: match.index,
-        });
-      }
+      for (const definition of definitions) {
+        // Retrieve links from the definition
+        const externalReferences = definition.matchAll(/[\u4E00-\u9FFF]+/g);
 
-      if (acc[entry.simplified]) {
-        acc[entry.simplified].definitions.push({
-          definition: entry.definition,
+        const links = [];
+        for (const match of externalReferences) {
+          links.push({
+            word: match[0],
+            start: match.index,
+          });
+        }
+
+        const finalDefinition: DictionaryEntry['definitions'][number] = {
+          sourceDictionaryName: dictionary.name,
+          dictionaryType: 'type' in dictionary ? dictionary.type : 'custom',
+          definition,
           links,
-        });
-      } else {
-        acc[entry.simplified] = {
-          ...entry,
-          definitions: [
-            {
-              definition: entry.definition,
-              links,
-            },
-          ],
         };
+
+        if (acc[entry.simplified]) {
+          acc[entry.simplified].definitions.push(finalDefinition);
+        } else {
+          acc[entry.simplified] = {
+            ...entry,
+            definitions: [finalDefinition],
+          };
+        }
       }
 
       return acc;
@@ -110,62 +129,94 @@ export function initDefaultDictionary() {
 
   // Define the regex with named capture groups
   const regex =
-    /^(?<traditional>.*?)\s+(?<simplified>.*?)\s+\[(?<pinyin>.*?)\]\s+\/(?<definition>.*?)\/\s*?/gm;
+    /^(?<traditional>\S+)\s+(?<simplified>\S+)\s+\[(?<pinyin>[^\]]+)\]\s+\/(?<definitions>.*)\/\s*$/gm;
 
-  const rawEntries = [];
+  const rawEntries: RawDictionaryEntry[] = [];
 
   for (const match of rawDictionary.matchAll(regex)) {
+    if (!match.groups) {
+      continue;
+    }
+
+    const { traditional, simplified, pinyin, definitions } = match.groups;
+
     rawEntries.push({
-      traditional: match.groups!.traditional,
-      simplified: match.groups!.simplified,
-      pinyin: match.groups!.pinyin.toLowerCase(),
-      definition: match.groups!.definition,
+      id: uuidv4(),
+      traditional,
+      simplified,
+      pinyin: pinyin.toLowerCase(),
+      definitions,
     });
   }
+
+  const defaultDictionaryName = 'Default (CEDICT)';
 
   defaultDictionary = {
     id: 'default',
     type: 'system',
-    name: 'Default (CEDICT)',
+    name: defaultDictionaryName,
     createdOn: new Date(),
     modifiedOn: new Date(),
     rawEntries,
-    wordMap: rawEntriesToMap(rawEntries),
+    wordMap: {},
   };
+
+  defaultDictionary.wordMap = rawEntriesToMap(defaultDictionary, rawEntries);
 
   logger.info(`Loaded default dictionary with ${rawEntries.length} entries`);
 }
 
-export function getDictionaryEntries(queries: string[]) {
+export function getDictionaryEntriesFromAllDictionaries(queries: string[]) {
   if (!defaultDictionary) {
-    throw new Error('Dictionary not initialized');
+    throw new Error('Default dictionary not initialized');
+  }
+
+  return getDictionaryEntries(
+    [defaultDictionary, ...localDictionaries],
+    queries
+  );
+}
+
+export function getDictionaryEntries(
+  dictionaries: Dictionary[],
+  queries: string[]
+) {
+  if (dictionaries.length === 0) {
+    logger.warn('No dictionaries were provided getDictionaryEntries');
+    return [];
   }
 
   const entryMap: Record<string, DictionaryEntry> = {};
 
-  for (const query of queries) {
-    entryMap[query] = defaultDictionary.wordMap[query];
-  }
+  // Remove duplicates
+  const querySet = new Set(queries);
 
-  const results: DictionaryEntry[] = [];
+  for (const query of querySet) {
+    for (const dict of dictionaries) {
+      const sourceEntry = dict.wordMap[query];
 
-  // Break up items with no entries into individual words, and process them
-  for (const key of Object.keys(entryMap)) {
-    if (!entryMap[key]) {
-      // Split the key into individual words
-      const individualWords = key.split('');
-
-      entryMap[key] = defaultDictionary.wordMap[key];
-
-      for (const word of individualWords) {
-        results.push(defaultDictionary.wordMap[word]);
+      if (!sourceEntry) {
+        // Skip if entry not found
+        continue;
       }
-    } else {
-      results.push(entryMap[key]);
+
+      if (entryMap[query]) {
+        // Combine definition with existing query
+        entryMap[query].definitions = [
+          ...entryMap[query].definitions,
+          ...sourceEntry.definitions,
+        ];
+      } else {
+        // If not, add the entry
+        entryMap[query] = {
+          ...sourceEntry,
+          definitions: [...sourceEntry.definitions],
+        };
+      }
     }
   }
 
-  return results.filter((entry) => entry !== undefined);
+  return Object.values(entryMap).filter((entry) => entry !== undefined);
 }
 
 export function getDictionaryEntry(query: string) {
@@ -173,7 +224,178 @@ export function getDictionaryEntry(query: string) {
     throw new Error('Dictionary not initialized');
   }
 
-  return defaultDictionary.wordMap[query];
+  const matches = getDictionaryEntries(
+    [defaultDictionary, ...localDictionaries],
+    [query]
+  );
+
+  return matches.length === 1 ? matches[0] : null;
+}
+
+export function createDictionaryEntry(
+  dictionaryId: string,
+  entry: CreateDictionaryEntryPayload
+): CreateDictionaryEntryResult {
+  logger.debug(`Adding dictionary entry "${entry.simplified}"`);
+
+  const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
+
+  if (!dictionary) {
+    logger.warn(`Dictionary with ID ${dictionaryId} not found`);
+    return { status: 'error' };
+  }
+
+  logger.debug(
+    `Dictionary entry "${entry.simplified}" will be added to dictionary "${dictionary.name}" (${dictionary.id})`
+  );
+
+  // Check if the word already exists and throw an error if it does
+  if (dictionary.wordMap[entry.simplified]) {
+    logger.warn(
+      `Dictionary entry "${entry.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
+    );
+    return { status: 'duplicate' };
+  }
+
+  dictionary.rawEntries.push({
+    id: uuidv4(),
+    simplified: entry.simplified,
+    traditional: entry.traditional,
+    pinyin: entry.pinyin,
+    definitions: entry.definitions.join('/'),
+  });
+
+  // Send a message to update OCR process on entry change
+  sendCommand({
+    action: 'entry_change',
+    type: 'add',
+    entry: entry.simplified,
+  });
+
+  // Note: This function is potentially expensive if there are many words in the dictionary
+  // However, this is necessary due to the interdependence of words on each other
+  dictionary.wordMap = rawEntriesToMap(dictionary, dictionary.rawEntries);
+
+  // Persist to file
+  saveLocalDictionary({
+    id: dictionary.id,
+    name: dictionary.name,
+    createdOn: dictionary.createdOn,
+    url: dictionary.url,
+    rawEntries: dictionary.rawEntries,
+    modifiedOn: new Date(),
+  });
+
+  return { status: 'success' };
+}
+
+export function deleteDictionaryEntry(dictionaryId: string, entryId: string) {
+  const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
+
+  if (!dictionary) {
+    logger.warn(`Dictionary with ID ${dictionaryId} not found`);
+    return;
+  }
+
+  const entry = dictionary.rawEntries.find((entry) => entry.id === entryId);
+
+  if (!entry) {
+    logger.warn(`Dictionary entry with ID ${entryId} not found`);
+    return;
+  }
+
+  dictionary.rawEntries = dictionary.rawEntries.filter(
+    (entry) => entry.id !== entryId
+  );
+
+  // Send a message to update OCR process on entry change
+  sendCommand({
+    action: 'entry_change',
+    type: 'remove',
+    entry: entry.simplified,
+  });
+
+  // Note: This function is potentially expensive if there are many words in the dictionary
+  // However, this is necessary due to the interdependence of words on each other
+  dictionary.wordMap = rawEntriesToMap(dictionary, dictionary.rawEntries);
+
+  // Persist to file
+  saveLocalDictionary({
+    id: dictionary.id,
+    name: dictionary.name,
+    url: dictionary.url,
+    rawEntries: dictionary.rawEntries,
+    createdOn: dictionary.createdOn,
+    modifiedOn: new Date(),
+  });
+}
+
+export function updateDictionaryEntry(
+  dictionaryId: string,
+  entryId: string,
+  payload: UpdateDictionaryEntryPayload
+): UpdateDictionaryEntryResult {
+  const dictionary = localDictionaries.find((dict) => dict.id === dictionaryId);
+
+  if (!dictionary) {
+    logger.warn(`Dictionary with ID ${dictionaryId} not found`);
+    return { status: 'error' };
+  }
+
+  const entryToUpdate = dictionary.rawEntries.find(
+    (rawEntry) => rawEntry.id === entryId
+  );
+
+  if (!entryToUpdate) {
+    logger.warn(
+      `Dictionary entry with ID ${entryId} not found in dictionary ${dictionaryId}`
+    );
+    return { status: 'error' };
+  }
+
+  // Check if the word already exists
+  if (dictionary.wordMap[payload.simplified]) {
+    logger.warn(
+      `Dictionary entry "${payload.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
+    );
+    return { status: 'duplicate' };
+  }
+
+  if (entryToUpdate.simplified !== payload.simplified) {
+    // Word changed completely, send message to OCR process
+    sendCommand({
+      action: 'entry_change',
+      type: 'remove',
+      entry: entryToUpdate.simplified,
+    });
+
+    sendCommand({
+      action: 'entry_change',
+      type: 'add',
+      entry: payload.simplified,
+    });
+  }
+
+  entryToUpdate.simplified = payload.simplified;
+  entryToUpdate.traditional = payload.traditional;
+  entryToUpdate.pinyin = payload.pinyin;
+  entryToUpdate.definitions = payload.definitions.join('/');
+
+  // Note: This function is potentially expensive if there are many words in the dictionary
+  // However, this is necessary due to the interdependence of words on each other
+  dictionary.wordMap = rawEntriesToMap(dictionary, dictionary.rawEntries);
+
+  // Persist to file
+  saveLocalDictionary({
+    id: dictionary.id,
+    name: dictionary.name,
+    url: dictionary.url,
+    rawEntries: dictionary.rawEntries,
+    createdOn: dictionary.createdOn,
+    modifiedOn: new Date(),
+  });
+
+  return { status: 'success' };
 }
 
 export function listDictionaries(): DictionaryMinimal[] {
@@ -187,19 +409,29 @@ export function listDictionaries(): DictionaryMinimal[] {
   ];
 }
 
-function getDictionariesFromOptions(options: DictionarySearchOptions) {
-  switch (options.space) {
-    case 'specific':
-      if (options.dictionaryId === 'default') {
-        return [defaultDictionary];
-      }
+function getDictionariesFromOptions(
+  options: DictionarySearchOptions
+): Dictionary[] {
+  if (!defaultDictionary) {
+    throw new Error('Default dictionary not initialized');
+  }
 
-      return [
-        localDictionaries.find((dict) => dict.id === options.dictionaryId),
-      ];
-    case 'all':
-    default:
-      return [defaultDictionary, ...localDictionaries];
+  if (options.space === 'specific') {
+    if (!options.dictionaryId) {
+      return [defaultDictionary];
+    }
+
+    const matchingDictionary = localDictionaries.find(
+      (dict) => dict.id === options.dictionaryId
+    );
+
+    if (!matchingDictionary) {
+      return [];
+    } else {
+      return [matchingDictionary];
+    }
+  } else {
+    return [defaultDictionary, ...localDictionaries];
   }
 }
 
@@ -223,20 +455,24 @@ export function searchDictionaries(
 
   if (!queryString || queryString === '') {
     return spliceResult(
-      getDictionaryEntries(allEntries.map((entry) => entry.simplified))
+      getDictionaryEntries(
+        dictionaries,
+        allEntries.map((entry) => entry.simplified)
+      )
     );
   }
 
   const fuse = new Fuse(allEntries, {
-    threshold: 0.0, // 0.0 is a perfect match, 1.0 matches anything
+    threshold: 0.2, // 0.0 is a perfect match, 1.0 matches anything
     keys: [
       { name: 'traditional', weight: 1.0 },
       { name: 'simplified', weight: 1.0 },
       { name: 'pinyin', weight: 1.0 },
-      { name: 'definition', weight: 1.0 },
+      { name: 'definitions', weight: 1.0 },
     ],
     ignoreDiacritics: true,
     includeScore: true,
+    sortFn: (a, b) => a.score - b.score,
 
     location: 0,
     distance: 600,
@@ -244,7 +480,10 @@ export function searchDictionaries(
   const rawResults = fuse.search(queryString);
 
   return spliceResult(
-    getDictionaryEntries(rawResults.map((rr) => rr.item.simplified))
+    getDictionaryEntries(
+      dictionaries,
+      rawResults.map((rr) => rr.item.simplified)
+    )
   );
 }
 
@@ -275,7 +514,10 @@ export function initLocalDictionaries() {
         localDictionaries.push({
           ...parsedDictionary.data,
           type: 'custom',
-          wordMap: rawEntriesToMap(parsedDictionary.data.rawEntries),
+          wordMap: rawEntriesToMap(
+            parsedDictionary.data,
+            parsedDictionary.data.rawEntries
+          ),
         });
 
         logger.info(
@@ -298,6 +540,10 @@ function saveLocalDictionary(dictionary: CustomDictionary) {
     // Write the dictionary to a file
     const filePath = `${LOCAL_DICTIONARIES_DIR}${path.sep}${dictionary.id}.json`;
     fs.writeFileSync(filePath, JSON.stringify(dictionary, null, 2));
+
+    logger.debug(
+      `Saved dictionary "${parsedDictionary.data.name}" with ${parsedDictionary.data.rawEntries.length} entries`
+    );
   }
 }
 

@@ -7,6 +7,7 @@ export function useDeleteDictionaryMutation() {
     mutationFn: (id: string) => window.api.deleteDictionary(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dictionaries'] });
+      queryClient.invalidateQueries({ queryKey: ['search-dictionaries'] });
     },
   });
 }

@@ -1,7 +1,8 @@
-import { ArrowLeft, SquarePen, Trash } from 'lucide-react';
+import { ArrowLeft, Plus, SquarePen, Trash } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { DictionaryEntry } from '@shared/types/dictionary';
 import { SidebarContainer } from '@renderer/components/Sidebar';
 import {
   AlertDialog,
@@ -15,11 +16,13 @@ import {
   AlertDialogTrigger,
 } from '@renderer/components/ui/AlertDialog';
 import { Button } from '@renderer/components/ui/Button';
+import { Separator } from '@renderer/components/ui/Separator';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@renderer/components/ui/Tooltip';
+import { DictionaryEntryDialog } from '@renderer/features/dictionary/components/DictionaryEntryDialog';
 import { DictionaryEntryList } from '@renderer/features/dictionary/components/DictionaryEntryList';
 import { DictionaryFormDialog } from '@renderer/features/dictionary/components/DictionaryFormDialog';
 import { DictionaryManager } from '@renderer/features/dictionary/components/DictionaryManager';
@@ -32,6 +35,16 @@ export function DictionaryPage() {
   const { mutate: deleteDictionary } = useDeleteDictionaryMutation();
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const [entryDialogState, setEntryDialogState] = useState<{
+    isOpen: boolean;
+    entry?: DictionaryEntry;
+    mode: 'create' | 'edit' | 'view';
+  }>({
+    isOpen: false,
+    mode: 'create',
+    entry: undefined,
+  });
 
   const canModifyDictionary =
     selectedDictionary !== null && selectedDictionary.type !== 'system';
@@ -65,8 +78,8 @@ export function DictionaryPage() {
       <SidebarContainer className="min-w-70">
         <DictionaryManager />
       </SidebarContainer>
-      <div className="flex w-full flex-col gap-4 p-4">
-        <div className="flex h-6 flex-row items-center gap-2">
+      <div className="flex w-full flex-col gap-4">
+        <div className="mx-4 mt-4 flex h-6 flex-row items-center gap-2">
           {selectedDictionary ? (
             <Button
               variant="ghost"
@@ -88,6 +101,25 @@ export function DictionaryPage() {
           {canModifyDictionary ? (
             <>
               <div className="ms-auto flex flex-row justify-end gap-2">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        setEntryDialogState({
+                          isOpen: true,
+                          mode: 'create',
+                          entry: undefined,
+                        })
+                      }
+                    >
+                      <Plus />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Add a new word</TooltipContent>
+                </Tooltip>
+                <Separator orientation="vertical" />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -135,7 +167,6 @@ export function DictionaryPage() {
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
-
               <DictionaryFormDialog
                 mode="edit"
                 open={isEditDialogOpen}
@@ -145,8 +176,29 @@ export function DictionaryPage() {
             </>
           ) : null}
         </div>
-        <DictionaryEntryList />
+        <DictionaryEntryList
+          handleSelectEntry={(entry) => {
+            setEntryDialogState({
+              mode: canModifyDictionary ? 'edit' : 'view',
+              isOpen: true,
+              entry,
+            });
+          }}
+        />
       </div>
+
+      <DictionaryEntryDialog
+        isOpen={entryDialogState.isOpen}
+        setIsOpen={(isOpen) => {
+          setEntryDialogState((prev) => ({
+            ...prev,
+            isOpen,
+          }));
+        }}
+        mode={entryDialogState.mode}
+        dictionaryId={selectedDictionary?.id ?? ''}
+        entry={entryDialogState.entry}
+      />
     </>
   );
 }

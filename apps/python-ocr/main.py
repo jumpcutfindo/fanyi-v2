@@ -3,55 +3,37 @@ import os
 import sys
 from app.utils import handle_pyinstaller_folders
 from app.ipc import write_and_send
-from app.engine import OCRAnalyzer
+from app.processor import Processor
 from app import logger
-from app.types import AppFD, OutgoingErrorPayload, OutgoingModelReadyPayload, OutgoingOcrResultPayload
+from app.types import AppFD, OutgoingModelReadyPayload
 
-in_stream = os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
+in_stream = (
+  os.environ.get("ENV") == "development"
+  and sys.stdin
+  or os.fdopen(AppFD.DATA_IN, "r", encoding="utf-8", closefd=False)
+)
+
+public_path = os.environ.get("PUBLIC_PATH")
+user_data_path = os.environ.get("USER_DATA_PATH")
+
 
 def main():
-    handle_pyinstaller_folders()
+  # On start, immediately try to fix leaked temp folders
+  handle_pyinstaller_folders()
 
-    logger.info("Initializing models...")
-    analyzer = OCRAnalyzer()
+  logger.info("Setting up processor...")
+  processor = Processor(public_path, user_data_path)
 
-    write_and_send(OutgoingModelReadyPayload(action="model_ready"))
+  logger.info("Processor ready to accept commands")
+  write_and_send(OutgoingModelReadyPayload(action="model_ready"))
 
-    for line in in_stream:
-        command = json.loads(line.strip())
-        
-        match command['action']:
-            case 'run_ocr':
-                logger.debug(f"Received 'run_ocr' command with image path {command['image_path']}")
-                
-                if not command['image_path'] or not os.path.exists(command['image_path']):
-                    logger.error(
-                        f"Error: Invalid or non-existent image path received: {command['image_path']}",
-                    )
-                    write_and_send(OutgoingErrorPayload(action="error", message="Invalid image path"))
-                    continue
-                
-                try:
-                    ocr_result = analyzer.ocr_and_segment(command['image_path'])
-
-                    write_and_send(OutgoingOcrResultPayload(
-                        action="ocr_result",
-                        data=ocr_result
-                    ))
-                except Exception as e:
-                    logger.error(f"Error during OCR execution: {e}")
-
-                    write_and_send(OutgoingErrorPayload(
-                        action="error",
-                        message=str(e)
-                    ))
-                break
-            case 'exit':
-                logger.info("Received 'exit' command. Shutting down.")
-                sys.exit(0)
-            case _:
-                logger.info(f"Unknown command received: '{command['action']}'")
+  for line in in_stream:
+    try:
+      payload = json.loads(line.strip())
+      processor.process(payload["action"], payload)
+    except Exception as e:
+      logger.error(f"Failed to process payload: {e}")
 
 
 if __name__ == "__main__":
-    main()
+  main()
