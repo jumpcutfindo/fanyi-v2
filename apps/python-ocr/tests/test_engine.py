@@ -2,35 +2,44 @@ import pytest
 from unittest.mock import MagicMock
 from app.engine import OCRAnalyzer
 
-def test_ocr_analyzer_init(mocker):
-    """Verifies that easyocr and jieba are initialized correctly."""
-    mock_reader_class = mocker.patch("easyocr.Reader")
-    mock_jieba_cut = mocker.patch("jieba.cut")
+def test_ocr_analyzer_init(mocker: MagicMock):
+    """Verifies that PaddleOCR and jieba are initialized correctly."""
+    mock_ocr_class = mocker.patch("app.engine.PaddleOCR")
+    mock_jieba_load = mocker.patch("jieba.load_userdict")
+    mocker.patch("os.path.exists", return_value=True)
     mocker.patch("app.engine.logger")
 
-    languages = ["ch_sim", "en"]
-    analyzer = OCRAnalyzer(languages=languages)
+    dict_path = "path/to/dict.txt"
 
-    mock_reader_class.assert_called_once_with(languages)
-    # Check warm-up call
-    mock_jieba_cut.assert_called_with("初始化", cut_all=False)
+    # Test instantiation
+    OCRAnalyzer(jieba_dict_path=dict_path)
 
-def test_ocr_and_segment_success(mocker):
+    mock_ocr_class.assert_called_once_with(
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,
+        use_textline_orientation=False,
+    )
+    mock_jieba_load.assert_called_once_with(dict_path)
+
+def test_ocr_and_segment_success(mocker: MagicMock):
     """Tests the full OCR and segmentation pipeline with mocked results."""
     # Setup mocks
-    mock_reader_instance = MagicMock()
-    mocker.patch("easyocr.Reader", return_value=mock_reader_instance)
-    # Mock jieba.cut for both init and the actual call
+    mock_ocr_instance = MagicMock()
+    mocker.patch("app.engine.PaddleOCR", return_value=mock_ocr_instance)
+    mocker.patch("jieba.load_userdict")
     mock_jieba_cut = mocker.patch("jieba.cut")
-    mock_jieba_cut.side_effect = [iter(["init"]), iter(["你好", "世界"])]
+    mock_jieba_cut.return_value = iter(["你好", "世界"])
+    mocker.patch("os.path.exists", return_value=True)
     mocker.patch("app.engine.logger")
 
-    # Mock easyocr result: [([[x,y], ...], text, confidence)]
-    mock_reader_instance.readtext.return_value = [
-        ([[10.1, 20.9], [100.5, 20.9], [100.5, 50.2], [10.1, 50.2]], "你好世界", 0.98)
-    ]
+    # Mock PaddleOCR result: [result_dict]
+    mock_ocr_instance.predict.return_value = [{
+        "dt_polys": [[[10.1, 20.9], [100.5, 20.9], [100.5, 50.2], [10.1, 50.2]]],
+        "rec_texts": ["你好世界"],
+        "rec_scores": [0.98]
+    }]
 
-    analyzer = OCRAnalyzer()
+    analyzer = OCRAnalyzer(jieba_dict_path="fake.txt")
     result = analyzer.ocr_and_segment("test_image.png")
 
     # Verify data transformation
@@ -43,36 +52,56 @@ def test_ocr_and_segment_success(mocker):
     assert result["results"][0]["text"] == "你好世界"
     assert result["results"][0]["confidence"] == 0.98
 
-    mock_reader_instance.readtext.assert_called_once_with("test_image.png")
+    mock_ocr_instance.predict.assert_called_once_with(input="test_image.png")
 
-def test_ocr_and_segment_empty(mocker):
+def test_ocr_and_segment_empty(mocker: MagicMock):
     """Tests handling of images where no text is detected."""
-    mock_reader_instance = MagicMock()
-    mocker.patch("easyocr.Reader", return_value=mock_reader_instance)
+    mock_ocr_instance = MagicMock()
+    mocker.patch("app.engine.PaddleOCR", return_value=mock_ocr_instance)
+    mocker.patch("jieba.load_userdict")
     mock_jieba_cut = mocker.patch("jieba.cut")
-    mock_jieba_cut.side_effect = [iter(["init"]), iter([])]
+    mock_jieba_cut.return_value = iter([])
+    mocker.patch("os.path.exists", return_value=True)
     mocker.patch("app.engine.logger")
 
-    mock_reader_instance.readtext.return_value = []
+    mock_ocr_instance.predict.return_value = [{
+        "dt_polys": [],
+        "rec_texts": [],
+        "rec_scores": []
+    }]
 
-    analyzer = OCRAnalyzer()
+    analyzer = OCRAnalyzer(jieba_dict_path="empty.txt")
     result = analyzer.ocr_and_segment("empty.png")
 
     assert result["results"] == []
     assert result["segmented_text"] == []
 
-def test_ocr_and_segment_error_handling(mocker):
+def test_ocr_and_segment_error_handling(mocker: MagicMock):
     """Verifies that exceptions are wrapped in RuntimeError."""
-    mock_reader_instance = MagicMock()
-    mocker.patch("easyocr.Reader", return_value=mock_reader_instance)
-    mocker.patch("jieba.cut")
+    mock_ocr_instance = MagicMock()
+    mocker.patch("app.engine.PaddleOCR", return_value=mock_ocr_instance)
+    mocker.patch("jieba.load_userdict")
+    mocker.patch("os.path.exists", return_value=True)
     mocker.patch("app.engine.logger")
 
-    mock_reader_instance.readtext.side_effect = Exception("Low level OCR failure")
+    mock_ocr_instance.predict.side_effect = Exception("Low level OCR failure")
 
-    analyzer = OCRAnalyzer()
+    analyzer = OCRAnalyzer(jieba_dict_path="broken.txt")
     with pytest.raises(RuntimeError) as exc_info:
         analyzer.ocr_and_segment("broken.png")
     
     assert "OCR or segmentation failed" in str(exc_info.value)
     assert "Low level OCR failure" in str(exc_info.value)
+
+def test_reload_jieba_dict(mocker: MagicMock):
+    """Verifies that jieba dictionary can be reloaded."""
+    mocker.patch("app.engine.PaddleOCR")
+    mock_jieba_load = mocker.patch("jieba.load_userdict")
+    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch("app.engine.logger")
+
+    analyzer = OCRAnalyzer(jieba_dict_path="initial.txt")
+    new_path = "new/path.txt"
+    analyzer.reload_jieba_dict(new_path)
+
+    mock_jieba_load.assert_called_with(new_path)
