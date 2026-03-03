@@ -37,7 +37,7 @@ const localDictionaries: Dictionary[] = [];
  * Comment: Maybe this can be improved with a custom class, such that adding each item is less
  * taxing?
  */
-function rawEntriesToMap(
+export function rawEntriesToMap(
   dictionary: Dictionary | CustomDictionary,
   rawEntries: RawDictionaryEntry[]
 ): Record<string, DictionaryEntry> {
