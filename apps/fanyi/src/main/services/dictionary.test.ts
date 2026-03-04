@@ -72,6 +72,51 @@ describe('dictionary service', () => {
       expect(result['正常']).toBeDefined();
     });
 
+    it('should replace number based pinyins', async () => {
+      const rawEntries: RawDictionaryEntry[] = [
+        {
+          id: '1',
+          simplified: '成功',
+          traditional: '成功',
+          pinyin: 'cheng2 gong1',
+          definitions: 'succesful',
+        },
+      ];
+
+      pinyin.convert.mockImplementation((str: string) => {
+        if (str === 'cheng2 gong1') return 'replaced pinyin';
+        return str;
+      });
+
+      const result = dictionaryService.rawEntriesToMap(mockDict, rawEntries);
+
+      expect(result['成功'].pinyin).toBe('replaced pinyin');
+    });
+
+    it('should replace number based pinyins in definitions', async () => {
+      const rawEntries: RawDictionaryEntry[] = [
+        {
+          id: '1',
+          simplified: '成功',
+          traditional: '成功',
+          pinyin: 'cheng2 gong1',
+          definitions: 'succesful [ni2 hao3]',
+        },
+      ];
+
+      pinyin.convert.mockImplementation((str: string) => {
+        if (str === 'ni2') return 'replaced';
+        if (str === 'hao3') return 'pinyin';
+        return str;
+      });
+
+      const result = dictionaryService.rawEntriesToMap(mockDict, rawEntries);
+
+      expect(result['成功'].definitions[0].definition).toBe(
+        'succesful [replaced pinyin]'
+      );
+    });
+
     it('should process complex definitions with nested pinyin and links', async () => {
       const rawEntries: RawDictionaryEntry[] = [
         {
