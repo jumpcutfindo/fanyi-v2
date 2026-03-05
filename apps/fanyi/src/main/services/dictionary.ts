@@ -353,8 +353,11 @@ export function updateDictionaryEntry(
     return { status: 'error' };
   }
 
-  // Check if the word already exists
-  if (dictionary.wordMap[payload.simplified]) {
+  // Check if the word already exists in the same dictionary, but ignore the entry we are currently updating
+  if (
+    payload.simplified !== entryToUpdate.simplified &&
+    dictionary.wordMap[payload.simplified]
+  ) {
     logger.warn(
       `Dictionary entry "${payload.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
     );

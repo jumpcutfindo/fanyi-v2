@@ -422,4 +422,146 @@ describe('dictionary service', () => {
       expect(result.status).toBe('error');
     });
   });
+
+  describe('updateDictionaryEntry', () => {
+    let customDict: any;
+    let entryId: string;
+
+    beforeEach(() => {
+      customDict = dictionaryService.createDictionary({
+        name: 'Custom',
+        url: 'custom.json',
+      } as any);
+
+      const payload = {
+        simplified: 'old',
+        traditional: 'old',
+        pinyin: 'old',
+        definitions: ['old definition'],
+      };
+
+      dictionaryService.createDictionaryEntry(customDict.id, payload);
+      const dict = dictionaryService.getLocalDictionary(customDict.id);
+      entryId = dict!.rawEntries[0].id;
+
+      vi.clearAllMocks();
+    });
+
+    it('should successfully update an entry and notify the system of word changes', () => {
+      const payload = {
+        simplified: 'new',
+        traditional: 'new',
+        pinyin: 'new',
+        definitions: ['new definition'],
+      };
+
+      const result = dictionaryService.updateDictionaryEntry(
+        customDict.id,
+        entryId,
+        payload
+      );
+
+      expect(result.status).toBe('success');
+
+      // Verify IPC calls for word change
+      expect(mockSendCommand).toHaveBeenCalledWith({
+        action: 'entry_change',
+        type: 'remove',
+        entry: 'old',
+      });
+      expect(mockSendCommand).toHaveBeenCalledWith({
+        action: 'entry_change',
+        type: 'add',
+        entry: 'new',
+      });
+
+      // Verify word map update
+      const testDictionary = dictionaryService.getLocalDictionary(
+        customDict.id
+      );
+      expect(testDictionary?.wordMap['new']).toBeDefined();
+      expect(testDictionary?.wordMap['old']).toBeUndefined();
+    });
+
+    it('should successfully update non-word fields without notifying system', () => {
+      const payload = {
+        simplified: 'old', // word stays the same
+        traditional: 'new traditional',
+        pinyin: 'new pinyin',
+        definitions: ['new definition'],
+      };
+
+      const result = dictionaryService.updateDictionaryEntry(
+        customDict.id,
+        entryId,
+        payload
+      );
+
+      expect(result.status).toBe('success');
+
+      // Verify IPC calls were NOT made
+      expect(mockSendCommand).not.toHaveBeenCalled();
+
+      // Verify word map update
+      const testDictionary = dictionaryService.getLocalDictionary(
+        customDict.id
+      );
+      expect(testDictionary?.wordMap['old'].pinyin).toBe('new pinyin');
+    });
+
+    it('should return duplicate status if word collides with another entry', () => {
+      // Create another entry
+      dictionaryService.createDictionaryEntry(customDict.id, {
+        simplified: 'other',
+        traditional: 'other',
+        pinyin: 'other',
+        definitions: ['other'],
+      });
+
+      const payload = {
+        simplified: 'other', // collide with the newly created entry
+        traditional: 'new',
+        pinyin: 'new',
+        definitions: ['new'],
+      };
+
+      const result = dictionaryService.updateDictionaryEntry(
+        customDict.id,
+        entryId,
+        payload
+      );
+
+      expect(result.status).toBe('duplicate');
+    });
+
+    it('should return error status if dictionary not found', () => {
+      const result = dictionaryService.updateDictionaryEntry(
+        'invalid-id',
+        entryId,
+        {
+          simplified: 'test',
+          traditional: 'test',
+          pinyin: 'pinyin',
+          definitions: ['def'],
+        }
+      );
+
+      expect(result.status).toBe('error');
+    });
+
+    it('should return error status if entry not found', () => {
+      const result = dictionaryService.updateDictionaryEntry(
+        customDict.id,
+        'invalid-entry-id',
+        {
+          simplified: 'test',
+          traditional: 'test',
+          pinyin: 'pinyin',
+          definitions: ['def'],
+        }
+      );
+
+      expect(result.status).toBe('error');
+    });
+  });
 });
