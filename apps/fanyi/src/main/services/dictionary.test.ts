@@ -4,6 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { RawDictionaryEntry } from '@shared/types/dictionary';
 
+const { mockSendCommand } = vi.hoisted(() => ({
+  mockSendCommand: vi.fn(),
+}));
+
 // Mock electron before any imports
 vi.mock('electron', () => ({
   app: {
@@ -31,7 +35,9 @@ vi.mock('pinyin-pro', () => ({
 }));
 
 vi.mock('@main/logger');
-vi.mock('@main/services/ocr');
+vi.mock('@main/services/ocr', () => ({
+  sendCommand: mockSendCommand,
+}));
 
 describe('dictionary service', () => {
   let dictionaryService: typeof import('./dictionary');
@@ -41,7 +47,7 @@ describe('dictionary service', () => {
     vi.clearAllMocks();
     vi.resetModules();
     process.env.VITE_PUBLIC = '/mock/public';
-    dictionaryService = await import('./dictionary');
+    dictionaryService = await vi.importActual('./dictionary');
     pinyin = await import('pinyin-pro');
   });
 
@@ -339,6 +345,81 @@ describe('dictionary service', () => {
       expect(result[1].simplified).toBe('你好'); // Other queries should be handled
       expect(result[1].definitions).toHaveLength(1);
       expect(result[1].definitions[0].definition).toBe('hello');
+    });
+  });
+
+  describe('createDictionaryEntry', () => {
+    let customDict: any;
+
+    beforeEach(() => {
+      customDict = dictionaryService.createDictionary({
+        name: 'Custom',
+        url: 'custom.json',
+      } as any);
+
+      vi.clearAllMocks(); // Clear mocks after setup
+    });
+
+    it('should successfully add an entry and notify the system', () => {
+      const payload = {
+        simplified: '测试',
+        traditional: '測試',
+        pinyin: 'ce4 shi4',
+        definitions: ['test', 'to test'],
+      };
+
+      const result = dictionaryService.createDictionaryEntry(
+        customDict.id,
+        payload
+      );
+
+      expect(result.status).toBe('success');
+
+      // Verify IPC call
+      expect(mockSendCommand).toHaveBeenCalledWith({
+        action: 'entry_change',
+        type: 'add',
+        entry: '测试',
+      });
+
+      // Verify persistence
+      expect(fs.writeFileSync).toHaveBeenCalled();
+
+      // Verify word map update
+      const testDictionary = dictionaryService.getLocalDictionary(
+        customDict.id
+      );
+
+      expect(testDictionary).toBeTruthy();
+      expect(testDictionary?.wordMap['测试']).not.toBeNull();
+    });
+
+    it('should return duplicate status if word already exists', () => {
+      const payload = {
+        simplified: 'existing',
+        traditional: 'existing',
+        pinyin: 'pinyin',
+        definitions: ['def'],
+      };
+
+      dictionaryService.createDictionaryEntry(customDict.id, payload);
+      const result = dictionaryService.createDictionaryEntry(
+        customDict.id,
+        payload
+      );
+
+      expect(result.status).toBe('duplicate');
+    });
+
+    it('should return error status if dictionary not found', () => {
+      const result = dictionaryService.createDictionaryEntry('invalid-id', {
+        simplified: 'test',
+        traditional: 'test',
+        pinyin: 'pinyin',
+        definitions: ['def'],
+      });
+
+      expect(result.status).toBe('error');
     });
   });
 });

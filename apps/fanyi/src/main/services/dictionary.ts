@@ -613,3 +613,15 @@ export function updateDictionary(dictionary: UpdateDictionaryPayload) {
     logger.warn(`Dictionary with ID ${dictionary.id} not found`);
   }
 }
+
+export function getDefaultDictionary() {
+  if (!defaultDictionary) {
+    throw new Error('Default dictionary not initialized');
+  }
+
+  return defaultDictionary;
+}
+
+export function getLocalDictionary(dictionaryId: string) {
+  return localDictionaries.find((dict) => dict.id === dictionaryId);
+}
