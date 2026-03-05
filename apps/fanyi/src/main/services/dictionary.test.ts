@@ -26,10 +26,6 @@ vi.mock('fs', () => ({
   },
 }));
 
-vi.mock('uuid', () => ({
-  v4: vi.fn().mockReturnValue('test-uuid'),
-}));
-
 vi.mock('pinyin-pro', () => ({
   convert: vi.fn((str) => str), // Simplified: returns as is by default
 }));
@@ -562,6 +558,89 @@ describe('dictionary service', () => {
       );
 
       expect(result.status).toBe('error');
+    });
+  });
+
+  describe('deleteDictionaryEntry', () => {
+    let customDict: any;
+    let entryId: string;
+
+    beforeEach(() => {
+      customDict = dictionaryService.createDictionary({
+        name: 'Custom',
+        url: 'custom.json',
+      } as any);
+
+      const payload = {
+        simplified: 'test',
+        traditional: 'test',
+        pinyin: 'test',
+        definitions: ['test definition'],
+      };
+
+      dictionaryService.createDictionaryEntry(customDict.id, payload);
+      const dict = dictionaryService.getLocalDictionary(customDict.id);
+      entryId = dict!.rawEntries[0].id;
+
+      vi.clearAllMocks();
+    });
+
+    it('should successfully delete an entry and notify the system', () => {
+      dictionaryService.deleteDictionaryEntry(customDict.id, entryId);
+
+      // Verify IPC call
+      expect(mockSendCommand).toHaveBeenCalledWith({
+        action: 'entry_change',
+        type: 'remove',
+        entry: 'test',
+      });
+
+      // Verify persistence
+      expect(fs.writeFileSync).toHaveBeenCalled();
+
+      // Verify word map update
+      const testDictionary = dictionaryService.getLocalDictionary(
+        customDict.id
+      );
+      expect(testDictionary?.wordMap['test']).toBeUndefined();
+      expect(testDictionary?.rawEntries).toHaveLength(0);
+    });
+
+    it('should do nothing if dictionary not found', () => {
+      dictionaryService.deleteDictionaryEntry('invalid-id', entryId);
+
+      expect(mockSendCommand).not.toHaveBeenCalled();
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
+    it('should do nothing if entry not found', () => {
+      dictionaryService.deleteDictionaryEntry(customDict.id, 'invalid-id');
+
+      expect(mockSendCommand).not.toHaveBeenCalled();
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
+    it('should preserve other entries when deleting', () => {
+      // Add a second entry
+      const payload2 = {
+        simplified: 'keep',
+        traditional: 'keep',
+        pinyin: 'keep',
+        definitions: ['keep definition'],
+      };
+      dictionaryService.createDictionaryEntry(customDict.id, payload2);
+
+      const dict = dictionaryService.getLocalDictionary(customDict.id);
+      expect(dict?.rawEntries).toHaveLength(2);
+
+      // Delete the first entry
+      dictionaryService.deleteDictionaryEntry(customDict.id, entryId);
+
+      // Verify state
+      const updatedDict = dictionaryService.getLocalDictionary(customDict.id);
+      expect(updatedDict?.rawEntries).toHaveLength(1);
+      expect(updatedDict?.wordMap['keep']).toBeDefined();
+      expect(updatedDict?.wordMap['test']).toBeUndefined();
     });
   });
 });
