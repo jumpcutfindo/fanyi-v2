@@ -212,4 +212,133 @@ describe('dictionary service', () => {
       );
     });
   });
+
+  describe('getDictionaryEntries', () => {
+    const mockEntry1: any = {
+      id: '1',
+      simplified: '测试',
+      traditional: '測試',
+      pinyin: 'ce4 shi4',
+      definitions: [
+        {
+          definition: 'test',
+          sourceDictionaryName: 'Dict 1',
+          dictionaryType: 'custom',
+        },
+      ],
+    };
+
+    const mockEntry2: any = {
+      id: '2',
+      simplified: '测试',
+      traditional: '測試',
+      pinyin: 'ce4 shi4',
+      definitions: [
+        {
+          definition: 'to test',
+          sourceDictionaryName: 'Dict 2',
+          dictionaryType: 'custom',
+        },
+      ],
+    };
+
+    const dict1: any = {
+      id: 'dict1',
+      name: 'Dict 1',
+      wordMap: { 测试: mockEntry1 },
+    };
+    const dict2: any = {
+      id: 'dict2',
+      name: 'Dict 2',
+      wordMap: { 测试: mockEntry2 },
+    };
+
+    it('should return empty array when no dictionaries provided', () => {
+      const result = dictionaryService.getDictionaryEntries([], ['测试']);
+      expect(result).toEqual([]);
+    });
+
+    it('should return empty array when no queries provided', () => {
+      const result = dictionaryService.getDictionaryEntries([dict1], []);
+      expect(result).toEqual([]);
+    });
+
+    it('should return unique entries and merge definitions from multiple dictionaries', () => {
+      const result = dictionaryService.getDictionaryEntries(
+        [dict1, dict2],
+        ['测试']
+      );
+
+      expect(result).toHaveLength(1);
+      expect(result[0].simplified).toBe('测试');
+      expect(result[0].definitions).toHaveLength(2);
+      expect(result[0].definitions[0].definition).toBe('test');
+      expect(result[0].definitions[1].definition).toBe('to test');
+    });
+
+    it('should skip queries that are not found', () => {
+      const result = dictionaryService.getDictionaryEntries(
+        [dict1],
+        ['测试', 'missing']
+      );
+
+      expect(result).toHaveLength(1);
+      expect(result[0].simplified).toBe('测试');
+    });
+
+    it('should not mutate original dictionary wordMap definitions', () => {
+      const result = dictionaryService.getDictionaryEntries(
+        [dict1, dict2],
+        ['测试']
+      );
+
+      expect(result[0].definitions).toHaveLength(2);
+      expect(dict1.wordMap['测试'].definitions).toHaveLength(1);
+      expect(dict2.wordMap['测试'].definitions).toHaveLength(1);
+    });
+
+    it('should correctly query multiple dictionaries', () => {
+      const mockEntryA = { ...mockEntry1 };
+      const mockEntryA2 = { ...mockEntry2 };
+      const mockEntryB = {
+        id: '2',
+        simplified: '你好',
+        traditional: '你好',
+        pinyin: 'ni3 hao3',
+        definitions: [
+          {
+            definition: 'hello',
+            sourceDictionaryName: 'Dict A',
+            dictionaryType: 'custom',
+          },
+        ],
+      };
+
+      const dictA = {
+        id: 'dictA',
+        name: 'Dict A',
+        wordMap: { 测试: mockEntryA, 你好: mockEntryB },
+      } as any;
+
+      const dictB = {
+        id: 'dictB',
+        name: 'Dict B',
+        wordMap: { 测试: mockEntryA2 },
+      } as any;
+
+      const result = dictionaryService.getDictionaryEntries(
+        [dictA, dictB],
+        ['测试', '你好']
+      );
+
+      expect(result).toHaveLength(2);
+      expect(result[0].simplified).toBe('测试');
+      expect(result[0].definitions).toHaveLength(2); // Definitions should be merged
+      expect(result[0].definitions[0].definition).toBe('test');
+      expect(result[0].definitions[1].definition).toBe('to test');
+      expect(result[1].simplified).toBe('你好'); // Other queries should be handled
+      expect(result[1].definitions).toHaveLength(1);
+      expect(result[1].definitions[0].definition).toBe('hello');
+    });
+  });
 });
