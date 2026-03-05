@@ -224,8 +224,6 @@ export function getDictionaryEntry(query: string) {
     throw new Error('Dictionary not initialized');
   }
 
-  console.log(query, defaultDictionary, localDictionaries);
-
   const matches = getDictionaryEntries(
     [defaultDictionary, ...localDictionaries],
     [query]
