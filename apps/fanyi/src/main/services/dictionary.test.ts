@@ -714,4 +714,62 @@ describe('dictionary service', () => {
       expect(loadedDict).toBeUndefined();
     });
   });
+
+  describe('createDictionary', () => {
+    it('should successfully create and persist a new dictionary', () => {
+      const payload = { name: 'New Dict', url: 'new.json' };
+      const result = dictionaryService.createDictionary(payload as any);
+
+      expect(result.id).toBeTruthy();
+      expect(result.name).toBe('New Dict');
+      expect(fs.writeFileSync).toHaveBeenCalled();
+
+      const loaded = dictionaryService.getLocalDictionary(result.id);
+      expect(loaded).toBeDefined();
+      expect(loaded?.name).toBe('New Dict');
+    });
+  });
+
+  describe('deleteDictionary', () => {
+    it('should successfully delete and remove dictionary file', () => {
+      const dict = dictionaryService.createDictionary({
+        name: 'Delete Me',
+      } as any);
+      dictionaryService.deleteDictionary(dict.id);
+
+      expect(fs.unlinkSync).toHaveBeenCalled();
+      expect(dictionaryService.getLocalDictionary(dict.id)).toBeUndefined();
+    });
+
+    it('should do nothing if dictionary not found', () => {
+      dictionaryService.deleteDictionary('invalid-id');
+      expect(fs.unlinkSync).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateDictionary', () => {
+    it('should successfully update and persist dictionary metadata', () => {
+      const dict = dictionaryService.createDictionary({
+        name: 'Old Name',
+      } as any);
+      const result = dictionaryService.updateDictionary({
+        id: dict.id,
+        name: 'New Name',
+      } as any);
+
+      expect(result?.name).toBe('New Name');
+      expect(fs.writeFileSync).toHaveBeenCalled();
+
+      const updated = dictionaryService.getLocalDictionary(dict.id);
+      expect(updated?.name).toBe('New Name');
+    });
+
+    it('should return undefined if dictionary not found', () => {
+      const result = dictionaryService.updateDictionary({
+        id: 'invalid-id',
+        name: 'New',
+      } as any);
+      expect(result).toBeUndefined();
+    });
+  });
 });
