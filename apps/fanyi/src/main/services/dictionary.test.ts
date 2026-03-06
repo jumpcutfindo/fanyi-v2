@@ -643,4 +643,75 @@ describe('dictionary service', () => {
       expect(updatedDict?.wordMap['test']).toBeUndefined();
     });
   });
+
+  describe('initLocalDictionaries', () => {
+    it('should create the directory if it does not exist', () => {
+      (fs.existsSync as any).mockReturnValue(false);
+      (fs.readdirSync as any).mockReturnValue([]);
+
+      dictionaryService.initLocalDictionaries();
+
+      expect(fs.mkdirSync).toHaveBeenCalledWith(
+        expect.stringContaining('dictionaries')
+      );
+    });
+
+    it('should successfully load valid dictionary files', () => {
+      const mockDict = {
+        id: 'test-dict',
+        name: 'Test Dictionary',
+        rawEntries: [
+          {
+            id: '1',
+            simplified: 'test',
+            traditional: 'test',
+            pinyin: 'test',
+            definitions: 'test def',
+          },
+        ],
+        createdOn: new Date().toISOString(),
+        modifiedOn: new Date().toISOString(),
+      };
+
+      (fs.existsSync as any).mockReturnValue(true);
+      (fs.readdirSync as any).mockReturnValue(['test-dict.json']);
+      (fs.readFileSync as any).mockReturnValue(JSON.stringify(mockDict));
+
+      dictionaryService.initLocalDictionaries();
+
+      const loadedDict = dictionaryService.getLocalDictionary('test-dict');
+      expect(loadedDict).toBeDefined();
+      expect(loadedDict?.name).toBe('Test Dictionary');
+      expect(loadedDict?.wordMap['test']).toBeDefined();
+    });
+
+    it('should skip dictionaries that fail schema validation', () => {
+      const invalidDict = {
+        id: 'invalid',
+        rawEntries: [],
+      };
+
+      (fs.existsSync as any).mockReturnValue(true);
+      (fs.readdirSync as any).mockReturnValue(['invalid.json']);
+      (fs.readFileSync as any).mockReturnValue(JSON.stringify(invalidDict));
+
+      dictionaryService.initLocalDictionaries();
+
+      const loadedDict = dictionaryService.getLocalDictionary('invalid');
+      expect(loadedDict).toBeUndefined();
+    });
+
+    it('should handle corrupt JSON files gracefully', () => {
+      (fs.existsSync as any).mockReturnValue(true);
+      (fs.readdirSync as any).mockReturnValue(['corrupt.json']);
+      (fs.readFileSync as any).mockReturnValue(
+        '{ name: "corrupt" invalid json'
+      );
+
+      dictionaryService.initLocalDictionaries();
+
+      const loadedDict = dictionaryService.getLocalDictionary('corrupt');
+      expect(loadedDict).toBeUndefined();
+    });
+  });
 });
