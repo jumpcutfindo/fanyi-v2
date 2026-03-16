@@ -41,9 +41,15 @@ jobs:
         run: uv sync
         working-directory: ./apps/python-ocr
 
-      - name: Run checks
+      - name: Fanyi (Electron) Checks
         run: |
-          source apps/python-ocr/.venv/bin/activate
-          pnpm run lint
-          pnpm run format
-          pnpm run compile
+          pnpm --filter fanyi lint
+          pnpm --filter fanyi format:check
+          pnpm --filter fanyi compile
+          pnpm --filter fanyi test:ci
+
+      - name: Python OCR Checks
+        if: always()
+        run: |
+          pnpm --filter python-ocr lint
+          pnpm --filter python-ocr test

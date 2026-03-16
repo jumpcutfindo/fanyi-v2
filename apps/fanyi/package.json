@@ -9,6 +9,7 @@
     "compile": "tsc",
     "test:e2e": "playwright test",
     "test": "vitest",
+    "test:ci": "vitest --run",
     "test:ui": "vitest --ui",
     "lint": "eslint . --fix --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",

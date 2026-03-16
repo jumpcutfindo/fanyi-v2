@@ -19,7 +19,8 @@
     "build:ocr": "pnpm --filter python-ocr build",
     "lint": "pnpm --filter fanyi lint && pnpm --filter python-ocr lint",
     "format": "pnpm --filter fanyi format:check && pnpm --filter python-ocr format",
-    "compile": "pnpm --filter fanyi compile"
+    "compile": "pnpm --filter fanyi compile",
+    "test": "concurrently --kill-others-on-fail \"pnpm --filter fanyi test:ci\" \"pnpm --filter python-ocr test\""
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
