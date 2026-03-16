@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { desktopCapturer } from 'electron';
-import {
-  getScreenshotSources,
-  takeScreenshotWithPreset,
-} from './screenshot';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getScreenshotSources, takeScreenshotWithPreset } from './screenshot';
+
 import { CustomScreenshotPreset } from '@shared/types/screenshot';
 
 vi.mock('electron', () => ({
