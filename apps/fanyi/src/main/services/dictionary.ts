@@ -37,7 +37,7 @@ const localDictionaries: Dictionary[] = [];
  * Comment: Maybe this can be improved with a custom class, such that adding each item is less
  * taxing?
  */
-function rawEntriesToMap(
+export function rawEntriesToMap(
   dictionary: Dictionary | CustomDictionary,
   rawEntries: RawDictionaryEntry[]
 ): Record<string, DictionaryEntry> {
@@ -353,8 +353,11 @@ export function updateDictionaryEntry(
     return { status: 'error' };
   }
 
-  // Check if the word already exists
-  if (dictionary.wordMap[payload.simplified]) {
+  // Check if the word already exists in the same dictionary, but ignore the entry we are currently updating
+  if (
+    payload.simplified !== entryToUpdate.simplified &&
+    dictionary.wordMap[payload.simplified]
+  ) {
     logger.warn(
       `Dictionary entry "${payload.simplified}" already exists in dictionary "${dictionary.name}" (${dictionary.id})`
     );
@@ -612,4 +615,16 @@ export function updateDictionary(dictionary: UpdateDictionaryPayload) {
   } else {
     logger.warn(`Dictionary with ID ${dictionary.id} not found`);
   }
+}
+
+export function getDefaultDictionary() {
+  if (!defaultDictionary) {
+    throw new Error('Default dictionary not initialized');
+  }
+
+  return defaultDictionary;
+}
+
+export function getLocalDictionary(dictionaryId: string) {
+  return localDictionaries.find((dict) => dict.id === dictionaryId);
 }

@@ -29,6 +29,7 @@ class Processor:
           ipc.write_and_send(
             OutgoingErrorPayload(action="error", message="Invalid image path")
           )
+          return
 
         try:
           ocr_result = self.engine.ocr_and_segment(data["image_path"])
