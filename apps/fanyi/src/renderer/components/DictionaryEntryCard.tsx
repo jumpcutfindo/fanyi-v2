@@ -126,12 +126,14 @@ function DictionaryHoverCard({ word }: DictionaryHoverCard) {
             <div className="flex flex-col gap-2 text-sm">
               {entry?.definitions.map((d, index, arr) => (
                 <>
-                  <span key={d.definition}>{d.definition}</span>
-                  {d.dictionaryType === 'custom' ? (
-                    <span className="text-muted-foreground text-[8pt] italic">
-                      {d.sourceDictionaryName}
-                    </span>
-                  ) : null}
+                  <div key={d.definition} className="flex flex-col text-sm">
+                    <span>{d.definition}</span>
+                    {d.dictionaryType === 'custom' ? (
+                      <span className="text-muted-foreground text-[8pt] italic">
+                        {d.sourceDictionaryName}
+                      </span>
+                    ) : null}
+                  </div>
                   {index !== arr.length - 1 ? <Separator /> : null}
                 </>
               ))}
