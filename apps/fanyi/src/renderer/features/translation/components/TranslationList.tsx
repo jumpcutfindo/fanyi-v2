@@ -154,7 +154,7 @@ export function TranslationList({ translations }: TranslationListProps) {
       </Panel>
       <PanelResizeHandle className="flex h-full items-center border-e hover:border-e-black/20" />
       <Panel
-        className="flex h-full grow flex-col items-center justify-center gap-2 overflow-auto p-2"
+        className="flex h-full grow flex-col items-center justify-center gap-2 overflow-auto"
         minSize={25}
         defaultSize={40}
       >
@@ -168,6 +168,7 @@ export function TranslationList({ translations }: TranslationListProps) {
 
               return (
                 <DictionaryEntryCard
+                  className={cn('mx-2 pb-1', index === 0 && 'pt-2')}
                   ref={(ref) => (itemsRef.current[entry.simplified] = ref)}
                   entry={entry}
                   isSelected={selectedEntry === entry}
