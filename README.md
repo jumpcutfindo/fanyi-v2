@@ -6,16 +6,29 @@ Fanyi is a Chinese to English focused language reading application meant to prov
 
 This application is built on top of **Electron**. It interacts with a Python-based OCR service that has OCR capabilities provided by `easyocr` and Chinese segmentation by `jieba`.
 
-<img width="1709" height="1162" alt="image" src="https://github.com/user-attachments/assets/a958a992-ccdb-4a1e-9a2b-3d63d8928ca0" />
+<img width="1624" height="1056" alt="Image" src="https://github.com/user-attachments/assets/06e24de1-1fd6-495a-865a-0496ac4dd584" />
 
 ## Features
 
-- Create and manage presets to easily select relevant regions of the screen to translate
+- Create and manage presets with hotkeys to easily select relevant regions of the screen to translate
 - Translate Chinese to English with in-built OCR and dictionary
 - Tab-based system to easily navigate through multiple translations
-- Attach hotkeys to different presets for easier access to translations
-- Condensed presentation of Chinese text for easy navigation
-- Link to Youdao dictionary for further learning
+- Link to external dictionaries for further learning
+- Provide custom dictionaries to cater to different learning contexts
+
+## Usage
+
+Refer to the [Releases](https://github.com/jumpcutfindo/fanyi-v2/releases) page for downloadable versions of the application for both Windows and MacOS.
+
+- The application runs an OCR software on your computer, and as a result CPU and memory usage will be high.
+- The first run of the application will attempt to download the OCR software, so it will take longer. Subsequent usage will require less start-up time.
+- For a better experience, create presets to reduce the size of the area you're attempting to translate. Larger areas will cause a lot of inefficient processing on the OCR system.
+
+### Dictionaries
+
+For more information on dictionaries and available custom dictionaries, see the [Dictionaries](https://github.com/jumpcutfindo/fanyi-v2/wiki/Dictionaries) page in the wiki.
+
+- See [Dictionaries > Custom dictionaries](https://github.com/jumpcutfindo/fanyi-v2/wiki/Dictionaries#custom-dictionaries) for some dictionaries that I have created that are compatible with Fanyi
 
 ## Setting Up the Project
 
@@ -42,3 +55,7 @@ To profile the application,
 1. Install this development tool with npm
 2. Start the application with `npx react-devtools`
 3. Refresh Fanyi, and the profiler should hook onto it for profiling
+
+### Building on MacOS
+
+On MacOS, if you wish to provide the icon to the application, the icon needs to be present in the `build` folder. Specifically, `apps/fanyi/build`.
