@@ -133,6 +133,7 @@ function initPythonOcr() {
       ...process.env,
       PUBLIC_PATH: process.env.VITE_PUBLIC,
       USER_DATA_PATH: app.getPath('userData'),
+      PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: 1,
     },
     windowsHide: true, // Hide console window on launch on Windows
   });
