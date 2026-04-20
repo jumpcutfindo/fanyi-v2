@@ -1,6 +1,6 @@
 {
   "name": "python-ocr",
-  "version": "2.0.0",
+  "version": "v2.0.1",
   "scripts": {
     "dev": "uv run scripts/dev.py",
     "install": "uv sync",
