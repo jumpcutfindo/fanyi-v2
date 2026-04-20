@@ -177,6 +177,40 @@ export function getDictionaryEntriesFromAllDictionaries(queries: string[]) {
   );
 }
 
+function findAndAppendInDictionaries(
+  entryMap: Record<string, DictionaryEntry>,
+  dictionaries: Dictionary[],
+  query: string
+): boolean {
+  let isExistsInDictionaries = false;
+
+  for (const dict of dictionaries) {
+    const sourceEntry = dict.wordMap[query];
+
+    if (!sourceEntry) {
+      continue;
+    }
+
+    isExistsInDictionaries = true;
+
+    if (entryMap[query]) {
+      // Combine definition with existing query
+      entryMap[query].definitions = [
+        ...entryMap[query].definitions,
+        ...sourceEntry.definitions,
+      ];
+    } else {
+      // If not, add the entry
+      entryMap[query] = {
+        ...sourceEntry,
+        definitions: [...sourceEntry.definitions],
+      };
+    }
+  }
+
+  return isExistsInDictionaries;
+}
+
 export function getDictionaryEntries(
   dictionaries: Dictionary[],
   queries: string[]
@@ -192,31 +226,22 @@ export function getDictionaryEntries(
   const querySet = new Set(queries);
 
   for (const query of querySet) {
-    for (const dict of dictionaries) {
-      const sourceEntry = dict.wordMap[query];
+    const isExistsInDictionaries = findAndAppendInDictionaries(
+      entryMap,
+      dictionaries,
+      query
+    );
 
-      if (!sourceEntry) {
-        // Skip if entry not found
-        continue;
-      }
+    if (!isExistsInDictionaries) {
+      // Break the word into individual entries
+      const individualEntries = query.split('');
 
-      if (entryMap[query]) {
-        // Combine definition with existing query
-        entryMap[query].definitions = [
-          ...entryMap[query].definitions,
-          ...sourceEntry.definitions,
-        ];
-      } else {
-        // If not, add the entry
-        entryMap[query] = {
-          ...sourceEntry,
-          definitions: [...sourceEntry.definitions],
-        };
+      for (const entry of individualEntries) {
+        findAndAppendInDictionaries(entryMap, dictionaries, entry);
       }
     }
   }
-
-  return Object.values(entryMap).filter((entry) => entry !== undefined);
+  return Object.values(entryMap);
 }
 
 export function getDictionaryEntry(query: string) {
