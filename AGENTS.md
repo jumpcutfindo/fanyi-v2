@@ -24,27 +24,44 @@ the Python process replies through `write_and_send` in `app/ipc.py`.
 
 - Node 24+, pnpm 10 (`packageManager: pnpm@10.33.0`).
 - Python 3.10+ with `uv` (see `apps/python-ocr/pyproject.toml`).
-- CI (`.github/workflows/main.yml`) runs on Node 24 / Python 3.11 and
-  currently pins pnpm 8; prefer the repo's pinned pnpm locally.
+- CI (`.github/workflows/main.yml`) runs on Node 24 / Python 3.11 and installs
+  pnpm from `packageManager` (10.33.0); prefer the repo's pinned pnpm locally.
 
 ## Commands
 
-Run from the repository root unless noted.
+Run from the repository root unless noted. `pnpm check` is the one command
+that validates a change; `pnpm fix` is the only one that rewrites files.
 
+- `pnpm check` — run the full gate in CI order: `lint`, `format:check`,
+  `build:app`, `test`. It never modifies files and must leave a clean tree;
+  run it before reporting work done.
+- `pnpm fix` — apply mechanical fixes (ESLint autofix + Prettier for `fanyi`,
+  `ruff --fix` + `ruff format` for `python-ocr`). Re-run `pnpm check` after.
 - `pnpm install` — install all workspaces.
 - `pnpm dev` — build the OCR executable if needed, then start Electron + Vite.
-- `pnpm build` — build OCR + Electron app (electron-builder packaging).
+- `pnpm build` — build the OCR executable and package the Electron app
+  (electron-builder).
+- `pnpm build:fanyi` — package the Electron app (`pnpm --filter fanyi build`).
+- `pnpm build:ocr` — build the packaged OCR executable.
+- `pnpm build:app` — type-check and bundle the app (`tsc && vite build`), no
+  electron-builder packaging.
+- `pnpm lint` — ESLint (`fanyi`, zero warnings) and `ruff check` (`python-ocr`).
+- `pnpm format` — Prettier write (`fanyi`) and `ruff format` (`python-ocr`);
+  prefer `pnpm fix` when fixing your changes.
+- `pnpm format:check` — Prettier check (`fanyi`) and `ruff format --check`
+  (`python-ocr`).
+- `pnpm compile` — TypeScript typecheck (`tsc`) for `fanyi`.
 - `pnpm test` — Vitest (`fanyi`) and pytest (`python-ocr`) together.
 - `pnpm --filter fanyi test` — Vitest in watch mode; `test:ci` for one run.
-- `pnpm --filter fanyi compile` — TypeScript typecheck (`tsc`).
-- `pnpm --filter fanyi lint` — ESLint, zero warnings allowed.
-- `pnpm --filter fanyi format:check` — Prettier check.
-- `pnpm --filter python-ocr lint` — `ruff check`.
-- `pnpm --filter python-ocr format` — `ruff format` (rewrites files).
-- `pnpm --filter python-ocr test` — `uv run pytest`.
 - `uv sync` in `apps/python-ocr` — install/refresh Python dependencies.
 
-Match CI order when validating: lint, format check, compile/typecheck, tests.
+CI (`.github/workflows/main.yml`) runs two jobs. `app` runs on Node 24
+(`24.x`), installs pnpm from `packageManager` (10.33.0), installs `uv`
+(required because `pnpm install` triggers `python-ocr`'s `uv sync --frozen`
+lifecycle), then `lint`, `format:check`, `build:app`, `test:ci`. `python` runs
+on Python 3.11 with `uv sync --frozen`, then `ruff check`,
+`ruff format --check`, and `pytest`. CI installs Node deps with
+`--frozen-lockfile`, so commit lockfile changes.
 
 ## Conventions — TypeScript / React
 
@@ -118,10 +135,10 @@ Match CI order when validating: lint, format check, compile/typecheck, tests.
 
 ## Verification before finishing
 
-1. `pnpm --filter fanyi compile`
-2. `pnpm --filter fanyi lint && pnpm --filter fanyi format:check`
-3. `pnpm --filter fanyi test:ci`
-4. Python changes: `pnpm --filter python-ocr lint && pnpm --filter python-ocr test`
+1. `pnpm check` — run it before reporting work done. It must pass and leave a
+   clean tree (`git status --porcelain` empty).
+2. `pnpm fix` — run first when the change is mechanical (formatting/lint); it
+   rewrites files, so re-run `pnpm check` afterwards.
 
 State which checks you ran and their results. If a check could not run, say
 why instead of claiming success.
