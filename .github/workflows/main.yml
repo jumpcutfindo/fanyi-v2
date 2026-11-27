@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  app:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -34,11 +34,6 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.11" # Use your desired Python version
-
       - name: Install uv
         uses: astral-sh/setup-uv@v10.4.0
         with:
@@ -47,19 +42,48 @@ jobs:
       - name: Install Node.js dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm --filter fanyi lint
+
+      - name: Format check
+        run: pnpm --filter fanyi format:check
+
+      - name: Build app
+        run: pnpm --filter fanyi build:app
+
+      - name: Test
+        run: pnpm --filter fanyi test:ci
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.4.0
+        with:
+          enable-cache: true
+
       - name: Install Python dependencies with uv
         run: uv sync --frozen
         working-directory: ./apps/python-ocr
 
-      - name: Fanyi (Electron) Checks
-        run: |
-          pnpm --filter fanyi lint
-          pnpm --filter fanyi format:check
-          pnpm --filter fanyi compile
-          pnpm --filter fanyi test:ci
+      - name: Lint
+        run: uv run --frozen ruff check
+        working-directory: ./apps/python-ocr
 
-      - name: Python OCR Checks
-        if: always()
-        run: |
-          pnpm --filter python-ocr lint
-          pnpm --filter python-ocr test
+      - name: Format check
+        run: uv run --frozen ruff format --check
+        working-directory: ./apps/python-ocr
+
+      - name: Test
+        run: uv run --frozen pytest
+        working-directory: ./apps/python-ocr
