@@ -37,7 +37,7 @@ Run from the repository root unless noted.
 - `pnpm test` — Vitest (`fanyi`) and pytest (`python-ocr`) together.
 - `pnpm --filter fanyi test` — Vitest in watch mode; `test:ci` for one run.
 - `pnpm --filter fanyi compile` — TypeScript typecheck (`tsc`).
-- `pnpm --filter fanyi lint` — ESLint with `--fix`, zero warnings allowed.
+- `pnpm --filter fanyi lint` — ESLint, zero warnings allowed.
 - `pnpm --filter fanyi format:check` — Prettier check.
 - `pnpm --filter python-ocr lint` — `ruff check`.
 - `pnpm --filter python-ocr format` — `ruff format` (rewrites files).
@@ -68,8 +68,7 @@ Match CI order when validating: lint, format check, compile/typecheck, tests.
 - TypeScript is strict (`strict`, `noUnusedLocals`, `noUnusedParameters`).
   Avoid `any`; existing tests use it behind an eslint-disable comment.
 - Unit tests are Vitest + Testing Library (`jsdom`), colocated as
-  `*.test.ts` next to the source. Playwright is configured
-  (`playwright.config.ts`, `testDir: ./e2e`) but no e2e suite exists yet.
+  `*.test.ts` next to the source.
 
 ## Conventions — Python
 

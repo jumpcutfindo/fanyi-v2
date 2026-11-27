@@ -8,6 +8,9 @@
     "build": "uv run scripts/package.py",
     "build:conditional": "git diff --name-only | findstr /R \"main.py dist/fanyi_ocr.exe\" >nul && pnpm run build || echo \"No changes found for 'main.py' or 'fanyi_ocr.exe', skipping build.\"",
     "lint": "uv run ruff check",
+    "format:check": "uv run ruff format --check",
+    "check": "pnpm run lint && pnpm run format:check && pnpm run test",
+    "fix": "uv run ruff check --fix && uv run ruff format",
     "format": "uv run ruff format"
   }
 }

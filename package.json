@@ -18,9 +18,12 @@
     "build:fanyi": "pnpm --filter fanyi build",
     "build:ocr": "pnpm --filter python-ocr build",
     "lint": "pnpm --filter fanyi lint && pnpm --filter python-ocr lint",
-    "format": "pnpm --filter fanyi format:check && pnpm --filter python-ocr format",
+    "format": "pnpm --filter fanyi format && pnpm --filter python-ocr format",
+    "format:check": "pnpm --filter fanyi format:check && pnpm --filter python-ocr format:check",
     "compile": "pnpm --filter fanyi compile",
-    "test": "concurrently --kill-others-on-fail \"pnpm --filter fanyi test:ci\" \"pnpm --filter python-ocr test\""
+    "test": "concurrently --kill-others-on-fail \"pnpm --filter fanyi test:ci\" \"pnpm --filter python-ocr test\"",
+    "check": "pnpm run lint && pnpm run format:check && pnpm run compile && pnpm run test",
+    "fix": "pnpm --filter fanyi fix && pnpm --filter python-ocr fix"
   },
   "devDependencies": {
     "concurrently": "^9.2.0"
