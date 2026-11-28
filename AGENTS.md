@@ -12,7 +12,7 @@ English. It is a pnpm monorepo with two apps:
   - `src/main/preload.ts` — `contextBridge` surface exposed as `window.api`.
   - `src/renderer` — React UI (shadcn "new-york" components, Tailwind 4).
   - `src/shared` — types and query helpers used by both main and renderer.
-- `apps/python-ocr` — Python 3.10+ OCR subprocess (`PaddleOCR` + `jieba`),
+- `apps/python-ocr` — Python 3.11 OCR subprocess (`PaddleOCR` + `jieba`),
   managed with `uv` and packaged with PyInstaller into `fanyi_ocr`.
 
 The Electron main process spawns the packaged OCR executable and talks to it
@@ -22,10 +22,12 @@ the Python process replies through `write_and_send` in `app/ipc.py`.
 
 ## Toolchain
 
-- Node 24+, pnpm 10 (`packageManager: pnpm@10.33.0`).
-- Python 3.10+ with `uv` (see `apps/python-ocr/pyproject.toml`).
-- CI (`.github/workflows/main.yml`) runs on Node 24 / Python 3.11 and installs
-  pnpm from `packageManager` (10.33.0); prefer the repo's pinned pnpm locally.
+- Node 24.22.3 (pinned in `.nvmrc`), pnpm 10.33.0 (`packageManager`); prefer
+  the repo's pinned pnpm locally.
+- Python 3.11 (pinned in `apps/python-ocr/.python-version`) with `uv` (see
+  `apps/python-ocr/pyproject.toml`).
+- CI (`.github/workflows/main.yml`) reads both version files: `.nvmrc` for the
+  app job and `apps/python-ocr/.python-version` for the python job.
 
 ## Commands
 
@@ -55,13 +57,13 @@ that validates a change; `pnpm fix` is the only one that rewrites files.
 - `pnpm --filter fanyi test` — Vitest in watch mode; `test:ci` for one run.
 - `uv sync` in `apps/python-ocr` — install/refresh Python dependencies.
 
-CI (`.github/workflows/main.yml`) runs two jobs. `app` runs on Node 24
-(`24.x`), installs pnpm from `packageManager` (10.33.0), installs `uv`
+CI (`.github/workflows/main.yml`) runs two jobs. `app` takes its Node version
+from `.nvmrc`, installs pnpm from `packageManager` (10.33.0), installs `uv`
 (required because `pnpm install` triggers `python-ocr`'s `uv sync --frozen`
-lifecycle), then `lint`, `format:check`, `build:app`, `test:ci`. `python` runs
-on Python 3.11 with `uv sync --frozen`, then `ruff check`,
-`ruff format --check`, and `pytest`. CI installs Node deps with
-`--frozen-lockfile`, so commit lockfile changes.
+lifecycle), then `lint`, `format:check`, `build:app`, `test:ci`. `python` takes
+its version from `apps/python-ocr/.python-version` (3.11), runs
+`uv sync --frozen`, then `ruff check`, `ruff format --check`, and `pytest`. CI
+installs Node deps with `--frozen-lockfile`, so commit lockfile changes.
 
 ## Conventions — TypeScript / React
 
