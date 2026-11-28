@@ -12,7 +12,7 @@ English. It is a pnpm monorepo with two apps:
   - `src/main/preload.ts` — `contextBridge` surface exposed as `window.api`.
   - `src/renderer` — React UI (shadcn "new-york" components, Tailwind 4).
   - `src/shared` — types and query helpers used by both main and renderer.
-- `apps/python-ocr` — Python 3.10+ OCR subprocess (`PaddleOCR` + `jieba`),
+- `apps/python-ocr` — Python 3.11 OCR subprocess (`PaddleOCR` + `jieba`),
   managed with `uv` and packaged with PyInstaller into `fanyi_ocr`.
 
 The Electron main process spawns the packaged OCR executable and talks to it
@@ -22,10 +22,11 @@ the Python process replies through `write_and_send` in `app/ipc.py`.
 
 ## Toolchain
 
-- Node 24+, pnpm 10 (`packageManager: pnpm@10.33.0`).
-- Python 3.10+ with `uv` (see `apps/python-ocr/pyproject.toml`).
-- CI (`.github/workflows/main.yml`) runs on Node 24 / Python 3.11 and
-  currently pins pnpm 8; prefer the repo's pinned pnpm locally.
+- Node 24.22.3 (pinned in `.nvmrc`), pnpm 10.33.0 (`packageManager`).
+- Python 3.11 (pinned in `apps/python-ocr/.python-version`) with `uv` (see
+  `apps/python-ocr/pyproject.toml`).
+- CI (`.github/workflows/main.yml`) reads both version files: `.nvmrc` for the
+  app job and `apps/python-ocr/.python-version` for the python job.
 
 ## Commands
 

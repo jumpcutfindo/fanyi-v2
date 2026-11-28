@@ -3,7 +3,7 @@ name = "python-ocr"
 version = "v2.0.1"
 description = "Python OCR process for fanyi"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "jieba>=0.42.1",
     "paddleocr==3.3.0",

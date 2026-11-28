@@ -34,8 +34,11 @@ For more information on dictionaries and available custom dictionaries, see the 
 
 This application uses a monorepo system with pnpm's monorepo support.
 
-- For the Electron application, ensure you have Node 24 or above with pnpm installed.
-- For the Python application, we make use of the uv package manager.
+Prerequisites:
+
+- Node.js 24.22.3 (see `.nvmrc`).
+- pnpm 10.33.0 (see `packageManager` in `package.json`).
+- Python 3.11 (see `apps/python-ocr/.python-version`); `uv` manages the Python version for the OCR subprocess.
 
 To set up the project,
 
